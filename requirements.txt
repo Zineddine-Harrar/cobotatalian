@@ -1,4 +1,6 @@
+firebase-admin
 streamlit
 pandas
 plotly
 matplotlib
+bcrypt
