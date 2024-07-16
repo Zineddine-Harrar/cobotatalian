@@ -64,7 +64,7 @@ def main():
         run_selected_app()
 
 def login_section():
-    logo_path = "C:\\Users\\zined\\Downloads\\atalian-logo (1).png"  # Changez ce chemin pour pointer vers votre logo
+    logo_path = "atalian-logo (1).png"  # Changez ce chemin pour pointer vers votre logo
     st.image(logo_path, width=300)
 
     st.title("Système d'authentification - ATALIAN")
