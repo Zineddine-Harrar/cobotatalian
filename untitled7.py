@@ -1,4 +1,4 @@
-import streamlit as st
+iimport streamlit as st
 from datetime import datetime, timedelta
 from firebase_config import db, init_firebase
 import untitled5 as app1
@@ -17,19 +17,19 @@ def check_password(hashed_password, password):
 def login(username, password):
     try:
         user_ref = db.collection('users').document(username)
-        print(f"Accessing document at path: users/{username}")
+        st.write(f"Accessing document at path: users/{username}")
         user = user_ref.get()
         if user.exists:
             user_data = user.to_dict()
-            print(f"User data retrieved: {user_data}")
+            st.write(f"User data retrieved: {user_data}")
             if check_password(user_data['password'], password):
-                print("Login successful.")
+                st.write("Login successful.")
                 return True
             else:
-                print("Incorrect password.")
+                st.write("Incorrect password.")
                 return False
         else:
-            print("User does not exist.")
+            st.write("User does not exist.")
             return False
     except Exception as e:
         st.error(f"Login error: {e}")
