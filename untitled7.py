@@ -25,6 +25,7 @@ def login(username, password):
             st.write(f"User data retrieved: {user_data}")
             # Assurez-vous que les champs 'username' et 'password' existent dans les données utilisateur
             if 'password' in user_data:
+                st.write(f"Retrieved hashed password: {user_data['password']}")
                 if check_password(user_data['password'], password):
                     st.write("Login successful.")
                     return True
