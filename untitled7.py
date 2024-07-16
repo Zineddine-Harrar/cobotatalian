@@ -1,4 +1,4 @@
-iimport streamlit as st
+import streamlit as st
 from datetime import datetime, timedelta
 from firebase_config import db, init_firebase
 import untitled5 as app1
