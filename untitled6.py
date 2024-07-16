@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 def main():
 
     # Charger les fichiers CSV
-    planning_df = pd.read_csv('C:\\Users\\zined\\Downloads\\PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
-    details_df = pd.read_csv('C:\\Users\\zined\\OneDrive - ATALIAN\\Documents\\Db RQUARTA-ECOBOT40\\Détail travail autonome (11).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
+    planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
+    details_df = pd.read_csv('Détail travail autonome (11).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
 
     # Nettoyer les colonnes dans details_df
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
@@ -106,7 +106,7 @@ def main():
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
 
     # Interface Streamlit
-    logo_path1 = "C:\\Users\\zined\\Downloads\\atalian-logo (1).png"
+    logo_path1 = "atalian-logo (1).png"
     st.image(logo_path1, width=150)
 
     st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
