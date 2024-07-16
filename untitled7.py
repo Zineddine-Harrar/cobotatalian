@@ -1,97 +1,70 @@
 import streamlit as st
-from datetime import datetime, timedelta
-from firebase_config import db, init_firebase
 import untitled5 as app1
 import untitled6 as app2
 import bcrypt
+from dotenv import load_dotenv
+import os
 
-# Initialiser Firebase
-init_firebase()
+# Charger les variables d'environnement
+load_dotenv()
 
-SESSION_TIMEOUT_MINUTES = 15
-
+# Fonction pour vérifier le mot de passe haché
 def check_password(hashed_password, password):
-    """Vérifier un mot de passe hashé."""
-    st.write(f"Checking password: hashed_password={hashed_password}, password={password}")
     return bcrypt.checkpw(password.encode(), hashed_password.encode())
 
+# Fonction pour récupérer les identifiants depuis le fichier .env
+def get_user_credentials():
+    users = []
+    for key in os.environ.keys():
+        if key.endswith('_USERNAME'):
+            username_key = key
+            password_key = key.replace('USERNAME', 'PASSWORD_HASH')
+            username = os.getenv(username_key)
+            password_hash = os.getenv(password_key)
+            users.append({'username': username, 'password_hash': password_hash})
+    return users
+
+# Fonction de connexion
 def login(username, password):
-    try:
-        user_ref = db.collection('users').document(username)
-        st.write(f"Accessing document at path: users/{username}")
-        user = user_ref.get()
-        if user.exists:
-            user_data = user.to_dict()
-            st.write(f"User data retrieved: {user_data}")
-            # Assurez-vous que les champs 'username' et 'password' existent dans les données utilisateur
-            if 'password' in user_data:
-                st.write(f"Retrieved hashed password: {user_data['password']}")
-                if check_password(user_data['password'], password):
-                    st.write("Login successful.")
-                    return True
-                else:
-                    st.write("Incorrect password.")
-                    return False
-            else:
-                st.write("Password field missing in user data.")
-                return False
-        else:
-            st.write("User does not exist.")
-            return False
-    except Exception as e:
-        st.error(f"Login error: {e}")
-        return False
+    users = get_user_credentials()
+    for user in users:
+        if user['username'] == username:
+            if check_password(user['password_hash'], password):
+                return True
+    return False
 
-def check_session_timeout():
-    if 'last_interaction' in st.session_state:
-        now = datetime.now()
-        last_interaction = st.session_state['last_interaction']
-        if (now - last_interaction).total_seconds() > SESSION_TIMEOUT_MINUTES * 60:
-            st.warning("Session expirée en raison d'inactivité. Veuillez vous reconnecter.")
-            st.session_state['logged_in'] = False
-            st.session_state.pop('last_interaction', None)
-            st.session_state.pop('selected_app', None)
-            st.experimental_rerun()
-    st.session_state['last_interaction'] = datetime.now()
-
+# Fonction principale
 def main():
-    st.set_page_config(page_title="RQUARTZ Applications", layout="wide")
-
-    st.write(f"Session state: {st.session_state}")
+    st.set_page_config(page_title="Simple Auth App", layout="wide")
 
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
 
-    if st.session_state['logged_in']:
-        check_session_timeout()
-
     if not st.session_state['logged_in']:
         login_section()
-    elif 'selected_app' not in st.session_state:
-        app_selection_page()
     else:
-        run_selected_app()
+        if 'selected_app' in st.session_state:
+            run_selected_app()
+        else:
+            app_selection_page()
 
+# Section de connexion
 def login_section():
-    logo_path = "atalian-logo (1).png"  # Changez ce chemin pour pointer vers votre logo
-    st.image(logo_path, width=300)
+    st.title("Connexion")
+    st.image("C:\\Users\\zined\\Downloads\\atalian-logo (1).png", width=300)  # Chemin vers votre logo
 
-    st.title("Système d'authentification - ATALIAN")
-    st.subheader("Connexion")
-    
     username = st.text_input("Nom d'utilisateur")
     password = st.text_input("Mot de passe", type='password')
     if st.button("Connexion"):
-        st.write(f"Attempting login for user: {username}")
         if login(username, password):
-            st.success(f"Logged In as {username}")
+            st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            st.session_state['last_interaction'] = datetime.now()
-            st.experimental_rerun()  # Recharger la page pour montrer l'écran de sélection d'application
+            st.experimental_rerun()
         else:
-            st.warning("Incorrect Username/Password")
+            st.error("Nom d'utilisateur ou mot de passe incorrect")
 
+# Page de sélection de l'application
 def app_selection_page():
     st.title("Applications RQUARTZ")
 
@@ -114,8 +87,8 @@ def app_selection_page():
         st.session_state.pop('selected_app', None)
         st.experimental_rerun()
 
+# Exécution de l'application sélectionnée
 def run_selected_app():
-    st.write(f"Running selected app: {st.session_state.get('selected_app')}")
     if st.session_state['selected_app'] == "RQUARTZ - IMON":
         app1.main()
     elif st.session_state['selected_app'] == "RQUARTZ - T2F":
