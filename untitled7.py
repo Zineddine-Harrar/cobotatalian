@@ -51,7 +51,7 @@ def main():
 # Section de connexion
 def login_section():
     st.title("Connexion")
-    st.image("C:\\Users\\zined\\Downloads\\atalian-logo (1).png", width=300)  # Chemin vers votre logo
+    st.image("atalian-logo (1).png", width=300)  # Chemin vers votre logo
 
     username = st.text_input("Nom d'utilisateur")
     password = st.text_input("Mot de passe", type='password')
