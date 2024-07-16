@@ -4,4 +4,4 @@ pandas
 plotly
 matplotlib
 bcrypt
-dotenv 
+python-dotenv 
