@@ -12,6 +12,7 @@ SESSION_TIMEOUT_MINUTES = 15
 
 def check_password(hashed_password, password):
     """Vérifier un mot de passe hashé."""
+    st.write(f"Checking password: hashed_password={hashed_password}, password={password}")
     return bcrypt.checkpw(password.encode(), hashed_password.encode())
 
 def login(username, password):
@@ -50,6 +51,8 @@ def check_session_timeout():
 def main():
     st.set_page_config(page_title="RQUARTZ Applications", layout="wide")
 
+    st.write(f"Session state: {st.session_state}")
+
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
 
@@ -70,11 +73,10 @@ def login_section():
     st.title("Système d'authentification - ATALIAN")
     st.subheader("Connexion")
     
-    
-
     username = st.text_input("Nom d'utilisateur")
     password = st.text_input("Mot de passe", type='password')
     if st.button("Connexion"):
+        st.write(f"Attempting login for user: {username}")
         if login(username, password):
             st.success(f"Logged In as {username}")
             st.session_state['logged_in'] = True
@@ -107,6 +109,7 @@ def app_selection_page():
         st.experimental_rerun()
 
 def run_selected_app():
+    st.write(f"Running selected app: {st.session_state.get('selected_app')}")
     if st.session_state['selected_app'] == "RQUARTZ - IMON":
         app1.main()
     elif st.session_state['selected_app'] == "RQUARTZ - T2F":
