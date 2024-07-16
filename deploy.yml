@@ -24,6 +24,10 @@ jobs:
         pip install -r requirements.txt
 
     - name: Deploy to Streamlit
-      run: streamlit run untitled7.py
       env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         STREAMLIT_AUTH_TOKEN: ${{ secrets.STREAMLIT_AUTH_TOKEN }}
+      run: |
+        echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > cobotata-7f514-firebase-adminsdk-31c8i-a83b3cfd57.json
+        export GOOGLE_APPLICATION_CREDENTIALS="cobotata-7f514-firebase-adminsdk-31c8i-a83b3cfd57.json"
+        streamlit run untitled7.py
