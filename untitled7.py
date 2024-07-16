@@ -23,11 +23,16 @@ def login(username, password):
         if user.exists:
             user_data = user.to_dict()
             st.write(f"User data retrieved: {user_data}")
-            if check_password(user_data['password'], password):
-                st.write("Login successful.")
-                return True
+            # Assurez-vous que les champs 'username' et 'password' existent dans les données utilisateur
+            if 'password' in user_data:
+                if check_password(user_data['password'], password):
+                    st.write("Login successful.")
+                    return True
+                else:
+                    st.write("Incorrect password.")
+                    return False
             else:
-                st.write("Incorrect password.")
+                st.write("Password field missing in user data.")
                 return False
         else:
             st.write("User does not exist.")
