@@ -108,7 +108,7 @@ def main():
     print(testkpi)
 
 # Interface Streamlit
-    logo_path1 = "C:\\Users\\zined\\Downloads\\atalian-logo (1).png"
+    logo_path1 = "atalian-logo (1).png"
     st.image(logo_path1, width=150)
 
     st.title('Indicateurs de Suivi des Parcours du ECOBOT 40')
