@@ -69,7 +69,7 @@ def app_selection_page():
     st.title("Applications RQUARTZ")
 
     st.markdown("### Sélectionnez une application")
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         if st.button("RQUARTZ - IMON"):
@@ -79,6 +79,11 @@ def app_selection_page():
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
+            st.experimental_rerun()
+            
+    with col3:
+        if st.button("ECOBOT 40"):
+            st.session_state['selected_app'] = "ECOBOT 40"
             st.experimental_rerun()
 
     if st.button("Deconnexion"):
@@ -93,6 +98,8 @@ def run_selected_app():
         app1.main()
     elif st.session_state['selected_app'] == "RQUARTZ - T2F":
         app2.main()
+    elif st.session_state['selected_app'] == "ECOBOT 40":
+        app3.main() 
 
 if __name__ == '__main__':
     main()
