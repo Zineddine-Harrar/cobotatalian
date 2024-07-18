@@ -49,6 +49,9 @@ def main():
             background-color: black;
             color: white;
         }
+        .stTextInput>label {
+            color: white;
+        }
         .stButton>button {
             background-color: black;
             color: white;
@@ -59,7 +62,7 @@ def main():
         .stMetric>div>div>div>span {
             color: white;
         }
-        .stTitle, .stHeader, .stSubheader, .stMarkdown, .stText {
+        .stTitle, .stHeader, .stSubheader, .stMarkdown {
             color: white;
         }
         .custom-title {
@@ -95,7 +98,7 @@ def login_section():
     st.markdown('<h1 class="custom-title">Connexion Interface de visualisation ATALIAN / COBOT</h1>', unsafe_allow_html=True)
     st.image("atalian-logo (1).png", width=300)  # Chemin vers votre logo
 
-    username = st.text_input('<h3 class="custom-title">Identifiant</h3>')
+    username = st.text_input("Nom d'utlisateur")
     password = st.text_input("Mot de passe", type='password')
     if st.button("Connexion"):
         if login(username, password):
