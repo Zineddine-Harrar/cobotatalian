@@ -6,44 +6,45 @@ import matplotlib.pyplot as plt
 
 def main():
 
-     st.markdown(
+    st.markdown(
         """
-        <style>
-        .stApp {
-            background-color: white;
-            color: black;
-        }
-        .stTextInput>div>div>input {
-            background-color: black;
-            color: white;
-        }
-        .stTextInput>label {
-            color: white;
-        }
-        .stButton>button {
-            background-color: black;
-            color: white;
-            border: 2px solid white;
-            padding: 10px;
-            margin: 10px;
-        }
-        .stMetric>div>div>div>span {
-            color: white;
-        }
-        .stTitle, .stHeader, .stSubheader, .stMarkdown {
-            color: black;
-        }
-        .custom-title {
-            color: #ff6347;
-        }
-        .stAlert>div {
-            background-color: #444;
-            color: white;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
+         <style>
+         .stApp {
+             background-color: white;
+             color: black;
+         }
+         .stTextInput>div>div>input {
+             background-color: black;
+             color: white;
+         }
+         .stTextInput>label {
+             color: white;
+         }
+         .stButton>button {
+             background-color: black;
+             color: white;
+             border: 2px solid white;
+             padding: 10px;
+             margin: 10px;
+         }
+         .stMetric>div>div>div>span {
+             color: white;
+         }
+         .stTitle, .stHeader, .stSubheader, .stMarkdown {
+             color: black;
+         }
+         .custom-title {
+             color: #ff6347;
+         }
+         .stAlert>div {
+             background-color: #444;
+             color: white;
+         }
+         </style>
+         """,
+         unsafe_allow_html=True
     )
+     
     # Charger les fichiers CSV
     planning_df = pd.read_csv('ECOBOT40.csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('TaskReport_Atalian_ADP_20240717120151.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
