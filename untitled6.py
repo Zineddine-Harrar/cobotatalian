@@ -5,7 +5,6 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 
 def main():
-
      st.markdown(
         """
         <style>
@@ -43,7 +42,7 @@ def main():
         </style>
         """,
         unsafe_allow_html=True
-    )
+     )
      
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
