@@ -46,7 +46,7 @@ def main():
             color: white;
         }
         .stTextInput>div>div>input {
-            background-color: white;
+            background-color: black;
             color: white;
         }
         .stButton>button {
