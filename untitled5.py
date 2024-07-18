@@ -6,25 +6,7 @@ import matplotlib.pyplot as plt
 
 def main():
 
-    # Ajouter des styles CSS personnalisés
-    st.markdown(
-        """
-        <style>
-        .main {
-            max-width: 100%;
-            padding: 0;
-            margin: 0;
-        }
-        .block-container {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+    
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
