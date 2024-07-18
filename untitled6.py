@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 
 def main():
 
-    st.markdown(
+     st.markdown(
         """
         <style>
         .stApp {
-            background-color: #DFD3D0;
-            color: white;
+            background-color: white;
+            color: black;
         }
         .stTextInput>div>div>input {
             background-color: black;
@@ -31,7 +31,7 @@ def main():
             color: white;
         }
         .stTitle, .stHeader, .stSubheader, .stMarkdown {
-            color: white;
+            color: black;
         }
         .custom-title {
             color: #ff6347;
