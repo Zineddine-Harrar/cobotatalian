@@ -168,10 +168,5 @@ def main():
     st.subheader('Tableau de Suivi des Parcours')
     st.dataframe(weekly_comparison_table, width=2000)
  
-    if st.button("Logout"):
-        st.session_state['logged_in'] = False
-        st.session_state.pop('selected_app', None)
-        st.experimental_rerun()
-
 if __name__ == '__main__':
     main()
