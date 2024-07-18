@@ -36,6 +36,18 @@ def login(username, password):
 
 # Fonction principale
 def main():
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background-color: black;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     st.set_page_config(page_title="Simple Auth App", layout="wide")
 
     if 'logged_in' not in st.session_state:
