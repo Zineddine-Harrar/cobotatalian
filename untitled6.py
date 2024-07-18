@@ -174,7 +174,7 @@ def main():
     st.image(logo_path1, width=150)  # Ajustez la largeur selon vos besoins
 
 
-    st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
+    st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
 
     # Sélection de la semaine
     semaine = st.number_input("Sélectionnez le numéro de la semaine", min_value=1, max_value=53, value=28)
