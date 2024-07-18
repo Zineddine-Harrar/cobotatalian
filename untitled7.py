@@ -37,6 +37,7 @@ def login(username, password):
 # Fonction principale
 def main():
     st.set_page_config(page_title="ATALIAN COBOT", layout="wide")
+    # Ajouter des styles CSS personnalisés pour le fond noir et le texte blanc
     st.markdown(
         """
         <style>
@@ -44,14 +45,34 @@ def main():
             background-color: black;
             color: white;
         }
+        .stTextInput>div>div>input {
+            background-color: black;
+            color: white;
+        }
+        .stButton>button {
+            background-color: black;
+            color: white;
+            border: 2px solid white;
+            padding: 10px;
+            margin: 10px;
+        }
+        .stMetric>div>div>div>span {
+            color: white;
+        }
+        .stTitle, .stHeader, .stSubheader, .stMarkdown {
+            color: white;
+        }
         .custom-title {
             color: #ff6347;
+        }
+        .stAlert>div {
+            background-color: #444;
+            color: white;
         }
         </style>
         """,
         unsafe_allow_html=True
     )
-
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
 
