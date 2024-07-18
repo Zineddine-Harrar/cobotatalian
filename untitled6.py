@@ -44,6 +44,7 @@ def main():
         """,
         unsafe_allow_html=True
     )
+     
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('Détail travail autonome (11).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
