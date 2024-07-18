@@ -44,6 +44,9 @@ def main():
             background-color: black;
             color: white;
         }
+        .custom-title {
+            color: #ff6347;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -69,6 +72,7 @@ def main():
 # Section de connexion
 def login_section():
     st.title("Connexion à l'interface de visualisation ATALIAN / COBOT")
+    st.markdown('<h1 class="custom-title">Connexion Interface de visualisation ATALIAN / COBOT</h1>', unsafe_allow_html=True)
     st.image("atalian-logo (1).png", width=300)  # Chemin vers votre logo
 
     username = st.text_input("Nom d'utilisateur")
@@ -85,7 +89,7 @@ def login_section():
 
 # Page de sélection de l'application
 def app_selection_page():
-    st.title("Applications RQUARTZ")
+    st.markdown('<h1 class="custom-title">Applications RQUARTZ</h1>', unsafe_allow_html=True)
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
