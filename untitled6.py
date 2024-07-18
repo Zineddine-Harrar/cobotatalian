@@ -5,7 +5,8 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 
 def main():
-     st.markdown(
+
+    st.markdown(
         """
         <style>
         .stApp {
@@ -42,11 +43,10 @@ def main():
         </style>
         """,
         unsafe_allow_html=True
-     )
-     
+    )
     # Charger les fichiers CSV
-    planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
-    details_df = pd.read_csv('Détail travail autonome (11).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
+    planning_df = pd.read_csv('PLANNING RQUARTZ IMON .csv', delimiter=';', encoding='ISO-8859-1')
+    details_df = pd.read_csv('RQUARTZ-IMON-(15-07-2024).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
 
     # Nettoyer les colonnes dans details_df
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
@@ -94,69 +94,108 @@ def main():
 
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
     def create_parcours_comparison_table(semaine, details_df, planning_df):
+        # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
+        
+        # Initialiser le tableau de suivi
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
         parcours_list = set(planning_df['parcours'])
         parcours_list.discard(None)
         comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
+        
+        # Initialiser un dictionnaire pour stocker les statuts des parcours
         parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
-
+        
         for day in days_of_week_fr:
+            # Parcours prévus pour le jour
             planned_routes = planning_df[(planning_df['jour_fr'] == day) & (planning_df['semaine'] == semaine)]['parcours'].str.strip().str.lower().tolist()
+            
+            # Parcours réalisés pour le jour
             actual_routes = weekly_details[weekly_details['jour_fr'] == day]['parcours'].str.strip().str.lower().tolist()
+            
+            # Comparer les parcours prévus et réalisés
             for parcours in parcours_list:
                 parcours_normalized = parcours.strip().lower()
                 if parcours_normalized in actual_routes:
                     parcours_status[parcours][day] = "Fait"
-
+        
+        # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
         for parcours, status in parcours_status.items():
             row = {'Parcours Prévu': parcours}
             row.update(status)
             rows.append(row)
-
+        
         comparison_table = pd.DataFrame(rows)
+        
         return comparison_table
 
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
-        total_parcours = 56
+        total_parcours = 49  # Total des parcours prévus sur une semaine (7 jours * 6 parcours par jour)
         parcours_faits = comparison_table.apply(lambda row: list(row[1:]).count("Fait"), axis=1).sum()
+        
         taux_suivi = (parcours_faits / total_parcours) * 100 if total_parcours > 0 else 0
+        
         return taux_suivi
 
     # Fonction pour calculer le taux de complétion hebdomadaire
     def calculate_weekly_completion_rate(details_df, semaine):
+        # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
+        
+        # Calculer le taux de complétion pour chaque parcours
         completion_rates = weekly_details.groupby('parcours')['terminerà_[%]'].mean()
+        
+        # Calculer le taux de complétion hebdomadaire
         completed_routes = (completion_rates >= 90).sum()
         total_routes = len(completion_rates)
         weekly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
+        
         return weekly_completion_rate
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
+        # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
-        heures_cumulees = weekly_details['durée[mn]'].sum() / 60
+        
+        # Calculer les indicateurs
+        heures_cumulees = weekly_details['durée[mn]'].sum() / 60  # Convertir les minutes en heures
         surface_nettoyee = weekly_details['surfacepropre_[mq]'].sum()
         vitesse_moyenne = weekly_details['vitesse_moyenne[km/h]'].mean()
         productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
+        
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
 
     # Interface Streamlit
+
+    # Afficher les logos côte à côte
     logo_path1 = "atalian-logo (1).png"
-    st.image(logo_path1, width=150)
+    st.image(logo_path1, width=150)  # Ajustez la largeur selon vos besoins
 
-    st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
 
+    st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
+
+    # Sélection de la semaine
     semaine = st.number_input("Sélectionnez le numéro de la semaine", min_value=1, max_value=53, value=28)
 
+    # Créer le tableau de suivi par parcours pour la semaine spécifiée
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
+
+    # Calculer le taux de suivi à partir du tableau de suivi
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
+
+    # Calculer le taux de complétion hebdomadaire
     weekly_completion_rate = calculate_weekly_completion_rate(details_df, semaine)
+
+    # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
+
+
+    # Afficher les KPI côte à côte
     st.subheader('Indicateurs Hebdomadaires')
+
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
@@ -171,28 +210,31 @@ def main():
     with col4:
         st.metric(label="Productivité moyenne", value=f"{productivite_moyenne:.2f} m²/h")
 
+    # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=taux_suivi,
-        title={'text': "Taux de Suivi"},
-        gauge={
+        mode = "gauge+number",
+        value = taux_suivi,
+        title = {'text': "Taux de Suivi"},
+        gauge = {
             'axis': {'range': [None, 100]},
-            'steps': [
+            'steps' : [
                 {'range': [0, 50], 'color': "lightgray"},
                 {'range': [50, 100], 'color': "green"}],
-            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}}))
+            'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}}))
 
+    # Créer la jauge du taux de complétion
     fig_completion = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=weekly_completion_rate,
-        title={'text': "Taux de Complétion Hebdomadaire"},
-        gauge={
+        mode = "gauge+number",
+        value = weekly_completion_rate,
+        title = {'text': "Taux de Complétion Hebdomadaire"},
+        gauge = {
             'axis': {'range': [None, 100]},
-            'steps': [
+            'steps' : [
                 {'range': [0, 50], 'color': "lightgray"},
                 {'range': [50, 100], 'color': "green"}],
-            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}}))
+            'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}}))
 
+    # Afficher les jauges côte à côte
     col1, col2 = st.columns(2)
 
     with col1:
@@ -203,8 +245,12 @@ def main():
         st.subheader('Taux de Complétion')
         st.plotly_chart(fig_completion)
 
+
+    # Afficher le tableau de suivi par parcours
     st.subheader('Tableau de Suivi des Parcours')
-    st.dataframe(weekly_comparison_table, width=2000)
- 
+    st.dataframe(weekly_comparison_table,width=2000)
+
+   
+
 if __name__ == '__main__':
     main()
