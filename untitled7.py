@@ -59,7 +59,7 @@ def main():
         .stMetric>div>div>div>span {
             color: white;
         }
-        .stTitle, .stHeader, .stSubheader, .stMarkdown {
+        .stTitle, .stHeader, .stSubheader, .stMarkdown, .stText {
             color: white;
         }
         .custom-title {
