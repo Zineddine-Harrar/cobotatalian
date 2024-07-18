@@ -41,17 +41,23 @@ def main():
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
 
+    # Maintenir l'état d'authentification
+    query_params = st.query_params
+    if 'logout' in query_params:
+        st.session_state['logged_in'] = False
+        st.session_state.pop('username', None)
+        st.session_state.pop('selected_app', None)
+        st.query_params.clear()
+        st.experimental_rerun()
+
     if not st.session_state['logged_in']:
         login_section()
     else:
-        if 'selected_app' in st.session_state:
-            run_selected_app()
-        else:
-            app_selection_page()
+        app_selection_page()
 
 # Section de connexion
 def login_section():
-    st.title("Connexion à l'interface de visualisation des données ROBOTS ATALIAN")
+    st.title("Connexion")
     st.image("atalian-logo (1).png", width=300)  # Chemin vers votre logo
 
     username = st.text_input("Nom d'utilisateur")
@@ -61,6 +67,7 @@ def login_section():
             st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
+            st.query_params.clear()
             st.experimental_rerun()
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
@@ -71,6 +78,9 @@ def app_selection_page():
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
+
+    if 'selected_app' not in st.session_state:
+        st.session_state['selected_app'] = None
 
     with col1:
         if st.button("RQUARTZ - IMON"):
@@ -87,10 +97,11 @@ def app_selection_page():
             st.session_state['selected_app'] = "ECOBOT 40"
             st.experimental_rerun()
 
-    if st.button("Deconnexion"):
-        st.session_state['logged_in'] = False
-        st.session_state.pop('username', None)
-        st.session_state.pop('selected_app', None)
+    if st.session_state['selected_app']:
+        run_selected_app()
+    
+    if st.button("Déconnexion"):
+        st.query_params.update({"logout": "true"})
         st.experimental_rerun()
 
 # Exécution de l'application sélectionnée
