@@ -13,6 +13,33 @@ def main():
             background-color: black;
             color: white;
         }
+        .stTextInput>div>div>input {
+            background-color: black;
+            color: white;
+        }
+        .stTextInput>label {
+            color: white;
+        }
+        .stButton>button {
+            background-color: black;
+            color: white;
+            border: 2px solid white;
+            padding: 10px;
+            margin: 10px;
+        }
+        .stMetric>div>div>div>span {
+            color: white;
+        }
+        .stTitle, .stHeader, .stSubheader, .stMarkdown {
+            color: white;
+        }
+        .custom-title {
+            color: #ff6347;
+        }
+        .stAlert>div {
+            background-color: #444;
+            color: white;
+        }
         </style>
         """,
         unsafe_allow_html=True
