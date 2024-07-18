@@ -69,7 +69,7 @@ def main():
 
 # Section de connexion
 def login_section():
-    st.title("Connexion")
+    st.title("Connexion à l'interface de visualisation ATALIAN / COBOT")
     st.image("atalian-logo (1).png", width=300)  # Chemin vers votre logo
 
     username = st.text_input("Nom d'utilisateur")
