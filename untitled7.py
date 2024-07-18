@@ -71,7 +71,6 @@ def main():
 
 # Section de connexion
 def login_section():
-    st.title("Connexion à l'interface de visualisation ATALIAN / COBOT")
     st.markdown('<h1 class="custom-title">Connexion Interface de visualisation ATALIAN / COBOT</h1>', unsafe_allow_html=True)
     st.image("atalian-logo (1).png", width=300)  # Chemin vers votre logo
 
