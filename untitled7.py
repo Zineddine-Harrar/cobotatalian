@@ -95,7 +95,7 @@ def login_section():
     st.markdown('<h1 class="custom-title">Connexion Interface de visualisation ATALIAN / COBOT</h1>', unsafe_allow_html=True)
     st.image("atalian-logo (1).png", width=300)  # Chemin vers votre logo
 
-    username = st.text_input("Nom d'utilisateur")
+    username = st.text_input('<h3 class="custom-title">Identifiant</h3>')
     password = st.text_input("Mot de passe", type='password')
     if st.button("Connexion"):
         if login(username, password):
