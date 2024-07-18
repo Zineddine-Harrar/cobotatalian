@@ -13,11 +13,37 @@ def main():
             background-color: black;
             color: white;
         }
+        .stTextInput>div>div>input {
+            background-color: black;
+            color: white;
+        }
+        .stTextInput>label {
+            color: white;
+        }
+        .stButton>button {
+            background-color: black;
+            color: white;
+            border: 2px solid white;
+            padding: 10px;
+            margin: 10px;
+        }
+        .stMetric>div>div>div>span {
+            color: white;
+        }
+        .stTitle, .stHeader, .stSubheader, .stMarkdown {
+            color: white;
+        }
+        .custom-title {
+            color: #ff6347;
+        }
+        .stAlert>div {
+            background-color: #444;
+            color: white;
+        }
         </style>
         """,
         unsafe_allow_html=True
     )
-
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('Détail travail autonome (11).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
