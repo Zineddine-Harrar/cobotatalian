@@ -5,6 +5,19 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 
 def main():
+
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background-color: black;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     # Charger les fichiers CSV
     planning_df = pd.read_csv('ECOBOT40.csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('TaskReport_Atalian_ADP_20240717120151.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
