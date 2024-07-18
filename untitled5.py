@@ -6,7 +6,18 @@ import matplotlib.pyplot as plt
 
 def main():
 
-    
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background-color: black;
+            color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
