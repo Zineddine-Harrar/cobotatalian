@@ -44,7 +44,6 @@ def main():
         """,
         unsafe_allow_html=True
     )
-
     # Charger les fichiers CSV
     planning_df = pd.read_csv('ECOBOT40.csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('TaskReport_Atalian_ADP_20240717120151.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
