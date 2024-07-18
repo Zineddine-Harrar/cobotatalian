@@ -13,9 +13,6 @@ def main():
             background-color: black;
             color: white;
         }
-        .stTextInput, .stButton, .stMetric, .stTitle, .stHeader, .stImage, .stSubheader, .stMarkdown {
-            color: white;
-        }
         </style>
         """,
         unsafe_allow_html=True
