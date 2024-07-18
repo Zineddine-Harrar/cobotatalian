@@ -36,6 +36,7 @@ def login(username, password):
 
 # Fonction principale
 def main():
+    st.set_page_config(page_title="ATALIAN COBOT", layout="wide")
     st.markdown(
         """
         <style>
@@ -47,8 +48,6 @@ def main():
         """,
         unsafe_allow_html=True
     )
-
-    st.set_page_config(page_title="Simple Auth App", layout="wide")
 
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
