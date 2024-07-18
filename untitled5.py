@@ -31,7 +31,7 @@ def main():
             color: white;
         }
         .stTitle, .stHeader, .stSubheader, .stMarkdown {
-            color: white;
+            color: black;
         }
         .custom-title {
             color: #ff6347;
