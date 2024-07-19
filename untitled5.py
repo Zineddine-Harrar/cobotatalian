@@ -171,9 +171,7 @@ def main():
 
     # Interface Streamlit
 
-    # Afficher les logos côte à côte
-    logo_path1 = "atalian-logo (1).png"
-    st.image(logo_path1, width=150)  # Ajustez la largeur selon vos besoins
+    
 
 
     st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
