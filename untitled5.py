@@ -11,7 +11,7 @@ def main():
         <style>
         .stApp {
             background-color: orange;
-            color: #05DECA;
+            color: black;
         }
         .stTextInput>div>div>input {
             background-color: black;
