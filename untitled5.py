@@ -47,7 +47,7 @@ def main():
 
 
     # Charger les fichiers CSV
-    planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
+    planning_df = pd.read_csv('DATASET/IMON/19-07.csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('19-07.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
 
     # Nettoyer les colonnes dans details_df
@@ -176,9 +176,26 @@ def main():
 
     st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
 
-    # Sélection de la semaine
-    semaine = st.number_input("Sélectionnez le numéro de la semaine", min_value=1, max_value=53, value=28)
+    # Créer un dictionnaire pour mapper chaque semaine à la date de début de la semaine
+    def get_week_start_dates(year):
+        start_date = datetime(year, 1, 1)
+        if start_date.weekday() > 0:  # Si le 1er janvier n'est pas un lundi
+            start_date += timedelta(days=(7 - start_date.weekday()))  # Aller au prochain lundi
+        week_dates = {}
+        for week in range(28, 54):  # Assumer jusqu'à 53 semaines
+            week_dates[week] = start_date + timedelta(weeks=(week - 1))
+        return week_dates
 
+    week_start_dates = get_week_start_dates(2024)
+    week_options = {week: date for week, date in week_start_dates.items()}
+
+    # Afficher le sélecteur de semaine avec les dates
+    selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
+
+    
+    # Sélection de la semaine
+    semaine = selected_week
+    
     # Créer le tableau de suivi par parcours pour la semaine spécifiée
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
 
