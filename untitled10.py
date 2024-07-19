@@ -10,7 +10,7 @@ def main():
         """
          <style>
          .stApp {
-             background-color: white;
+             background-color: orange;
              color: black;
          }
          .stTextInput>div>div>input {
