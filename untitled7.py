@@ -112,6 +112,9 @@ def login_section():
 
 # Page de sélection de l'application
 def app_selection_page():
+    # Afficher les logos côte à côte
+    logo_path1 = "atalian-logo (1).png"
+    st.image(logo_path1, width=150)  # Ajustez la largeur selon vos besoins
     st.markdown('<h1 class="custom-title">Applications RQUARTZ</h1>', unsafe_allow_html=True)
 
     st.markdown("### Sélectionnez une application")
