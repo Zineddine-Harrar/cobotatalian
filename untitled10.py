@@ -40,6 +40,25 @@ def main():
              background-color: #444;
              color: white;
          }
+         .metric-container {
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+        }
+        .metric-label {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        .metric-delta {
+            font-size: 1.2em;
+            color: #28a745;
+        }
          </style>
          """,
          unsafe_allow_html=True
@@ -177,17 +196,41 @@ def main():
     heures_cumulees, surface_nettoyee, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
     st.subheader('Indicateurs Hebdomadaires')
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric(label="Heures cumulées", value=f"{heures_cumulees:.2f} heures")
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Heures cumulées</div>
+                <div class="metric-value">{heures_cumulees:.2f} heures</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     with col2:
-        st.metric(label="Surface nettoyée", value=f"{surface_nettoyee:.2f} m²")
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Surface nettoyée</div>
+                <div class="metric-value">{surface_nettoyee:.2f} m²</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     with col3:
-        st.metric(label="Productivité moyenne", value=f"{productivite_moyenne:.2f} m²/h")
-
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Productivité moyenne</div>
+                <div class="metric-value">{productivite_moyenne:.2f} m²/h</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
         value=taux_suivi,
