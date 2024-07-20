@@ -256,14 +256,14 @@ def main():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader('Taux de Suivi')
+        st.markdown("## **Taux de Suivi**')
         st.plotly_chart(fig_suivi)
 
     with col2:
-        st.subheader('Taux de Complétion')
+        st.markdown("## **Taux de Complétion**")
         st.plotly_chart(fig_completion)
 
-    st.subheader('Tableau de Suivi des Parcours')
+    st.markdown("## **Tableau de Suivi des Parcours**")
     st.dataframe(weekly_comparison_table, width=2000)
 
 
