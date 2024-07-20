@@ -8,37 +8,44 @@ def main():
 
     st.markdown(
         """
-        <style>
-        .stApp {
-            background-color: orange;
-            color: black;
-        }
-        .stTextInput>div>div>input {
-            background-color: black;
-            color: white;
-        }
-        .stTextInput>label {
-            color: white;
-        }
-        .stButton>button {
-            background-color: black;
-            color: white;
-            border: 2px solid white;
-            padding: 10px;
-            margin: 10px;
-        }
-        .stMetric>div>div>div>span {
-            color: white;
-        }
-        .stTitle, .stHeader, .stSubheader, .stMarkdown {
-            color: black;
-        }
-        .custom-title {
-            color: #ff6347;
-        }
-        .stAlert>div {
-            background-color: #444;
-            color: white;
+         <style>
+         .stApp {
+             background-color: orange;
+             color: black;
+         }
+         .stTextInput>div>div>input {
+             background-color: black;
+             color: white;
+         }
+         .stTextInput>label {
+             color: white;
+         }
+         .stButton>button {
+             background-color: black;
+             color: white;
+             border: 2px solid white;
+             padding: 10px;
+             margin: 10px;
+         }
+         .stMetric>div>div>div>span {
+             color: white;
+         }
+         .stTitle, .stHeader, .stSubheader, .stMarkdown {
+             color: black;
+         }
+         .custom-title {
+             color: #ff6347;
+         }
+         .stAlert>div {
+             background-color: #444;
+             color: white;
+         }
+         .metric-container {
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
         }
         .metric-label {
             font-size: 1.5em;
@@ -52,9 +59,9 @@ def main():
             font-size: 1.2em;
             color: #28a745;
         }
-        </style>
-        """,
-        unsafe_allow_html=True
+         </style>
+         """,
+         unsafe_allow_html=True
     )
 
 
