@@ -8,42 +8,62 @@ def main():
 
     st.markdown(
         """
-        <style>
-        .stApp {
-            background-color: orange;
-            color: black;
+         <style>
+         .stApp {
+             background-color: orange;
+             color: black;
+         }
+         .stTextInput>div>div>input {
+             background-color: black;
+             color: white;
+         }
+         .stTextInput>label {
+             color: white;
+         }
+         .stButton>button {
+             background-color: black;
+             color: white;
+             border: 2px solid white;
+             padding: 10px;
+             margin: 10px;
+         }
+         .stMetric>div>div>div>span {
+             color: white;
+         }
+         .stTitle, .stHeader, .stSubheader, .stMarkdown {
+             color: black;
+         }
+         .custom-title {
+             color: #ff6347;
+         }
+         .stAlert>div {
+             background-color: #444;
+             color: white;
+         }
+         .metric-container {
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
         }
-        .stTextInput>div>div>input {
-            background-color: black;
-            color: white;
+        .metric-label {
+            font-size: 1.5em;
+            font-weight: bold;
         }
-        .stTextInput>label {
-            color: white;
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
         }
-        .stButton>button {
-            background-color: black;
-            color: white;
-            border: 2px solid white;
-            padding: 10px;
-            margin: 10px;
+        .metric-delta {
+            font-size: 1.2em;
+            color: #28a745;
         }
-        .stMetric>div>div>div>span {
-            color: white;
-        }
-        .stTitle, .stHeader, .stSubheader, .stMarkdown {
-            color: black;
-        }
-        .custom-title {
-            color: #ff6347;
-        }
-        .stAlert>div {
-            background-color: #444;
-            color: white;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
+         </style>
+         """,
+         unsafe_allow_html=True
     )
+
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('DATASET/T2F/19-07.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
@@ -209,21 +229,54 @@ def main():
 
 
     # Afficher les KPI côte à côte
-    st.subheader('Indicateurs Hebdomadaires')
+    st.markdown("## **Indicateurs Hebdomadaires**")
+
 
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric(label="Heures cumulées", value=f"{heures_cumulees:.2f} heures")
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Heures cumulées</div>
+                <div class="metric-value">{heures_cumulees:.2f} heures</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     with col2:
-        st.metric(label="Surface nettoyée", value=f"{surface_nettoyee:.2f} m²")
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Surface nettoyée</div>
+                <div class="metric-value">{surface_nettoyee:.2f} m²</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     with col3:
-        st.metric(label="Vitesse moyenne", value=f"{vitesse_moyenne:.2f} km/h")
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Productivité moyenne</div>
+                <div class="metric-value">{productivite_moyenne:.2f} m²/h</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     with col4:
-        st.metric(label="Productivité moyenne", value=f"{productivite_moyenne:.2f} m²/h")
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Vitesse moyenne</div>
+                <div class="metric-value">{vitesse_moyenne:.2f} km/h</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
