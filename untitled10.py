@@ -195,7 +195,7 @@ def main():
     weekly_completion_rate = calculate_weekly_completion_rate(details_df, semaine)
     heures_cumulees, surface_nettoyee, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
-    st.subheader('Indicateurs Hebdomadaires')
+    st.subheader('## **Indicateurs Hebdomadaires**')
     col1, col2, col3 = st.columns(3)
 
     with col1:
