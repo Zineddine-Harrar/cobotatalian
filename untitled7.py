@@ -116,6 +116,9 @@ def app_selection_page():
     logo_path1 = "atalian-logo (1).png"
     st.image(logo_path1, width=150)  # Ajustez la largeur selon vos besoins
     st.markdown('<h1 class="custom-title">Applications RQUARTZ</h1>', unsafe_allow_html=True)
+    if st.button("Déconnexion"):
+        st.query_params.update({"logout": "true"})
+        st.experimental_rerun()
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -141,10 +144,7 @@ def app_selection_page():
     if st.session_state['selected_app']:
         run_selected_app()
     
-    if st.button("Déconnexion"):
-        st.query_params.update({"logout": "true"})
-        st.experimental_rerun()
-
+    
 # Exécution de l'application sélectionnée
 def run_selected_app():
     if st.session_state['selected_app'] == "RQUARTZ - IMON":
