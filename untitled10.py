@@ -260,10 +260,10 @@ def main():
         st.plotly_chart(fig_suivi)
 
     with col2:
-        st.subheader("Taux de Complétion")
+        st.subheader('Taux de Complétion')
         st.plotly_chart(fig_completion)
 
-    st.subheader("Tableau de Suivi des Parcours")
+    st.subheader('Tableau de Suivi des Parcours')
     st.dataframe(weekly_comparison_table, width=2000)
 
 
