@@ -371,10 +371,10 @@ def main():
     table_html = styled_table.to_html()
 
     # Afficher le tableau de suivi par parcours avec du CSS personnalisé
-    st.markdown("""
+    st.markdown(f"""
         <h2>Tableau de Suivi des Parcours</h2>
         <div style="overflow-x:auto;">
-        """ + table_html + """
+        {table_html}
         </div>
     """, unsafe_allow_html=True)
 
