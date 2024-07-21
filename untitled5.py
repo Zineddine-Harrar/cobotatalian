@@ -102,6 +102,7 @@ def main():
     )
 
 
+
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('DATASET/IMON/19-07.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
@@ -371,20 +372,18 @@ def main():
 
     # Appliquer le style conditionnel
     def style_row(row):
-        return ['fait' if cell == 'Fait' else 'pas-fait' for cell in row]
+        return ['background-color: #d4edda; color: #155724;' if cell == 'Fait' else 'background-color: #f8d7da; color: #721c24;' for cell in row]
 
     styled_table = weekly_comparison_table.style.apply(style_row, axis=1)
 
     # Convertir le DataFrame stylisé en HTML
-    table_html = styled_table.render()
+    table_html = styled_table.to_html()
 
     # Afficher le tableau de suivi par parcours avec du CSS personnalisé
     st.markdown("""
         <h2>Tableau de Suivi des Parcours</h2>
         <div style="overflow-x:auto;">
-        <table class="styled-table">
         """ + table_html + """
-        </table>
         </div>
     """, unsafe_allow_html=True)
     
