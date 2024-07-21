@@ -59,6 +59,43 @@ def main():
             font-size: 1.2em;
             color: #28a745;
         }
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+        .styled-table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
+        }
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
+        .styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: #009879;
+        }
+        .styled-table .fait {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .styled-table .pas-fait {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
          </style>
          """,
          unsafe_allow_html=True
@@ -332,9 +369,24 @@ def main():
         st.subheader('Taux de Complétion')
         st.plotly_chart(fig_completion)
 
-    # Afficher le tableau de suivi par parcours
-    st.subheader('Tableau de Suivi des Parcours')
-    st.dataframe(weekly_comparison_table,width=2000)
+    # Appliquer le style conditionnel
+    def style_row(row):
+        return ['fait' if cell == 'Fait' else 'pas-fait' for cell in row]
 
+    styled_table = weekly_comparison_table.style.apply(style_row, axis=1)
+
+    # Convertir le DataFrame stylisé en HTML
+    table_html = styled_table.render()
+
+    # Afficher le tableau de suivi par parcours avec du CSS personnalisé
+    st.markdown("""
+        <h2>Tableau de Suivi des Parcours</h2>
+        <div style="overflow-x:auto;">
+        <table class="styled-table">
+        """ + table_html + """
+        </table>
+        </div>
+    """, unsafe_allow_html=True)
+    
 if __name__ == '__main__':
     main()
