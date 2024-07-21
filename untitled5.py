@@ -367,7 +367,7 @@ def main():
     # Appliquer le style conditionnel
     def style_cell(val):
         if val == 'Fait':
-            return 'background-color: #13FF1A; color: #CACFD2;'
+            return 'background-color: #13FF1A; color: black;'
         elif val == 'Pas fait':
             return 'background-color: #FF1313; color: #CACFD2;'
         
