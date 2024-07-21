@@ -370,8 +370,7 @@ def main():
             return 'background-color: #13FF1A; color: black;'
         elif val == 'Pas fait':
             return 'background-color: #FF1313; color: #CACFD2;'
-        else 
-            return 'background-color: black; color: #CACFD2;'
+        
             
     styled_table = weekly_comparison_table.style.applymap(style_cell)
     # Afficher le tableau de suivi par parcours
