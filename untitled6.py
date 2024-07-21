@@ -8,39 +8,39 @@ def main():
 
     st.markdown(
         """
-         <style>
-         .stApp {
-             background-color: orange;
-             color: black;
-         }
-         .stTextInput>div>div>input {
-             background-color: black;
-             color: white;
-         }
-         .stTextInput>label {
-             color: white;
-         }
-         .stButton>button {
-             background-color: black;
-             color: white;
-             border: 2px solid white;
-             padding: 10px;
-             margin: 10px;
-         }
-         .stMetric>div>div>div>span {
-             color: white;
-         }
-         .stTitle, .stHeader, .stSubheader, .stMarkdown {
-             color: black;
-         }
-         .custom-title {
-             color: #ff6347;
-         }
-         .stAlert>div {
-             background-color: #444;
-             color: white;
-         }
-         .metric-container {
+        <style>
+        .stApp {
+            background-color: orange;
+            color: black;
+        }
+        .stTextInput>div>div>input {
+            background-color: black;
+            color: white;
+        }
+        .stTextInput>label {
+            color: white;
+        }
+        .stButton>button {
+            background-color: black;
+            color: white;
+            border: 2px solid white;
+            padding: 10px;
+            margin: 10px;
+        }
+        .stMetric>div>div>div>span {
+            color: white;
+        }
+        .stTitle, .stHeader, .stSubheader, .stMarkdown {
+            color: black;
+        }
+        .custom-title {
+            color: #ff6347;
+        }
+        .stAlert>div {
+            background-color: #444;
+            color: white;
+        }
+        .metric-container {
             border-radius: 10px;
             background-color: #1e1e1e;
             padding: 20px;
@@ -59,10 +59,34 @@ def main():
             font-size: 1.2em;
             color: #28a745;
         }
-         </style>
-         """,
-         unsafe_allow_html=True
+        .dataframe {
+            background-color: #000 !important;
+        }
+        .dataframe thead th {
+            background-color: #000 !important;
+            color: #fff !important;
+        }
+        .dataframe tbody td {
+            background-color: #000 !important;
+            color: #fff !important;
+        }
+        .dataframe tbody td[data-val='Fait'] {
+            background-color: #13FF1A !important;
+            color: black !important;
+        }
+        .dataframe tbody td[data-val='Pas fait'] {
+            background-color: #FF1313 !important;
+            color: #CACFD2 !important;
+        }
+        .dataframe tbody td:first-child {
+            background-color: #000 !important;
+            color: #fff !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
     )
+
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
@@ -280,27 +304,45 @@ def main():
 
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = taux_suivi,
-        title = {'text': "Taux de Suivi"},
-        gauge = {
+        mode="gauge+number",
+        value=taux_suivi,
+        title={'text': "Taux de Suivi"},
+        gauge={
             'axis': {'range': [None, 100]},
-            'steps' : [
-                {'range': [0, 50], 'color': "lightgray"},
+            'steps': [
+                {'range': [0, 50], 'color': "orange"},
                 {'range': [50, 100], 'color': "green"}],
-            'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}}))
+            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}
+        }
+    ))
+
+    # Mettre à jour le fond en noir
+    fig_suivi.update_layout(
+        paper_bgcolor="black",
+        plot_bgcolor="black",
+        font={'color': "white"}
+    )
 
     # Créer la jauge du taux de complétion
     fig_completion = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = weekly_completion_rate,
-        title = {'text': "Taux de Complétion Hebdomadaire"},
-        gauge = {
+        mode="gauge+number",
+        value=weekly_completion_rate,
+        title={'text': "Taux de Complétion Hebdomadaire"},
+        gauge={
             'axis': {'range': [None, 100]},
-            'steps' : [
-                {'range': [0, 50], 'color': "lightgray"},
+            'steps': [
+                {'range': [0, 50], 'color': "orange"},
                 {'range': [50, 100], 'color': "green"}],
-            'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}}))
+            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}
+        }
+    ))
+
+    # Mettre à jour le fond en noir
+    fig_completion.update_layout(
+        paper_bgcolor="black",
+        plot_bgcolor="black",
+        font={'color': "white"}
+    )
 
     # Afficher les jauges côte à côte
     col1, col2 = st.columns(2)
@@ -313,10 +355,29 @@ def main():
         st.subheader('Taux de Complétion')
         st.plotly_chart(fig_completion)
 
+    # Appliquer le style conditionnel
+    def style_cell(val):
+        if val == 'Fait':
+            return 'background-color: #13FF1A; color: black;'
+        elif val == 'Pas fait':
+            return 'background-color: #FF1313; color: #CACFD2;'
+        else:
+            return ''
+
+    def style_header(val):
+        return 'background-color: black; color: white;'
+
+    # Appliquer le style sur tout le DataFrame
+    styled_table = weekly_comparison_table.style.applymap(style_cell)
+    
+    # Appliquer le style sur la colonne "Parcours Prévu"
+    styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
+    # Appliquer le style sur les en-têtes de colonne
+    styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
     # Afficher le tableau de suivi par parcours
     st.subheader('Tableau de Suivi des Parcours')
-    st.dataframe(weekly_comparison_table,width=2000)
+    st.dataframe(styled_table, width=2000)
 
    
 
