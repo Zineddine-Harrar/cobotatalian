@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 import plotly.graph_objects as go
-import matplotlib.pyplot as plt
 
 def main():
 
@@ -100,8 +99,6 @@ def main():
          """,
          unsafe_allow_html=True
     )
-
-
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
@@ -228,9 +225,6 @@ def main():
 
     # Interface Streamlit
 
-    
-
-
     st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
 
     # Créer un dictionnaire pour mapper chaque semaine à la date de début de la semaine
@@ -265,11 +259,8 @@ def main():
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
-
-
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
-
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -316,7 +307,7 @@ def main():
             """,
             unsafe_allow_html=True
         )
-        
+
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
@@ -387,6 +378,5 @@ def main():
         </div>
     """, unsafe_allow_html=True)
 
-    
 if __name__ == '__main__':
     main()
