@@ -367,9 +367,9 @@ def main():
     # Appliquer le style conditionnel
     def style_cell(val):
         if val == 'Fait':
-            return 'background-color: #d4edda; color: #155724;'
+            return 'background-color: #13FF1A; color: #155724;'
         elif val == 'Pas fait':
-            return 'background-color: #f8d7da; color: #721c24;'
+            return 'background-color: #FF1313; color: #721c24;'
         
     styled_table = weekly_comparison_table.style.applymap(style_cell)
     # Afficher le tableau de suivi par parcours
