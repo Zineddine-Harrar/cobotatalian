@@ -281,27 +281,45 @@ def main():
         
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = taux_suivi,
-        title = {'text': "Taux de Suivi"},
-        gauge = {
+        mode="gauge+number",
+        value=taux_suivi,
+        title={'text': "Taux de Suivi"},
+        gauge={
             'axis': {'range': [None, 100]},
-            'steps' : [
+            'steps': [
                 {'range': [0, 50], 'color': "orange"},
                 {'range': [50, 100], 'color': "green"}],
-            'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}}))
+            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}
+        }
+    ))
+
+    # Mettre à jour le fond en noir
+    fig_suivi.update_layout(
+        paper_bgcolor="black",
+        plot_bgcolor="black",
+        font={'color': "white"}
+    )
 
     # Créer la jauge du taux de complétion
     fig_completion = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = weekly_completion_rate,
-        title = {'text': "Taux de Complétion Hebdomadaire"},
-        gauge = {
+        mode="gauge+number",
+        value=weekly_completion_rate,
+        title={'text': "Taux de Complétion Hebdomadaire"},
+        gauge={
             'axis': {'range': [None, 100]},
-            'steps' : [
+            'steps': [
                 {'range': [0, 50], 'color': "orange"},
                 {'range': [50, 100], 'color': "green"}],
-            'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}}))
+            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}
+        }
+    ))
+
+    # Mettre à jour le fond en noir
+    fig_completion.update_layout(
+        paper_bgcolor="black",
+        plot_bgcolor="black",
+        font={'color': "white"}
+    )
 
     # Afficher les jauges côte à côte
     col1, col2 = st.columns(2)
@@ -313,7 +331,6 @@ def main():
     with col2:
         st.subheader('Taux de Complétion')
         st.plotly_chart(fig_completion)
-
 
     # Afficher le tableau de suivi par parcours
     st.subheader('Tableau de Suivi des Parcours')
