@@ -39,6 +39,9 @@ def main():
              background-color: #444;
              color: white;
          }
+         .st.Dataframe {
+             background-color:#1e1e1e;
+         }
          .metric-container {
             border-radius: 10px;
             background-color: #1e1e1e;
@@ -58,27 +61,40 @@ def main():
             font-size: 1.2em;
             color: #28a745;
         }
-        table {
-            width: 100%;
-            background-color: black;
-            color: white;
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
         }
-        .dataframe th, .dataframe td {
-            padding: 10px;
+        .styled-table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
         }
-        .dataframe th {
-            background-color: #000;
-            color: #fff;
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
         }
-        .dataframe tbody td {
-            background-color: #000;
-            color: #fff;
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
         }
-        .dataframe tbody td[data-val='Fait'] {
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
+        .styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: #009879;
+        }
+        .styled-table .fait {
             background-color: #d4edda;
             color: #155724;
         }
-        .dataframe tbody td[data-val='Pas fait'] {
+        .styled-table .pas-fait {
             background-color: #f8d7da;
             color: #721c24;
         }
@@ -354,24 +370,12 @@ def main():
             return 'background-color: #d4edda; color: #155724;'
         elif val == 'Pas fait':
             return 'background-color: #f8d7da; color: #721c24;'
-        else:
-            return ''
-
+        
     styled_table = weekly_comparison_table.style.applymap(style_cell)
+    # Afficher le tableau de suivi par parcours
+    st.subheader('Tableau de Suivi des Parcours')
+    st.dataframe(styled_table,width=2000)
 
-    # Convertir le DataFrame stylisé en HTML avec un fond noir pour le tableau
-    table_html = styled_table.set_table_styles(
-        [{'selector': 'thead th', 'props': [('background-color', '#000'), ('color', '#fff')]},
-         {'selector': 'tbody td', 'props': [('background-color', '#000'), ('color', '#fff')]}]
-    ).to_html()
-
-    # Afficher le tableau de suivi par parcours avec du CSS personnalisé
-    st.markdown(f"""
-        <h2 style="color: #fff;">Tableau de Suivi des Parcours</h2>
-        <div style="overflow-x:auto;">
-        {table_html}
-        </div>
-    """, unsafe_allow_html=True)
 
 if __name__ == '__main__':
     main()
