@@ -39,6 +39,9 @@ def main():
              background-color: #444;
              color: white;
          }
+         .st.Dataframe {
+             background-color:#1e1e1e;
+         }
          .metric-container {
             border-radius: 10px;
             background-color: #1e1e1e;
