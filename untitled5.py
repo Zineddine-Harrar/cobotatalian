@@ -354,13 +354,24 @@ def main():
             return 'background-color: #13FF1A; color: black;'
         elif val == 'Pas fait':
             return 'background-color: #FF1313; color: #CACFD2;'
-        
-            
+        else:
+            return ''
+
+    def style_header(val):
+        return 'background-color: black; color: white;'
+
+    # Appliquer le style sur tout le DataFrame
     styled_table = weekly_comparison_table.style.applymap(style_cell)
+    
+    # Appliquer le style sur la colonne "Parcours Prévu"
+    styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
+    
+    # Appliquer le style sur les en-têtes de colonne
+    styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
+
     # Afficher le tableau de suivi par parcours
     st.subheader('Tableau de Suivi des Parcours')
-    st.dataframe(styled_table,width=2000)
-
+    st.dataframe(styled_table, width=2000)
 
 if __name__ == '__main__':
     main()
