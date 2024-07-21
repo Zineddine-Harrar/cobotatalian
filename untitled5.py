@@ -7,42 +7,39 @@ def main():
 
     st.markdown(
         """
-         <style>
-         .stApp {
-             background-color: orange;
-             color: black;
-         }
-         .stTextInput>div>div>input {
-             background-color: black;
-             color: white;
-         }
-         .stTextInput>label {
-             color: white;
-         }
-         .stButton>button {
-             background-color: black;
-             color: white;
-             border: 2px solid white;
-             padding: 10px;
-             margin: 10px;
-         }
-         .stMetric>div>div>div>span {
-             color: white;
-         }
-         .stTitle, .stHeader, .stSubheader, .stMarkdown {
-             color: black;
-         }
-         .custom-title {
-             color: #ff6347;
-         }
-         .stAlert>div {
-             background-color: #444;
-             color: white;
-         }
-         .st.Dataframe {
-             background-color:#1e1e1e;
-         }
-         .metric-container {
+        <style>
+        .stApp {
+            background-color: orange;
+            color: black;
+        }
+        .stTextInput>div>div>input {
+            background-color: black;
+            color: white;
+        }
+        .stTextInput>label {
+            color: white;
+        }
+        .stButton>button {
+            background-color: black;
+            color: white;
+            border: 2px solid white;
+            padding: 10px;
+            margin: 10px;
+        }
+        .stMetric>div>div>div>span {
+            color: white;
+        }
+        .stTitle, .stHeader, .stSubheader, .stMarkdown {
+            color: black;
+        }
+        .custom-title {
+            color: #ff6347;
+        }
+        .stAlert>div {
+            background-color: #444;
+            color: white;
+        }
+        .metric-container {
             border-radius: 10px;
             background-color: #1e1e1e;
             padding: 20px;
@@ -61,47 +58,34 @@ def main():
             font-size: 1.2em;
             color: #28a745;
         }
-        .styled-table {
-            border-collapse: collapse;
-            margin: 25px 0;
-            font-size: 0.9em;
-            min-width: 400px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        .dataframe {
+            background-color: #000 !important;
         }
-        .styled-table thead tr {
-            background-color: #009879;
-            color: #ffffff;
-            text-align: left;
+        .dataframe thead th {
+            background-color: #000 !important;
+            color: #fff !important;
         }
-        .styled-table th,
-        .styled-table td {
-            padding: 12px 15px;
+        .dataframe tbody td {
+            background-color: #000 !important;
+            color: #fff !important;
         }
-        .styled-table tbody tr {
-            border-bottom: 1px solid #dddddd;
+        .dataframe tbody td[data-val='Fait'] {
+            background-color: #13FF1A !important;
+            color: black !important;
         }
-        .styled-table tbody tr:nth-of-type(even) {
-            background-color: #f3f3f3;
+        .dataframe tbody td[data-val='Pas fait'] {
+            background-color: #FF1313 !important;
+            color: #CACFD2 !important;
         }
-        .styled-table tbody tr:last-of-type {
-            border-bottom: 2px solid #009879;
+        .dataframe tbody td:first-child {
+            background-color: #000 !important;
+            color: #fff !important;
         }
-        .styled-table tbody tr.active-row {
-            font-weight: bold;
-            color: #009879;
-        }
-        .styled-table .fait {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .styled-table .pas-fait {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-         </style>
-         """,
-         unsafe_allow_html=True
+        </style>
+        """,
+        unsafe_allow_html=True
     )
+
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
