@@ -367,16 +367,10 @@ def main():
 
     styled_table = weekly_comparison_table.style.apply(style_row, axis=1)
 
-    # Convertir le DataFrame stylisé en HTML
-    table_html = styled_table.to_html()
+    # Afficher le tableau de suivi par parcours
+    st.subheader('Tableau de Suivi des Parcours')
+    st.dataframe(styled_table,width=2000)
 
-    # Afficher le tableau de suivi par parcours avec du CSS personnalisé
-    st.markdown(f"""
-        <h2>Tableau de Suivi des Parcours</h2>
-        <div style="overflow-x:auto;">
-        {table_html}
-        </div>
-    """, unsafe_allow_html=True)
 
 if __name__ == '__main__':
     main()
