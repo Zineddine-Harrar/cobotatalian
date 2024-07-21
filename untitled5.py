@@ -362,11 +362,13 @@ def main():
         st.plotly_chart(fig_completion)
 
     # Appliquer le style conditionnel
-    def style_row(row):
-        return ['background-color: #d4edda; color: #155724;' if cell == 'Fait' else 'background-color: #f8d7da; color: #721c24;' for cell in row]
-
-    styled_table = weekly_comparison_table.style.apply(style_row, axis=1)
-
+    def style_cell(val):
+        if val == 'Fait':
+            return 'background-color: #d4edda; color: #155724;'
+        elif val == 'Pas fait':
+            return 'background-color: #f8d7da; color: #721c24;'
+        
+    styled_table = weekly_comparison_table.style.applymap(style_cell)
     # Afficher le tableau de suivi par parcours
     st.subheader('Tableau de Suivi des Parcours')
     st.dataframe(styled_table,width=2000)
