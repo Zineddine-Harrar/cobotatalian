@@ -372,24 +372,22 @@ def main():
     st.subheader('Tableau de Suivi des Parcours')
     st.dataframe(styled_table, width=2000)
 
-     # Vérifiez si completion_rates peut être transformé en DataFrame
-    if isinstance(completion_rates, pd.Series):
-        completion_rates_df = completion_rates.reset_index()
-        # Renommer les colonnes pour supprimer les caractères spéciaux
-        completion_rates_df.columns = ['parcours', 'taux_completion']
+    
+    completion_rates_df = completion_rates.reset_index()
+    # Renommer les colonnes pour supprimer les caractères spéciaux
+    completion_rates_df.columns = ['parcours', 'taux_completion']
 
-        st.write("completion_rates_df:", completion_rates_df.head())
+    st.write("completion_rates_df:", completion_rates_df.head())
         
-        # Créer l'histogramme des taux de complétion par parcours
-        fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                          title='Taux de Complétion Hebdomadaire par Parcours',
-                          labels={'parcours': 'Parcours', 'taux_completion': 'Taux de Complétion (%)'},
-                          template='plotly_dark')
+    # Créer l'histogramme des taux de complétion par parcours
+    fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
+                     title='Taux de Complétion Hebdomadaire par Parcours',
+                     labels={'parcours': 'Parcours', 'taux_completion': 'Taux de Complétion (%)'},
+                     template='plotly_dark')
 
-        # Afficher l'histogramme
-        st.plotly_chart(fig_hist)
-    else:
-        st.write("Erreur: completion_rates n'est pas une Series")
+    # Afficher l'histogramme
+    st.plotly_chart(fig_hist)
+    
     
 if __name__ == '__main__':
     main()
