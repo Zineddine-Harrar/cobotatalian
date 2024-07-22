@@ -390,8 +390,8 @@ def main():
                   labels={'parcours': 'Parcours', 'taux_completion': 'Taux de Complétion (%)'},
                   template='plotly_dark')
 
-    # Afficher l'histogramme
-    pio.show(fig_hist)
+    # Afficher l'histogramme dans Streamlit
+    st.plotly_chart(fig_hist)
     
     
 if __name__ == '__main__':
