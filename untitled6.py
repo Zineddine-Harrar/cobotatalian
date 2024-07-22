@@ -379,14 +379,18 @@ def main():
 
     st.write("completion_rates_df:", completion_rates_df.head())
         
+    # Transformer en DataFrame pour Plotly
+    completion_rates_df = completion_rates.reset_index()
+    completion_rates_df.columns = ['parcours', 'taux_completion']
+
     # Créer l'histogramme des taux de complétion par parcours
     fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                     title='Taux de Complétion Hebdomadaire par Parcours',
-                     labels={'parcours': 'Parcours', 'taux_completion': 'Taux de Complétion (%)'},
-                     template='plotly_dark')
+                  title='Taux de Complétion Hebdomadaire par Parcours',
+                  labels={'parcours': 'Parcours', 'taux_completion': 'Taux de Complétion (%)'},
+                  template='plotly_dark')
 
     # Afficher l'histogramme
-    st.plotly_chart(fig_hist)
+    pio.show(fig_hist)
     
     
 if __name__ == '__main__':
