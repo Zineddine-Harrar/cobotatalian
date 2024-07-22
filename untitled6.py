@@ -241,8 +241,7 @@ def main():
     # Calculer le taux de complétion hebdomadaire
     weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df, semaine)
 
-    # Vérifiez si completion_rates est bien une Series
-    st.write("completion_rates:", completion_rates.head())
+    
 
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
@@ -378,7 +377,6 @@ def main():
     # Renommer les colonnes pour supprimer les caractères spéciaux
     completion_rates_df.columns = ['parcours', 'taux_completion']
 
-    st.write("completion_rates_df:", completion_rates_df.head())
         
     # Transformer en DataFrame pour Plotly
     completion_rates_df = completion_rates.reset_index()
