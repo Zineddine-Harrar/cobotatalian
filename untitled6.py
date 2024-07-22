@@ -196,7 +196,7 @@ def main():
         total_routes = len(completion_rates)
         weekly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
         
-        return weekly_completion_rate
+        return weekly_completion_rate , completion_rates
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -239,7 +239,7 @@ def main():
     semaine = selected_week
 
     # Créer le tableau de suivi par parcours pour la semaine spécifiée
-    weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
+    weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df, semaine)
 
     # Calculer le taux de suivi à partir du tableau de suivi
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
@@ -379,7 +379,14 @@ def main():
     st.subheader('Tableau de Suivi des Parcours')
     st.dataframe(styled_table, width=2000)
 
-   
+    # Créer l'histogramme des taux de complétion par parcours
+    fig_hist = px.bar(completion_rates.reset_index(), x='parcours', y='terminerà_[%]',
+                      title='Taux de Complétion Hebdomadaire par Parcours',
+                      labels={'parcours': 'Parcours', 'terminerà_[%]': 'Taux de Complétion (%)'},
+                      template='plotly_dark')
+
+    # Afficher l'histogramme
+    st.plotly_chart(fig_hist)
 
 if __name__ == '__main__':
     main()
