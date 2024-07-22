@@ -224,21 +224,26 @@ def main():
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
 
-    # Afficher le sélecteur de semaine avec les dates
+   # Afficher le sélecteur de semaine avec les dates
     selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
 
-    
     # Sélection de la semaine
     semaine = selected_week
-    
+
     # Créer le tableau de suivi par parcours pour la semaine spécifiée
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
+    
+    # Afficher la structure du tableau de comparaison pour le débogage
+    st.write("Structure du tableau de comparaison:", weekly_comparison_table.head())
 
     # Calculer le taux de suivi à partir du tableau de suivi
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
 
     # Calculer le taux de complétion hebdomadaire
     weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df, semaine)
+
+    # Vérifiez si completion_rates est bien une Series
+    st.write("completion_rates:", completion_rates.head())
 
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
@@ -349,7 +354,7 @@ def main():
     st.subheader('Tableau de Suivi des Parcours')
     st.dataframe(weekly_comparison_table, width=2000)
 
-   # Vérifiez si completion_rates peut être transformé en DataFrame
+    # Vérifiez si completion_rates peut être transformé en DataFrame
     if isinstance(completion_rates, pd.Series):
         completion_rates_df = completion_rates.reset_index()
         st.write("completion_rates_df:", completion_rates_df.head())
