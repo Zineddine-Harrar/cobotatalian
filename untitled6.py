@@ -98,9 +98,8 @@ def main():
 
     details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M', errors='coerce')
     details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
-
-
-    # Extraire le jour de la semaine et la date de début
+    
+        # Extraire le jour de la semaine et la date de début
     details_df['jour'] = details_df['début'].dt.day_name()
     details_df['date'] = details_df['début'].dt.date
 
@@ -119,7 +118,7 @@ def main():
     }
     details_df['jour_fr'] = details_df['jour'].map(day_translation)
 
-    # Convertir les colonnes pertinentes en format numérique
+# Convertir les colonnes pertinentes en format numérique
     numeric_columns = ['durée[mn]', 'surfacepropre_[mq]', 'vitesse_moyenne[km/h]', 'productivitéhoraire_[mq/h]']
     for col in numeric_columns:
         details_df[col] = pd.to_numeric(details_df[col].astype(str).str.replace(',', '.'), errors='coerce')
@@ -187,16 +186,13 @@ def main():
     def calculate_weekly_completion_rate(details_df, semaine):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
-        
         # Calculer le taux de complétion pour chaque parcours
         completion_rates = weekly_details.groupby('parcours')['terminerà_[%]'].mean()
-        
         # Calculer le taux de complétion hebdomadaire
         completed_routes = (completion_rates >= 90).sum()
         total_routes = len(completion_rates)
         weekly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
-        
-        return weekly_completion_rate , completion_rates
+        return weekly_completion_rate, completion_rates
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -213,11 +209,7 @@ def main():
 
     # Interface Streamlit
 
-    # Afficher les logos côte à côte
-    
-
-
-    st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
+    st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
 
     # Créer un dictionnaire pour mapper chaque semaine à la date de début de la semaine
     def get_week_start_dates(year):
@@ -235,26 +227,24 @@ def main():
     # Afficher le sélecteur de semaine avec les dates
     selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
 
+    
     # Sélection de la semaine
     semaine = selected_week
-
+    
     # Créer le tableau de suivi par parcours pour la semaine spécifiée
-    weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df, semaine)
+    weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
 
     # Calculer le taux de suivi à partir du tableau de suivi
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
 
     # Calculer le taux de complétion hebdomadaire
-    weekly_completion_rate = calculate_weekly_completion_rate(details_df, semaine)
+    weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df, semaine)
 
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
-
-
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
-
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -355,29 +345,9 @@ def main():
         st.subheader('Taux de Complétion')
         st.plotly_chart(fig_completion)
 
-    # Appliquer le style conditionnel
-    def style_cell(val):
-        if val == 'Fait':
-            return 'background-color: #13FF1A; color: black;'
-        elif val == 'Pas fait':
-            return 'background-color: #FF1313; color: #CACFD2;'
-        else:
-            return ''
-
-    def style_header(val):
-        return 'background-color: black; color: white;'
-
-    # Appliquer le style sur tout le DataFrame
-    styled_table = weekly_comparison_table.style.applymap(style_cell)
-    
-    # Appliquer le style sur la colonne "Parcours Prévu"
-    styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
-    # Appliquer le style sur les en-têtes de colonne
-    styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
-
     # Afficher le tableau de suivi par parcours
     st.subheader('Tableau de Suivi des Parcours')
-    st.dataframe(styled_table, width=2000)
+    st.dataframe(weekly_comparison_table, width=2000)
 
     # Créer l'histogramme des taux de complétion par parcours
     fig_hist = px.bar(completion_rates.reset_index(), x='parcours', y='terminerà_[%]',
@@ -390,3 +360,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+   
