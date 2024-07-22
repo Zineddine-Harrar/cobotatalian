@@ -209,7 +209,7 @@ def main():
 
     # Interface Streamlit
 
-    st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
+    st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
 
     # Créer un dictionnaire pour mapper chaque semaine à la date de début de la semaine
     def get_week_start_dates(year):
@@ -350,26 +350,32 @@ def main():
         st.subheader('Taux de Complétion')
         st.plotly_chart(fig_completion)
 
+    # Appliquer le style conditionnel
+    def style_cell(val):
+        if val == 'Fait':
+            return 'background-color: #13FF1A; color: black;'
+        elif val == 'Pas fait':
+            return 'background-color: #FF1313; color: #CACFD2;'
+        else:
+            return ''
+
+    def style_header(val):
+        return 'background-color: black; color: white;'
+
+    # Appliquer le style sur tout le DataFrame
+    styled_table = weekly_comparison_table.style.applymap(style_cell)
+    
+    # Appliquer le style sur la colonne "Parcours Prévu"
+    styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
+    # Appliquer le style sur les en-têtes de colonne
+    styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
+
     # Afficher le tableau de suivi par parcours
     st.subheader('Tableau de Suivi des Parcours')
-    st.dataframe(weekly_comparison_table, width=2000)
+    st.dataframe(styled_table, width=2000)
 
-    # Vérifiez si completion_rates peut être transformé en DataFrame
-    if isinstance(completion_rates, pd.Series):
-        completion_rates_df = completion_rates.reset_index()
-        st.write("completion_rates_df:", completion_rates_df.head())
-        
-        # Créer l'histogramme des taux de complétion par parcours
-        fig_hist = px.bar(completion_rates_df, x='parcours', y='terminerà_[%]',
-                          title='Taux de Complétion Hebdomadaire par Parcours',
-                          labels={'parcours': 'Parcours', 'terminerà_[%]': 'Taux de Complétion (%)'},
-                          template='plotly_dark')
 
-        # Afficher l'histogramme
-        st.plotly_chart(fig_hist)
-    else:
-        st.write("Erreur: completion_rates n'est pas une Series")
-
+    
 if __name__ == '__main__':
     main()
    
