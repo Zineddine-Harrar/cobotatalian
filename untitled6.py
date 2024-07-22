@@ -233,8 +233,6 @@ def main():
     # Créer le tableau de suivi par parcours pour la semaine spécifiée
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
     
-    # Afficher la structure du tableau de comparaison pour le débogage
-    st.write("Structure du tableau de comparaison:", weekly_comparison_table.head())
 
     # Calculer le taux de suivi à partir du tableau de suivi
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
