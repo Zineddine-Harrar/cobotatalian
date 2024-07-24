@@ -90,7 +90,7 @@ def main():
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('DATASET/IMON/19-07.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
-
+    
     # Nettoyer les colonnes dans details_df
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
     details_df.columns = details_df.columns.str.replace(' ', '_').str.lower()
@@ -98,7 +98,7 @@ def main():
     # Convertir les colonnes "début" et "fin" en format datetime
     details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M', errors='coerce')
     details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M', errors='coerce')
-
+    print(details_df['début'])
     # Extraire le jour de la semaine et la date de début
     details_df['jour'] = details_df['début'].dt.day_name()
     details_df['date'] = details_df['début'].dt.date
@@ -186,16 +186,13 @@ def main():
     def calculate_weekly_completion_rate(details_df, semaine):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
-        
         # Calculer le taux de complétion pour chaque parcours
         completion_rates = weekly_details.groupby('parcours')['terminerà_[%]'].mean()
-        
         # Calculer le taux de complétion hebdomadaire
         completed_routes = (completion_rates >= 90).sum()
         total_routes = len(completion_rates)
         weekly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
-        
-        return weekly_completion_rate
+        return weekly_completion_rate, completion_rates
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -227,20 +224,23 @@ def main():
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
 
-    # Afficher le sélecteur de semaine avec les dates
+   # Afficher le sélecteur de semaine avec les dates
     selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
 
-    
     # Sélection de la semaine
     semaine = selected_week
-    
+
+    # Créer le tableau de suivi par parcours pour la semaine spécifiée
+    weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
     
 
     # Calculer le taux de suivi à partir du tableau de suivi
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
 
     # Calculer le taux de complétion hebdomadaire
-    weekly_completion_rate = calculate_weekly_completion_rate(details_df, semaine)
+    weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df, semaine)
+
+    
 
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
@@ -371,5 +371,6 @@ def main():
     st.subheader('Tableau de Suivi des Parcours')
     st.dataframe(styled_table, width=2000)
 
+    
 if __name__ == '__main__':
     main()
