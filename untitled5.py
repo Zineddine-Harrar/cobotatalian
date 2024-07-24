@@ -96,7 +96,7 @@ def main():
     details_df.columns = details_df.columns.str.replace(' ', '_').str.lower()
 
     # Convertir les colonnes "début" et "fin" en format datetime
-    details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M', errors='coerce')
+    details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
     details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M', errors='coerce')
 
     # Extraire le jour de la semaine et la date de début
@@ -234,8 +234,7 @@ def main():
     # Sélection de la semaine
     semaine = selected_week
     
-    # Créer le tableau de suivi par parcours pour la semaine spécifiée
-    weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
+    
 
     # Calculer le taux de suivi à partir du tableau de suivi
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
