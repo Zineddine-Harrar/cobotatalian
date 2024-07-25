@@ -229,7 +229,6 @@ def main():
 
     # Sélection de la semaine
     semaine = selected_week
-    st.write(details_df)
     # Créer le tableau de suivi par parcours pour la semaine spécifiée
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
     
@@ -293,7 +292,6 @@ def main():
             """,
             unsafe_allow_html=True
         )
-    st.write(taux_suivi)
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
