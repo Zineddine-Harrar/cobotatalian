@@ -229,7 +229,7 @@ def main():
 
     # Sélection de la semaine
     semaine = selected_week
-
+    st.write(details_df)
     # Créer le tableau de suivi par parcours pour la semaine spécifiée
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
     
