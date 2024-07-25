@@ -293,7 +293,7 @@ def main():
             """,
             unsafe_allow_html=True
         )
-
+    st.write(taux_suivi)
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
