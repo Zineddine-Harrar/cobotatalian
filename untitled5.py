@@ -156,10 +156,10 @@ def main():
         return details_df
 
     # Nettoyer les doublons dans le dataframe details_df
-    details_df = clean_duplicates(details_df)
+    details_df1 = clean_duplicates(details_df)
 
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
-    def create_parcours_comparison_table(semaine, details_df, planning_df):
+    def create_parcours_comparison_table(semaine, details_df1, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
         
@@ -206,7 +206,7 @@ def main():
         return taux_suivi
 
     # Fonction pour calculer le taux de complétion hebdomadaire
-    def calculate_weekly_completion_rate(details_df, semaine):
+    def calculate_weekly_completion_rate(details_df1, semaine):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
         # Calculer le taux de complétion pour chaque parcours
