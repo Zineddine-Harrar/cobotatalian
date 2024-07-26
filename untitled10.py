@@ -150,7 +150,7 @@ def main():
         return details_df
 
     # Nettoyer les doublons dans le dataframe details_df
-    details_df = clean_duplicates(details_df)
+    details_df1 = clean_duplicates(details_df)
     def create_parcours_comparison_table(semaine, details_df, planning_df):
         weekly_details = details_df[details_df['semaine'] == semaine]
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
@@ -233,9 +233,9 @@ def main():
     # Sélection de la semaine
     semaine = selected_week
 
-    weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
+    weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-    completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df, semaine)
+    completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df1, semaine)
     heures_cumulees, surface_nettoyee, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
     st.markdown("## **Indicateurs Hebdomadaires**")
