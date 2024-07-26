@@ -216,9 +216,9 @@ def main():
 
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-    weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df, semaine)
+    weekly_completion_rate = calculate_weekly_completion_rate(details_df, semaine)
     heures_cumulees, surface_nettoyee, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
-
+    completion_rates = calculate_weekly_completion_rate(details_df, semaine)
     st.markdown("## **Indicateurs Hebdomadaires**")
     col1, col2, col3 = st.columns(3)
 
