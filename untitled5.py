@@ -229,6 +229,7 @@ def main():
 
     # Sélection de la semaine
     semaine = selected_week
+
     # Créer le tableau de suivi par parcours pour la semaine spécifiée
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
     
@@ -292,6 +293,7 @@ def main():
             """,
             unsafe_allow_html=True
         )
+
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
@@ -368,6 +370,25 @@ def main():
     # Afficher le tableau de suivi par parcours
     st.subheader('Tableau de Suivi des Parcours')
     st.dataframe(styled_table, width=2000)
+
+    
+    completion_rates_df = completion_rates.reset_index()
+    # Renommer les colonnes pour supprimer les caractères spéciaux
+    completion_rates_df.columns = ['parcours', 'taux_completion']
+
+        
+    # Transformer en DataFrame pour Plotly
+    completion_rates_df = completion_rates.reset_index()
+    completion_rates_df.columns = ['parcours', 'taux_completion']
+
+    # Créer l'histogramme des taux de complétion par parcours
+    fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
+                  title='Taux de Complétion Hebdomadaire par Parcours',
+                  labels={'parcours': 'Parcours', 'taux_completion': 'Taux de Complétion (%)'},
+                  template='plotly_dark')
+
+    # Afficher l'histogramme dans Streamlit
+    st.plotly_chart(fig_hist)
 
     
 if __name__ == '__main__':
