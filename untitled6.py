@@ -135,6 +135,26 @@ def main():
         return planning_df
 
     planning_df = add_weeks_to_planning_df(planning_df)
+    # Fonction pour nettoyer les doublons
+    def clean_duplicates(details_df):
+        # Convertir les colonnes "début" et "fin" en format datetime
+        details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
+        details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M', errors='coerce')
+    
+        # Extraire la date de début
+        details_df['date'] = details_df['début'].dt.date
+    
+        # Garder la ligne avec le plus haut pourcentage de complétion pour chaque groupe (location, route, date)
+        details_df = details_df.loc[details_df.groupby(['parcours', 'date'])['terminerà_[%]'].idxmax()]
+    
+        # Additionner les colonnes surface, durée et distance pour chaque groupe
+        sum_columns = ['surfacepropre_[mq]', 'durée[mn]']
+        details_df[sum_columns] = details_df.groupby(['parcours', 'début'])[sum_columns].transform('sum')
+    
+        return details_df
+
+    # Nettoyer les doublons dans le dataframe details_df
+    details_df = clean_duplicates(details_df)
 
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
     def create_parcours_comparison_table(semaine, details_df, planning_df):
