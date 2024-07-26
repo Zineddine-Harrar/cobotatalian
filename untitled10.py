@@ -2,10 +2,10 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 import plotly.graph_objects as go
+import plotly.express as px  # Assurez-vous d'importer plotly.express pour px.bar
 import matplotlib.pyplot as plt
 
 def main():
-
     st.markdown(
         """
         <style>
@@ -87,7 +87,6 @@ def main():
         unsafe_allow_html=True
     )
 
-     
     # Charger les fichiers CSV
     planning_df = pd.read_csv('ECOBOT40.csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('DATASET/ECOBOT40/22-07 Eco bot 40.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
@@ -158,17 +157,19 @@ def main():
 
         comparison_table = pd.DataFrame(rows)
         return comparison_table
-    testcomp = create_parcours_comparison_table(28
-                                            , details_df, planning_df)
+
+    testcomp = create_parcours_comparison_table(28, details_df, planning_df)
+
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
         total_parcours = 28
         parcours_faits = comparison_table.apply(lambda row: list(row[1:]).count("Fait"), axis=1).sum()
         taux_suivi = (parcours_faits / total_parcours) * 100 if total_parcours > 0 else 0
         return taux_suivi
-    
+
     testtaux = calculate_taux_suivi_from_table(testcomp)
     print(testtaux)
+
     # Fonction pour calculer le taux de complétion hebdomadaire
     def calculate_weekly_completion_rate(details_df, semaine):
         weekly_details = details_df[details_df['semaine'] == semaine]
@@ -176,9 +177,11 @@ def main():
         completed_routes = (completion_rates >= 90).sum()
         total_routes = len(completion_rates)
         weekly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
-        return weekly_completion_rate
-    testcompletion = calculate_weekly_completion_rate(details_df, 28)
-    print(testcompletion)
+        return completion_rates, weekly_completion_rate
+
+    completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df, 28)
+    print(weekly_completion_rate)
+
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
         weekly_details = details_df[details_df['semaine'] == semaine]
@@ -186,12 +189,11 @@ def main():
         surface_nettoyee = weekly_details['actual_cleaning_area(?)'].sum()
         productivite_moyenne = weekly_details['work_efficiency_(?/h)'].mean()
         return heures_cumulees, surface_nettoyee, productivite_moyenne
-    
+
     testkpi = calculate_weekly_indicators(details_df, 28)
     print(testkpi)
 
-# Interface Streamlit
-    
+    # Interface Streamlit
     st.title('Indicateurs de Suivi des Parcours du ECOBOT 40')
 
     # Créer un dictionnaire pour mapper chaque semaine à la date de début de la semaine
@@ -210,15 +212,14 @@ def main():
     # Afficher le sélecteur de semaine avec les dates
     selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
 
-    
     # Sélection de la semaine
     semaine = selected_week
 
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-    weekly_completion_rate = calculate_weekly_completion_rate(details_df, semaine)
+    completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df, semaine)
     heures_cumulees, surface_nettoyee, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
-    completion_rates = calculate_weekly_completion_rate(details_df, semaine)
+
     st.markdown("## **Indicateurs Hebdomadaires**")
     col1, col2, col3 = st.columns(3)
 
@@ -254,7 +255,7 @@ def main():
             """,
             unsafe_allow_html=True,
         )
-    
+
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
@@ -322,7 +323,7 @@ def main():
 
     # Appliquer le style sur tout le DataFrame
     styled_table = weekly_comparison_table.style.applymap(style_cell)
-    
+
     # Appliquer le style sur la colonne "Parcours Prévu"
     styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
     # Appliquer le style sur les en-têtes de colonne
@@ -338,13 +339,12 @@ def main():
 
     # Créer l'histogramme des taux de complétion par parcours
     fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
-                  title='Taux de Complétion Hebdomadaire par Parcours',
-                  labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Complétion (%)'},
-                  template='plotly_dark')
+                      title='Taux de Complétion Hebdomadaire par Parcours',
+                      labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Complétion (%)'},
+                      template='plotly_dark')
 
     # Afficher l'histogramme dans Streamlit
     st.plotly_chart(fig_hist)
 
 if __name__ == '__main__':
     main()
-
