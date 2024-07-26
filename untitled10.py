@@ -216,7 +216,7 @@ def main():
 
     weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-    weekly_completion_rate = calculate_weekly_completion_rate(details_df, semaine)
+    weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df, semaine)
     heures_cumulees, surface_nettoyee, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
     st.markdown("## **Indicateurs Hebdomadaires**")
@@ -332,6 +332,18 @@ def main():
     st.subheader('Tableau de Suivi des Parcours')
     st.dataframe(styled_table, width=2000)
 
+    completion_rates_df = completion_rates.reset_index()
+    # Renommer les colonnes pour supprimer les caractères spéciaux
+    completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
+
+    # Créer l'histogramme des taux de complétion par parcours
+    fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
+                  title='Taux de Complétion Hebdomadaire par Parcours',
+                  labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Complétion (%)'},
+                  template='plotly_dark')
+
+    # Afficher l'histogramme dans Streamlit
+    st.plotly_chart(fig_hist)
 
 if __name__ == '__main__':
     main()
