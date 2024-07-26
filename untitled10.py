@@ -132,7 +132,25 @@ def main():
         return planning_df
 
     planning_df = add_weeks_to_planning_df(planning_df)
+    # Fonction pour nettoyer les doublons
+    def clean_duplicates(details_df):
+        # Convertir les colonnes "début" et "fin" en format datetime
+        details_df['task_start_time'] = pd.to_datetime(details_df['task_start_time'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
+    
+        # Extraire la date de début
+        details_df['date'] = details_df['task_start_time'].dt.date
+    
+        # Garder la ligne avec le plus haut pourcentage de complétion pour chaque groupe (location, route, date)
+        details_df = details_df.loc[details_df.groupby(['cleaning_plan', 'date'])['task_completion_(%)'].idxmax()]
+    
+        # Additionner les colonnes surface, durée et distance pour chaque groupe
+        sum_columns = ['actual_cleaning_area(?)', 'total_time_(h)', 'work_efficiency_(?/h)']
+        details_df[sum_columns] = details_df.groupby(['cleaning_plan', 'task_start_time'])[sum_columns].transform('sum')
+    
+        return details_df
 
+    # Nettoyer les doublons dans le dataframe details_df
+    details_df = clean_duplicates(details_df)
     def create_parcours_comparison_table(semaine, details_df, planning_df):
         weekly_details = details_df[details_df['semaine'] == semaine]
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
