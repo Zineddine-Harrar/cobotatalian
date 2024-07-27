@@ -34,6 +34,10 @@ def login(username, password):
                 return True
     return False
 
+# Fonction pour rediriger avec JavaScript
+def js_redirect(url):
+    st.write(f'<script>window.location.href = "{url}";</script>', unsafe_allow_html=True)
+
 # Fonction principale
 def main():
     st.set_page_config(page_title="ATALIAN COBOT", layout="wide")
@@ -110,7 +114,7 @@ def login_section():
             st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            st.query_params.update(logged_in="true")
+            js_redirect(st.get_url() + "?logged_in=true")
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -124,7 +128,7 @@ def app_selection_page():
         st.session_state['logged_in'] = False
         st.session_state['username'] = ''
         st.session_state['selected_app'] = None
-        st.query_params.update(logged_in="false")
+        js_redirect(st.get_url() + "?logged_in=false")
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -132,17 +136,17 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            st.query_params.update(app="rquartz_imon")
+            js_redirect(st.get_url() + "?app=rquartz_imon")
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            st.query_params.update(app="rquartz_t2f")
+            js_redirect(st.get_url() + "?app=rquartz_t2f")
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            st.query_params.update(app="ecobot_40")
+            js_redirect(st.get_url() + "?app=ecobot_40")
 
     if st.session_state['selected_app']:
         run_selected_app()
