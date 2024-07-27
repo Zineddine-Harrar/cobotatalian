@@ -119,8 +119,7 @@ def login_section():
             st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            new_query_params = {**st.experimental_get_query_params(), "logged_in": "true"}
-            st.experimental_set_query_params(**new_query_params)
+            st.query_params.update({"logged_in": "true"})
             js_redirect(f"{st.get_url()}?logged_in=true")
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
@@ -135,8 +134,7 @@ def app_selection_page():
         st.session_state['logged_in'] = False
         st.session_state['username'] = ''
         st.session_state['selected_app'] = None
-        new_query_params = {**st.experimental_get_query_params(), "logged_in": "false"}
-        st.experimental_set_query_params(**new_query_params)
+        st.query_params.update({"logged_in": "false"})
         js_redirect(f"{st.get_url()}?logged_in=false")
 
     st.markdown("### Sélectionnez une application")
@@ -145,22 +143,19 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            new_query_params = {**st.experimental_get_query_params(), "app": "rquartz_imon"}
-            st.experimental_set_query_params(**new_query_params)
+            st.query_params.update({"app": "rquartz_imon"})
             js_redirect(f"{st.get_url()}?app=rquartz_imon")
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            new_query_params = {**st.experimental_get_query_params(), "app": "rquartz_t2f"}
-            st.experimental_set_query_params(**new_query_params)
+            st.query_params.update({"app": "rquartz_t2f"})
             js_redirect(f"{st.get_url()}?app=rquartz_t2f")
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            new_query_params = {**st.experimental_get_query_params(), "app": "ecobot_40"}
-            st.experimental_set_query_params(**new_query_params)
+            st.query_params.update({"app": "ecobot_40"})
             js_redirect(f"{st.get_url()}?app=ecobot_40")
 
     if st.session_state['selected_app']:
