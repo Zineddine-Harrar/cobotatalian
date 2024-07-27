@@ -35,12 +35,15 @@ def login(username, password):
     return False
 
 # Fonction pour rediriger avec JavaScript
-def js_redirect(url):
-    st.write(f'<script>window.location.href = "{url}";</script>', unsafe_allow_html=True)
-
-# Fonction pour obtenir l'URL actuelle
-def get_current_url():
-    return st.script_run_ctx().query_string
+def js_redirect(params):
+    js_code = f"""
+        <script>
+            const params = new URLSearchParams(window.location.search);
+            {"".join([f'params.set("{key}", "{value}");' for key, value in params.items()])}
+            window.location.search = params.toString();
+        </script>
+    """
+    st.write(js_code, unsafe_allow_html=True)
 
 # Fonction principale
 def main():
@@ -94,11 +97,11 @@ def main():
     if 'selected_app' not in st.session_state:
         st.session_state['selected_app'] = None
 
-    query_params = st.query_params
-    if 'logged_in' in query_params and query_params['logged_in'] == 'true':
+    query_params = st.experimental_get_query_params()
+    if 'logged_in' in query_params and query_params['logged_in'][0] == 'true':
         st.session_state['logged_in'] = True
 
-    if 'logged_in' in query_params and query_params['logged_in'] == 'false':
+    if 'logged_in' in query_params and query_params['logged_in'][0] == 'false':
         st.session_state['logged_in'] = False
 
     if st.session_state['logged_in']:
@@ -118,7 +121,7 @@ def login_section():
             st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            js_redirect(f"{get_current_url()}&logged_in=true")
+            js_redirect({"logged_in": "true"})
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -132,7 +135,7 @@ def app_selection_page():
         st.session_state['logged_in'] = False
         st.session_state['username'] = ''
         st.session_state['selected_app'] = None
-        js_redirect(f"{get_current_url()}&logged_in=false")
+        js_redirect({"logged_in": "false"})
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -140,17 +143,17 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            js_redirect(f"{get_current_url()}&app=rquartz_imon")
+            js_redirect({"app": "rquartz_imon"})
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            js_redirect(f"{get_current_url()}&app=rquartz_t2f")
+            js_redirect({"app": "rquartz_t2f"})
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            js_redirect(f"{get_current_url()}&app=ecobot_40")
+            js_redirect({"app": "ecobot_40"})
 
     if st.session_state['selected_app']:
         run_selected_app()
