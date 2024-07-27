@@ -91,7 +91,7 @@ def main():
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
-    details_df = pd.read_csv('19-07 (3) (1).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
+    details_df = pd.read_csv('DATASET/IMON/19-07 (3) (1).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
     
     # Nettoyer les colonnes dans details_df
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
@@ -229,8 +229,8 @@ def main():
         productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
         
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
-    # Load the dataset with appropriate header row
-    file_path = "C:\\Users\zined\Downloads\\Détails de l'alarme de la machines (4).xlsx"
+   # Load the dataset with appropriate header row
+    file_path = "DATASET/ALERTE/IMON/Détails de l'alarme de la machines (4).xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
     
     # Rename columns for easier access
