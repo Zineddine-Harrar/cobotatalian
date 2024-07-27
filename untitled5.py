@@ -1,9 +1,3 @@
-import subprocess
-import sys
-
-# Ensure openpyxl is installed
-subprocess.check_call([sys.executable, "-m", "pip", "install", "openpyxl"])
-
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
@@ -235,7 +229,7 @@ def main():
         productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
         
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
-   # Load the dataset with appropriate header row
+    # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/Détails de l'alarme de la machines (4).xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
     
@@ -299,15 +293,12 @@ def main():
 
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
-    
     # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
     # Calculate the count of alerts by description
     alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
     alert_count_by_description.columns = ['Description', 'Alert Count']
-
-
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
@@ -460,7 +451,6 @@ def main():
                       labels={'Description': 'Description', 'Alert Count': 'Number of Alerts'},
                       template='plotly_dark')
     st.plotly_chart(fig_hist)
-
     
 if __name__ == '__main__':
     main()
