@@ -87,6 +87,7 @@ def main():
         st.session_state.pop('selected_app', None)
         query_params.clear()
         st.experimental_set_query_params(**query_params)
+        st.experimental_rerun()
 
     if not st.session_state['logged_in']:
         login_section()
@@ -106,6 +107,7 @@ def login_section():
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
             st.experimental_set_query_params()
+            st.experimental_rerun()
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -117,6 +119,7 @@ def app_selection_page():
     st.markdown('<h1 class="custom-title">Applications RQUARTZ</h1>', unsafe_allow_html=True)
     if st.button("Déconnexion"):
         st.experimental_set_query_params(logout="true")
+        st.experimental_rerun()
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -127,14 +130,17 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
+            st.experimental_rerun()
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
+            st.experimental_rerun()
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
+            st.experimental_rerun()
 
     if st.session_state['selected_app']:
         run_selected_app()
