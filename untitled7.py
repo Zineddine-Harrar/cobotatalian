@@ -85,8 +85,7 @@ def main():
         st.session_state['logged_in'] = False
         st.session_state.pop('username', None)
         st.session_state.pop('selected_app', None)
-        query_params.clear()
-        st.experimental_set_query_params(**query_params)
+        st.experimental_set_query_params()
         st.experimental_rerun()
 
     if not st.session_state['logged_in']:
@@ -106,10 +105,7 @@ def login_section():
             st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            st.experimental_set_query_params()
-            st.experimental_rerun()
-        else:
-            st.error("Nom d'utilisateur ou mot de passe incorrect")
+            st.experimental_set_query_params(logged_in="true")
 
 # Page de sélection de l'application
 def app_selection_page():
@@ -119,7 +115,6 @@ def app_selection_page():
     st.markdown('<h1 class="custom-title">Applications RQUARTZ</h1>', unsafe_allow_html=True)
     if st.button("Déconnexion"):
         st.experimental_set_query_params(logout="true")
-        st.experimental_rerun()
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
