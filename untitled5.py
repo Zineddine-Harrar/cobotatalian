@@ -229,7 +229,33 @@ def main():
         productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
         
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
+    # Load the dataset with appropriate header row
+    file_path = "DATASET/ALERTE/IMON/Détails de l'alarme de la machines (4).xlsx"
+    alarm_details_df = pd.read_excel(file_path, header=4)
+    
+    # Rename columns for easier access
+    alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Modèle_machine', 'Machine_Description', 'N_de_série']
 
+    # Convert 'Apparition_Date' and 'Retour_Date' columns to string format if not already
+    alarm_details_df['Apparition_Date'] = alarm_details_df['Apparition_Date'].astype(str)
+    alarm_details_df['Retour_Date'] = alarm_details_df['Retour_Date'].astype(str)
+
+    # Combine 'Apparition_Date' and 'Apparition_Time' into a single datetime column
+    alarm_details_df['Apparition'] = pd.to_datetime(alarm_details_df['Apparition_Date'] + ' ' + alarm_details_df['Apparition_Time'], format='%Y-%m-%d %H:%M:%S')
+
+    # Combine 'Retour_Date' and 'Retour_Time' into a single datetime column
+    alarm_details_df['Retour'] = pd.to_datetime(alarm_details_df['Retour_Date'] + ' ' + alarm_details_df['Retour_Time'], format='%Y-%m-%d %H:%M:%S')
+
+    # Calculate resolution time in minutes
+    alarm_details_df['Resolution Time'] = (alarm_details_df['Retour'] - alarm_details_df['Apparition']).dt.total_seconds() / 60
+
+    # Drop intermediate columns
+    alarm_details_df.drop(columns=['Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Index'], inplace=True)
+
+    # Function to filter data by week
+    def filter_data_by_week(data, week_number):
+        data['week'] = data['Apparition'].dt.isocalendar().week
+        return data[data['week'] == week_number]
     # Interface Streamlit
 
     st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
@@ -267,7 +293,12 @@ def main():
 
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
+    # Filter alarm data by the selected week
+    filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
+    # Calculate the count of alerts by description
+    alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
+    alert_count_by_description.columns = ['Description', 'Alert Count']
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
@@ -412,7 +443,14 @@ def main():
 
     # Afficher l'histogramme dans Streamlit
     st.plotly_chart(fig_hist)
-
+    
+    # Visualize the count of alerts by description
+    st.subheader('Count of Alerts by Description')
+    fig_hist = px.bar(alert_count_by_description, x='Description', y='Alert Count',
+                      title='Count of Alerts by Description for Week {}'.format(semaine),
+                      labels={'Description': 'Description', 'Alert Count': 'Number of Alerts'},
+                      template='plotly_dark')
+    st.plotly_chart(fig_hist)
     
 if __name__ == '__main__':
     main()
