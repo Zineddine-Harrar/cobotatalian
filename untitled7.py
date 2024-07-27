@@ -87,10 +87,10 @@ def main():
         st.session_state['selected_app'] = None
 
     query_params = st.query_params
-    if 'logged_in' in query_params and query_params['logged_in'] == 'true':
+    if 'logged_in' in query_params and query_params['logged_in'] == ['true']:
         st.session_state['logged_in'] = True
 
-    if 'logged_in' in query_params and query_params['logged_in'] == 'false':
+    if 'logged_in' in query_params and query_params['logged_in'] == ['false']:
         st.session_state['logged_in'] = False
 
     if st.session_state['logged_in']:
@@ -111,8 +111,7 @@ def login_section():
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
             st.experimental_set_query_params(logged_in="true")
-            st.experimental_set_query_params(logged_in="true")
-
+            st.experimental_rerun()  # Force the script to rerun after setting the session state
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -127,7 +126,7 @@ def app_selection_page():
         st.session_state['username'] = ''
         st.session_state['selected_app'] = None
         st.experimental_set_query_params(logged_in="false")
-        st.experimental_set_query_params(logged_in="false")
+        st.experimental_rerun()  # Force the script to rerun after setting the session state
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
