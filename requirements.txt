@@ -1,5 +1,5 @@
 firebase-admin
-streamlit
+streamlit==1.27.0
 pandas
 plotly
 matplotlib
