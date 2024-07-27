@@ -111,8 +111,7 @@ def login_section():
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
             st.experimental_set_query_params(logged_in="true")
-            # Redirection en rechargeant la page
-            st.experimental_set_query_params(logged_in="true")
+            st.experimental_rerun()  # Force the script to rerun after setting the session state
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -127,8 +126,7 @@ def app_selection_page():
         st.session_state['username'] = ''
         st.session_state['selected_app'] = None
         st.experimental_set_query_params(logged_in="false")
-        # Redirection en rechargeant la page
-        st.experimental_set_query_params(logged_in="false")
+        st.experimental_rerun()  # Force the script to rerun after setting the session state
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -136,17 +134,17 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            st.experimental_set_query_params(app="rquartz_imon")
+            st.experimental_rerun()
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            st.experimental_set_query_params(app="rquartz_t2f")
+            st.experimental_rerun()
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            st.experimental_set_query_params(app="ecobot_40")
+            st.experimental_rerun()
 
     if st.session_state['selected_app']:
         run_selected_app()
