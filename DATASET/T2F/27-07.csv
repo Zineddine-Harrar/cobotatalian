@@ -1,0 +1,390 @@
+;Code;Composant;Description;Apparition;;Retour;;Modèle machine;Description;N. de série
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;08/07/2024;08:53:37;08/07/2024;09:00:44;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;08/07/2024;09:12:52;08/07/2024;09:13:52;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;08/07/2024;09:15:31;08/07/2024;09:18:11;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;09/07/2024;06:55:07;09/07/2024;09:12:26;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;09/07/2024;09:45:48;09/07/2024;09:53:05;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;09/07/2024;09:55:52;09/07/2024;09:56:23;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;09/07/2024;10:07:00;09/07/2024;10:14:58;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;10/07/2024;08:13:16;10/07/2024;08:21:07;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;10/07/2024;08:16:47;10/07/2024;08:20:57;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;10/07/2024;08:23:25;10/07/2024;08:23:58;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;10/07/2024;08:25:51;10/07/2024;08:36:09;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;4;"Carte de Telematics
+";Niveau d'eau bas;11/07/2024;07:21:37;11/07/2024;07:54:43;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;11/07/2024;07:23:17;11/07/2024;07:51:59;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;11/07/2024;07:26:46;11/07/2024;07:51:50;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;4;"Carte de Telematics
+";Niveau d'eau bas;11/07/2024;11:19:37;11/07/2024;13:12:44;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;24, 9, 101;Carte de fonction;Alarme carte traction;11/07/2024;11:32:43;11/07/2024;12:02:15;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;12/07/2024;12:14:12;12/07/2024;12:16:41;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;15/07/2024;11:01:44;15/07/2024;11:27:58;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;15/07/2024;11:28:02;15/07/2024;11:40:07;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;23, 9, -105;Carte de fonction;Alarme carte contrôle direction;15/07/2024;11:40:26;15/07/2024;11:47:26;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;4;"Carte de Telematics
+";Niveau d'eau bas;16/07/2024;07:25:49;16/07/2024;07:30:03;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;17/07/2024;07:24:38;17/07/2024;07:29:43;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;17/07/2024;07:28:08;17/07/2024;07:29:14;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;17/07/2024;07:29:21;17/07/2024;07:29:43;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;10:28:05;18/07/2024;10:28:56;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;18/07/2024;12:38:44;18/07/2024;12:45:55;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;08:04:06;19/07/2024;08:04:07;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;4;"Carte de Telematics
+";Niveau d'eau bas;19/07/2024;09:23:10;19/07/2024;10:30:37;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;19/07/2024;11:32:59;19/07/2024;12:00:38;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;19/07/2024;12:02:39;19/07/2024;14:46:33;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;4;"Carte de Telematics
+";Niveau d'eau bas;19/07/2024;14:50:33;23/07/2024;08:43:48;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;51, 9, -34;Carte de fonction;Unité 2 éteinte;23/07/2024;09:27:25;23/07/2024;09:29:44;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;66, 9, -33;Carte de fonction;Time out verin de brosse;23/07/2024;09:29:55;23/07/2024;09:30:06;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;23/07/2024;09:33:57;24/07/2024;06:01:56;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;24/07/2024;06:01:56;24/07/2024;06:04:07;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;4;"Carte de Telematics
+";Niveau d'eau bas;25/07/2024;09:48:49;25/07/2024;10:03:38;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;24, 9, 101;Carte de fonction;Alarme carte traction;25/07/2024;09:57:17;25/07/2024;10:00:17;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;79, 1, 91;Carte de fonction;79;25/07/2024;10:13:02;25/07/2024;10:13:05;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;25/07/2024;10:18:38;25/07/2024;10:18:45;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;25/07/2024;10:47:07;25/07/2024;10:48:33;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;25/07/2024;11:39:00;25/07/2024;11:50:49;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;25/07/2024;11:50:49;26/07/2024;06:37:33;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;26/07/2024;06:43:11;26/07/2024;06:43:18;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;26/07/2024;06:44:08;26/07/2024;06:44:23;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;5;"Carte de Telematics
+";Niveau de detergent bas;26/07/2024;09:13:34;26/07/2024;12:09:56;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;5;"Carte de Telematics
+";Niveau de detergent bas;26/07/2024;12:10:56;;;Robot Quartz;Atalian R-Q 80 03 5873 Roissy Pole;2022005873
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;08/07/2024;09:54:38;08/07/2024;09:55:16;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;08/07/2024;12:15:19;08/07/2024;12:18:19;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;08/07/2024;23:27:56;08/07/2024;23:42:33;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;08/07/2024;23:31:26;08/07/2024;23:42:34;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;08/07/2024;23:50:48;08/07/2024;23:51:48;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;09/07/2024;00:04:49;09/07/2024;00:05:49;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;09/07/2024;00:29:16;09/07/2024;00:30:12;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;09/07/2024;02:52:57;09/07/2024;03:07:33;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;09/07/2024;03:05:21;09/07/2024;03:05:29;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;09/07/2024;03:32:14;09/07/2024;03:35:41;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;09/07/2024;08:22:11;09/07/2024;08:23:51;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;09/07/2024;08:46:11;09/07/2024;08:48:05;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;09/07/2024;11:08:02;09/07/2024;11:15:52;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;09/07/2024;11:11:32;09/07/2024;11:15:40;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;09/07/2024;11:54:44;09/07/2024;14:43:30;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;09/07/2024;23:33:48;09/07/2024;23:34:48;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;09/07/2024;23:36:48;09/07/2024;23:37:48;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;09/07/2024;23:39:58;09/07/2024;23:40:00;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;10/07/2024;01:33:38;10/07/2024;01:51:18;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;10/07/2024;04:46:10;10/07/2024;04:52:29;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;21, 9, -64;Carte de fonction;Erreur communication carte de contrôle direction;10/07/2024;09:24:24;10/07/2024;09:26:23;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;10/07/2024;10:07:00;10/07/2024;10:21:54;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;10/07/2024;10:10:29;10/07/2024;10:21:55;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;10/07/2024;10:24:00;10/07/2024;10:25:26;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;10/07/2024;10:26:57;10/07/2024;10:52:49;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;10/07/2024;10:30:27;10/07/2024;10:47:01;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;10/07/2024;10:52:02;10/07/2024;10:52:51;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;10/07/2024;11:01:54;10/07/2024;11:08:15;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;10/07/2024;11:05:28;10/07/2024;11:08:15;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;10/07/2024;11:08:32;10/07/2024;11:12:12;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;11/07/2024;00:29:46;11/07/2024;01:20:31;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;24, 9, 101;Carte de fonction;Alarme carte traction;11/07/2024;00:45:22;11/07/2024;01:15:37;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;11/07/2024;02:28:48;11/07/2024;02:55:51;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;24, 9, 101;Carte de fonction;Alarme carte traction;11/07/2024;02:46:59;11/07/2024;02:52:05;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;11/07/2024;09:13:03;11/07/2024;09:22:10;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;11/07/2024;09:16:32;11/07/2024;09:22:10;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;11/07/2024;09:33:26;11/07/2024;10:03:34;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;11/07/2024;09:36:57;11/07/2024;10:03:35;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;11/07/2024;10:57:27;11/07/2024;13:43:45;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;11/07/2024;13:07:50;11/07/2024;13:24:02;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;11/07/2024;13:25:25;11/07/2024;13:27:09;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;11/07/2024;23:27:01;11/07/2024;23:40:48;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;12/07/2024;01:02:28;12/07/2024;01:24:58;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;12/07/2024;02:20:53;12/07/2024;03:16:16;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;50, 9, -40;Carte de fonction;Unité 1 éteinte;12/07/2024;02:23:46;12/07/2024;03:12:07;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;13/07/2024;00:07:00;13/07/2024;00:15:17;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;00:32:48;13/07/2024;03:34:07;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;13/07/2024;00:36:18;13/07/2024;03:33:54;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:14:30;13/07/2024;08:15:30;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:17:31;13/07/2024;08:18:31;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:19:40;13/07/2024;08:23:14;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:24:55;13/07/2024;08:25:35;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:26:53;13/07/2024;08:27:53;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:30:19;13/07/2024;08:33:12;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:34:32;13/07/2024;08:35:28;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:37:38;13/07/2024;08:40:22;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:41:07;13/07/2024;08:44:44;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:46:18;13/07/2024;08:48:19;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;08:49:19;13/07/2024;08:49:46;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;09:04:52;13/07/2024;09:15:31;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;13/07/2024;09:08:21;13/07/2024;09:15:31;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;13/07/2024;09:54:11;13/07/2024;10:05:57;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;13/07/2024;09:57:40;13/07/2024;10:05:57;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;16/07/2024;08:39:58;16/07/2024;09:54:45;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;16/07/2024;10:01:36;16/07/2024;10:01:44;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;16/07/2024;10:17:16;16/07/2024;10:19:46;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;79, 1, 91;Carte de fonction;79;16/07/2024;10:22:05;16/07/2024;10:22:08;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;16/07/2024;10:33:54;16/07/2024;10:34:02;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;24, 9, 124;Carte de fonction;Alarme carte traction;16/07/2024;10:34:02;16/07/2024;10:35:43;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;16/07/2024;23:37:42;17/07/2024;00:03:48;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;24, 9, 101;Carte de fonction;Alarme carte traction;16/07/2024;23:54:24;16/07/2024;23:57:17;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;17/07/2024;01:34:48;17/07/2024;01:38:21;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;17/07/2024;01:57:05;17/07/2024;01:57:19;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;8;"Carte de Telematics
+";Niveau de batterie faible;17/07/2024;03:15:57;17/07/2024;03:41:51;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;67, 0, -15;Carte de fonction;Attention niveau batterie bas;17/07/2024;03:15:59;17/07/2024;03:41:54;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;17/07/2024;03:17:00;17/07/2024;04:46:13;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;8;"Carte de Telematics
+";Niveau de batterie faible;17/07/2024;03:41:54;17/07/2024;04:40:20;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;8;"Carte de Telematics
+";Niveau de batterie faible;17/07/2024;04:41:20;17/07/2024;07:30:30;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;17/07/2024;08:37:29;17/07/2024;09:00:48;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;17/07/2024;08:41:00;17/07/2024;08:49:54;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;17/07/2024;08:54:54;17/07/2024;08:59:00;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;17/07/2024;09:02:39;17/07/2024;09:11:40;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;17/07/2024;09:31:07;17/07/2024;09:36:20;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;17/07/2024;09:34:36;17/07/2024;09:36:20;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;17/07/2024;10:25:07;17/07/2024;10:27:27;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;01:35:52;18/07/2024;01:40:13;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;18/07/2024;01:39:20;18/07/2024;01:40:14;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;01:44:16;18/07/2024;01:52:38;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;18/07/2024;01:47:46;18/07/2024;01:52:39;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;01:54:18;18/07/2024;02:19:02;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;18/07/2024;01:57:48;18/07/2024;02:19:04;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;02:20:35;18/07/2024;02:20:44;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;02:22:17;18/07/2024;02:26:19;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;18/07/2024;02:25:46;18/07/2024;02:25:57;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;02:27:52;18/07/2024;03:26:16;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;18/07/2024;02:31:22;18/07/2024;03:25:55;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;18/07/2024;05:12:46;18/07/2024;05:14:44;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;08:47:56;18/07/2024;08:48:01;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;10:25:28;18/07/2024;10:25:53;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;18/07/2024;10:39:06;18/07/2024;10:42:01;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;00:34:56;19/07/2024;00:35:08;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;00:41:17;19/07/2024;01:09:57;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;19/07/2024;00:44:46;19/07/2024;01:01:50;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;19/07/2024;01:06:50;19/07/2024;01:09:57;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;02:48:13;19/07/2024;02:50:09;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;02:51:42;19/07/2024;04:21:02;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;19/07/2024;02:55:11;19/07/2024;04:20:55;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;07:54:08;19/07/2024;07:56:08;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;10:39:01;19/07/2024;10:48:24;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;19/07/2024;10:42:30;19/07/2024;10:48:24;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;11:36:59;19/07/2024;11:37:58;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;11:41:34;19/07/2024;11:51:34;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;19/07/2024;11:45:04;19/07/2024;11:51:34;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;19/07/2024;12:08:51;19/07/2024;12:33:05;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;19/07/2024;12:12:21;19/07/2024;12:33:06;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;19/07/2024;12:33:45;19/07/2024;12:45:34;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;20/07/2024;10:39:56;20/07/2024;10:50:24;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;20/07/2024;10:43:27;20/07/2024;10:50:26;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;20/07/2024;11:52:04;20/07/2024;11:55:04;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;20/07/2024;12:27:45;20/07/2024;12:30:09;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;21/07/2024;00:07:38;21/07/2024;00:07:55;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;21/07/2024;02:30:44;21/07/2024;02:53:02;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;21/07/2024;02:34:14;21/07/2024;02:53:04;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;21/07/2024;02:54:38;21/07/2024;03:27:00;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;21/07/2024;02:58:08;21/07/2024;03:27:00;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;21/07/2024;08:39:57;21/07/2024;08:49:58;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;21/07/2024;08:43:26;21/07/2024;08:49:58;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;21/07/2024;10:57:30;21/07/2024;11:11:49;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;21/07/2024;11:02:00;21/07/2024;11:11:47;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;21/07/2024;11:16:05;21/07/2024;11:23:50;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;21/07/2024;11:19:37;21/07/2024;11:23:41;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;21/07/2024;12:01:03;21/07/2024;12:54:16;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;21/07/2024;13:57:24;21/07/2024;14:04:49;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;22/07/2024;23:50:09;23/07/2024;00:13:51;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;23/07/2024;00:02:11;23/07/2024;00:02:45;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;23/07/2024;02:00:29;23/07/2024;02:03:38;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;23/07/2024;03:26:06;23/07/2024;03:50:04;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;23/07/2024;03:29:37;23/07/2024;03:34:45;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;23/07/2024;03:43:28;23/07/2024;03:44:23;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;23/07/2024;03:51:23;23/07/2024;04:07:53;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;23/07/2024;04:01:50;23/07/2024;04:06:03;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;23/07/2024;04:08:57;23/07/2024;04:31:50;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;23/07/2024;04:15:27;23/07/2024;04:20:20;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;23/07/2024;04:42:55;23/07/2024;04:50:28;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;00:18:33;24/07/2024;00:19:46;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;00:37:28;24/07/2024;00:38:28;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;00:38:39;24/07/2024;00:39:20;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;00:40:04;24/07/2024;00:41:04;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;00:41:44;24/07/2024;00:44:06;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;00:44:49;24/07/2024;00:49:41;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;00:50:41;24/07/2024;00:56:20;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;00:57:37;24/07/2024;01:04:20;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;01:05:26;24/07/2024;01:07:24;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;01:07:57;24/07/2024;01:10:52;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;01:11:19;24/07/2024;01:14:34;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;01:15:39;24/07/2024;01:21:42;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;24/07/2024;01:57:47;24/07/2024;02:05:15;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;02:42:40;24/07/2024;02:44:00;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;02:45:13;24/07/2024;02:48:17;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;02:49:49;24/07/2024;02:56:33;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;24/07/2024;02:53:18;24/07/2024;02:54:40;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;02:57:56;24/07/2024;03:13:12;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;24/07/2024;03:01:26;24/07/2024;03:11:55;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;03:15:07;24/07/2024;03:47:23;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;24/07/2024;03:27:04;24/07/2024;03:28:37;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;24/07/2024;03:39:25;24/07/2024;03:47:23;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;03:50:34;24/07/2024;03:52:24;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;8;"Carte de Telematics
+";Niveau de batterie faible;24/07/2024;04:32:33;24/07/2024;07:25:28;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;07:44:54;24/07/2024;07:49:17;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;24/07/2024;07:48:23;24/07/2024;07:49:18;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;07:56:23;24/07/2024;08:05:19;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;24/07/2024;07:59:53;24/07/2024;08:05:12;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;08:22:05;24/07/2024;08:48:04;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;24/07/2024;08:25:35;24/07/2024;08:47:44;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;24/07/2024;10:36:44;24/07/2024;10:37:44;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;24/07/2024;14:16:51;24/07/2024;14:24:03;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;25/07/2024;00:18:04;25/07/2024;00:26:37;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;69, 0, -19;Carte de fonction;69;25/07/2024;00:34:16;25/07/2024;00:34:33;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;69, 0, -19;Carte de fonction;69;25/07/2024;00:36:00;25/07/2024;00:36:03;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;25/07/2024;01:47:22;25/07/2024;05:35:10;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;24, 9, 101;Carte de fonction;Alarme carte traction;25/07/2024;02:05:14;25/07/2024;02:08:28;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;25/07/2024;07:57:35;25/07/2024;07:59:21;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;25/07/2024;08:18:31;25/07/2024;08:24:42;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;25/07/2024;08:21:59;25/07/2024;08:24:15;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;25/07/2024;08:37:14;25/07/2024;08:37:39;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;25/07/2024;10:17:29;25/07/2024;12:12:43;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;25/07/2024;13:32:33;25/07/2024;13:33:13;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;25/07/2024;23:43:38;26/07/2024;00:34:00;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;24, 9, 101;Carte de fonction;Alarme carte traction;25/07/2024;23:58:10;26/07/2024;00:26:44;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;4;"Carte de Telematics
+";Niveau d'eau bas;26/07/2024;02:04:19;26/07/2024;04:46:47;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;26/07/2024;04:51:15;26/07/2024;04:51:21;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;26/07/2024;23:03:18;26/07/2024;23:09:38;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;26/07/2024;23:06:47;26/07/2024;23:09:39;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;6;"Carte de Telematics
+";STOP presence d'un obstacle;26/07/2024;23:11:12;26/07/2024;23:15:11;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;73, 9, -14;Carte de fonction;Nettoyage arrete depuis trop de temps;26/07/2024;23:14:42;26/07/2024;23:15:12;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;24, 9, 101;Carte de fonction;Alarme carte traction;26/07/2024;23:47:04;26/07/2024;23:48:26;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;24, 9, 101;Carte de fonction;Alarme carte traction;26/07/2024;23:49:10;26/07/2024;23:50:49;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;51, 9, -40;Carte de fonction;Unité 2 éteinte;26/07/2024;23:52:16;26/07/2024;23:52:24;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;66, 9, -33;Carte de fonction;Time out verin de brosse;26/07/2024;23:52:36;26/07/2024;23:52:43;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;27/07/2024;00:22:20;27/07/2024;00:22:49;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
+;54, 1, 3;Carte de fonction;Echec parcours de naviguation 3;27/07/2024;00:24:29;27/07/2024;00:26:50;Robot Quartz;FLP Atalian R-Q 80 03 5722 T2F;2022005722
