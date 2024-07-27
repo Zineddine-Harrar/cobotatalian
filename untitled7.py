@@ -38,6 +38,10 @@ def login(username, password):
 def js_redirect(url):
     st.write(f'<script>window.location.href = "{url}";</script>', unsafe_allow_html=True)
 
+# Fonction pour obtenir l'URL actuelle
+def get_current_url():
+    return st.script_run_ctx().query_string
+
 # Fonction principale
 def main():
     st.set_page_config(page_title="ATALIAN COBOT", layout="wide")
@@ -90,7 +94,7 @@ def main():
     if 'selected_app' not in st.session_state:
         st.session_state['selected_app'] = None
 
-    query_params = st.query_params.to_dict()
+    query_params = st.query_params
     if 'logged_in' in query_params and query_params['logged_in'] == 'true':
         st.session_state['logged_in'] = True
 
@@ -114,7 +118,7 @@ def login_section():
             st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            js_redirect(st.get_url() + "?logged_in=true")
+            js_redirect(f"{get_current_url()}&logged_in=true")
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -128,7 +132,7 @@ def app_selection_page():
         st.session_state['logged_in'] = False
         st.session_state['username'] = ''
         st.session_state['selected_app'] = None
-        js_redirect(st.get_url() + "?logged_in=false")
+        js_redirect(f"{get_current_url()}&logged_in=false")
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -136,17 +140,17 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            js_redirect(st.get_url() + "?app=rquartz_imon")
+            js_redirect(f"{get_current_url()}&app=rquartz_imon")
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            js_redirect(st.get_url() + "?app=rquartz_t2f")
+            js_redirect(f"{get_current_url()}&app=rquartz_t2f")
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            js_redirect(st.get_url() + "?app=ecobot_40")
+            js_redirect(f"{get_current_url()}&app=ecobot_40")
 
     if st.session_state['selected_app']:
         run_selected_app()
