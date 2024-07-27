@@ -91,7 +91,7 @@ def main():
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
-    details_df = pd.read_csv('DATASET/IMON/19-07 (3) (1).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
+    details_df = pd.read_csv('19-07 (3) (1).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
     
     # Nettoyer les colonnes dans details_df
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
@@ -230,7 +230,7 @@ def main():
         
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
     # Load the dataset with appropriate header row
-    file_path = "DATASET/ALERTE/IMON/Détails de l'alarme de la machines (4).xlsx"
+    file_path = "C:\\Users\zined\Downloads\\Détails de l'alarme de la machines (4).xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
     
     # Rename columns for easier access
@@ -293,12 +293,15 @@ def main():
 
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
+    
     # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
     # Calculate the count of alerts by description
     alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
     alert_count_by_description.columns = ['Description', 'Alert Count']
+
+
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
@@ -451,6 +454,7 @@ def main():
                       labels={'Description': 'Description', 'Alert Count': 'Number of Alerts'},
                       template='plotly_dark')
     st.plotly_chart(fig_hist)
+
     
 if __name__ == '__main__':
     main()
