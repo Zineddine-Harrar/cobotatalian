@@ -95,7 +95,7 @@ def main():
     if 'selected_app' not in st.session_state:
         st.session_state['selected_app'] = None
 
-    query_params = st.query_params
+    query_params = st.query_params.to_dict()
     if 'logged_in' in query_params and query_params['logged_in'] == 'true':
         st.session_state['logged_in'] = True
 
@@ -120,7 +120,7 @@ def login_section():
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
             st.query_params.update({"logged_in": "true"})
-            js_redirect(f"{st.query_params['url']}?logged_in=true")
+            js_redirect(f"{st.get_option('server.baseUrlPath')}?logged_in=true")
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -135,7 +135,7 @@ def app_selection_page():
         st.session_state['username'] = ''
         st.session_state['selected_app'] = None
         st.query_params.update({"logged_in": "false"})
-        js_redirect(f"{st.query_params['url']}?logged_in=false")
+        js_redirect(f"{st.get_option('server.baseUrlPath')}?logged_in=false")
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -144,19 +144,19 @@ def app_selection_page():
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
             st.query_params.update({"app": "rquartz_imon"})
-            js_redirect(f"{st.query_params['url']}?app=rquartz_imon")
+            js_redirect(f"{st.get_option('server.baseUrlPath')}?app=rquartz_imon")
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
             st.query_params.update({"app": "rquartz_t2f"})
-            js_redirect(f"{st.query_params['url']}?app=rquartz_t2f")
+            js_redirect(f"{st.get_option('server.baseUrlPath')}?app=rquartz_t2f")
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
             st.query_params.update({"app": "ecobot_40"})
-            js_redirect(f"{st.query_params['url']}?app=ecobot_40")
+            js_redirect(f"{st.get_option('server.baseUrlPath')}?app=ecobot_40")
 
     if st.session_state['selected_app']:
         run_selected_app()
