@@ -35,12 +35,10 @@ def login(username, password):
     return False
 
 # Fonction pour rediriger avec JavaScript
-def js_redirect(params):
+def js_redirect(url):
     js_code = f"""
         <script>
-            const params = new URLSearchParams(window.location.search);
-            {"".join([f'params.set("{key}", "{value}");' for key, value in params.items()])}
-            window.location.search = params.toString();
+            window.location.href = "{url}";
         </script>
     """
     st.write(js_code, unsafe_allow_html=True)
@@ -121,8 +119,9 @@ def login_section():
             st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            st.query_params.update({"logged_in": "true"})
-            js_redirect({"logged_in": "true"})
+            new_query_params = {**st.experimental_get_query_params(), "logged_in": "true"}
+            st.experimental_set_query_params(**new_query_params)
+            js_redirect(f"{st.get_url()}?logged_in=true")
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -136,8 +135,9 @@ def app_selection_page():
         st.session_state['logged_in'] = False
         st.session_state['username'] = ''
         st.session_state['selected_app'] = None
-        st.query_params.update({"logged_in": "false"})
-        js_redirect({"logged_in": "false"})
+        new_query_params = {**st.experimental_get_query_params(), "logged_in": "false"}
+        st.experimental_set_query_params(**new_query_params)
+        js_redirect(f"{st.get_url()}?logged_in=false")
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -145,20 +145,23 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            st.query_params.update({"app": "rquartz_imon"})
-            js_redirect({"app": "rquartz_imon"})
+            new_query_params = {**st.experimental_get_query_params(), "app": "rquartz_imon"}
+            st.experimental_set_query_params(**new_query_params)
+            js_redirect(f"{st.get_url()}?app=rquartz_imon")
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            st.query_params.update({"app": "rquartz_t2f"})
-            js_redirect({"app": "rquartz_t2f"})
+            new_query_params = {**st.experimental_get_query_params(), "app": "rquartz_t2f"}
+            st.experimental_set_query_params(**new_query_params)
+            js_redirect(f"{st.get_url()}?app=rquartz_t2f")
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            st.query_params.update({"app": "ecobot_40"})
-            js_redirect({"app": "ecobot_40"})
+            new_query_params = {**st.experimental_get_query_params(), "app": "ecobot_40"}
+            st.experimental_set_query_params(**new_query_params)
+            js_redirect(f"{st.get_url()}?app=ecobot_40")
 
     if st.session_state['selected_app']:
         run_selected_app()
