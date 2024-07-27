@@ -86,11 +86,11 @@ def main():
     if 'selected_app' not in st.session_state:
         st.session_state['selected_app'] = None
 
-    query_params = st.experimental_get_query_params()
-    if 'logged_in' in query_params and query_params['logged_in'][0] == 'true':
+    query_params = st.query_params.to_dict()
+    if 'logged_in' in query_params and query_params['logged_in'] == 'true':
         st.session_state['logged_in'] = True
 
-    if 'logged_in' in query_params and query_params['logged_in'][0] == 'false':
+    if 'logged_in' in query_params and query_params['logged_in'] == 'false':
         st.session_state['logged_in'] = False
 
     if st.session_state['logged_in']:
@@ -110,8 +110,7 @@ def login_section():
             st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            st.experimental_set_query_params(logged_in="true")
-            st.experimental_rerun()  # Force the script to rerun after setting the session state
+            st.query_params.update(logged_in="true")
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -125,8 +124,7 @@ def app_selection_page():
         st.session_state['logged_in'] = False
         st.session_state['username'] = ''
         st.session_state['selected_app'] = None
-        st.experimental_set_query_params(logged_in="false")
-        st.experimental_rerun()  # Force the script to rerun after setting the session state
+        st.query_params.update(logged_in="false")
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -134,20 +132,17 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            st.experimental_set_query_params(app="rquartz_imon")
-            st.experimental_rerun()
+            st.query_params.update(app="rquartz_imon")
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            st.experimental_set_query_params(app="rquartz_t2f")
-            st.experimental_rerun()
+            st.query_params.update(app="rquartz_t2f")
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            st.experimental_set_query_params(app="ecobot_40")
-            st.experimental_rerun()
+            st.query_params.update(app="ecobot_40")
 
     if st.session_state['selected_app']:
         run_selected_app()
