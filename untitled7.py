@@ -80,13 +80,13 @@ def main():
         st.session_state['logged_in'] = False
 
     # Maintenir l'état d'authentification
-    query_params = st.query_params
+    query_params = st.experimental_get_query_params()
     if 'logout' in query_params:
         st.session_state['logged_in'] = False
         st.session_state.pop('username', None)
         st.session_state.pop('selected_app', None)
-        st.query_params.clear()
-        st.experimental_rerun()
+        query_params.clear()
+        st.experimental_set_query_params(**query_params)
 
     if not st.session_state['logged_in']:
         login_section()
@@ -98,15 +98,14 @@ def login_section():
     st.markdown('<h1 class="custom-title">Connexion Interface de visualisation ATALIAN / COBOT</h1>', unsafe_allow_html=True)
     st.image("atalian-logo (1).png", width=300)  # Chemin vers votre logo
 
-    username = st.text_input("Nom d'utlisateur")
+    username = st.text_input("Nom d'utilisateur")
     password = st.text_input("Mot de passe", type='password')
     if st.button("Connexion"):
         if login(username, password):
             st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            st.query_params.clear()
-            st.experimental_rerun()
+            st.experimental_set_query_params()
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -117,8 +116,7 @@ def app_selection_page():
     st.image(logo_path1, width=150)  # Ajustez la largeur selon vos besoins
     st.markdown('<h1 class="custom-title">Applications RQUARTZ</h1>', unsafe_allow_html=True)
     if st.button("Déconnexion"):
-        st.query_params.update({"logout": "true"})
-        st.experimental_rerun()
+        st.experimental_set_query_params(logout="true")
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
@@ -129,17 +127,14 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            st.experimental_rerun()
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            st.experimental_rerun()
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            st.experimental_rerun()
 
     if st.session_state['selected_app']:
         run_selected_app()
