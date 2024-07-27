@@ -447,7 +447,7 @@ def main():
     # Visualize the count of alerts by description
     st.subheader('Alertes Signalés')
     fig_hist = px.bar(alert_count_by_description, x='Description', y='Alert Count',
-                      title='Alertes signalés par type par semaine {}'.format(semaine),
+                      title='Alertes signalés par type // Semaine // {}'.format(semaine),
                       labels={'Description': 'Type', 'Alert Count': 'Nombre'},
                       template='plotly_dark')
     st.plotly_chart(fig_hist)
