@@ -86,11 +86,11 @@ def main():
     if 'selected_app' not in st.session_state:
         st.session_state['selected_app'] = None
 
-    query_params = st.query_params
-    if 'logged_in' in query_params and query_params['logged_in'] == ['true']:
+    query_params = st.experimental_get_query_params()
+    if 'logged_in' in query_params and query_params['logged_in'][0] == 'true':
         st.session_state['logged_in'] = True
 
-    if 'logged_in' in query_params and query_params['logged_in'] == ['false']:
+    if 'logged_in' in query_params and query_params['logged_in'][0] == 'false':
         st.session_state['logged_in'] = False
 
     if st.session_state['logged_in']:
@@ -135,16 +135,19 @@ def app_selection_page():
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
             st.experimental_set_query_params(app="rquartz_imon")
+            st.experimental_rerun()
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
             st.experimental_set_query_params(app="rquartz_t2f")
+            st.experimental_rerun()
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
             st.experimental_set_query_params(app="ecobot_40")
+            st.experimental_rerun()
 
     if st.session_state['selected_app']:
         run_selected_app()
