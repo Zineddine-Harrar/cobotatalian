@@ -76,8 +76,15 @@ def main():
         """,
         unsafe_allow_html=True
     )
+
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
+
+    if 'username' not in st.session_state:
+        st.session_state['username'] = ''
+
+    if 'selected_app' not in st.session_state:
+        st.session_state['selected_app'] = None
 
     if st.session_state['logged_in']:
         app_selection_page()
@@ -93,10 +100,9 @@ def login_section():
     password = st.text_input("Mot de passe", type='password')
     if st.button("Connexion"):
         if login(username, password):
-            st.success(f"Bienvenue {username}")
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
-            st.experimental_rerun()
+            st.experimental_set_query_params(logged_in="true")
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -108,30 +114,24 @@ def app_selection_page():
     st.markdown('<h1 class="custom-title">Applications RQUARTZ</h1>', unsafe_allow_html=True)
     if st.button("Déconnexion"):
         st.session_state['logged_in'] = False
-        st.session_state.pop('username', None)
-        st.session_state.pop('selected_app', None)
-        st.experimental_rerun()
+        st.session_state['username'] = ''
+        st.session_state['selected_app'] = None
+        st.experimental_set_query_params()
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
 
-    if 'selected_app' not in st.session_state:
-        st.session_state['selected_app'] = None
-
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            run_selected_app()
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            run_selected_app()
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            run_selected_app()
 
     if st.session_state['selected_app']:
         run_selected_app()
