@@ -557,18 +557,6 @@ def main():
 
     st.plotly_chart(fig_costs)
 
-    st.subheader("Analyse des Coûts")
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.metric("Coût hebdomadaire", f"{weekly_cost:.2f} €")
-    with col2:
-        st.metric("Coût horaire moyen", f"{hourly_cost:.2f} €/h")
-
-    # Ajouter un commentaire sur le coût
-    if heures_cumulees > 0:
-        st.info(f"Basé sur {heures_cumulees:.1f} heures d'utilisation cette semaine.")
-    else:
-        st.warning("Aucune heure d'utilisation enregistrée cette semaine.")
+    
 if __name__ == '__main__':
     main()
