@@ -245,7 +245,7 @@ def main():
         fig_pie.update_traces(textposition='inside', textinfo='percent+label')
         return fig_pie
 
-    def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=900, weeks_per_month=4.3):
+    def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=900, weeks_per_month=4):
         # Coût hebdomadaire
         weekly_cost = monthly_cost / weeks_per_month
     
