@@ -536,26 +536,7 @@ def main():
     st.subheader("Résumé des Alertes")
     st.dataframe(alert_summary)
 
-    # Ajouter un graphique pour visualiser les coûts
-    st.subheader("Analyse des Coûts")
 
-    fig_costs = go.Figure()
-
-    fig_costs.add_trace(go.Bar(
-        x=["Coût Total", "Coût par m²"],
-        y=[total_cost, cost_per_sqm],
-        text=[f"{total_cost:.2f} €", f"{cost_per_sqm:.2f} €/m²"],
-        textposition='auto',
-    ))
-
-    fig_costs.update_layout(
-        title="Répartition des Coûts",
-        xaxis_title="Métrique",
-        yaxis_title="Coût (€)",
-        template='plotly_dark'
-    )
-
-    st.plotly_chart(fig_costs)
 
     
 if __name__ == '__main__':
