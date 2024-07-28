@@ -531,11 +531,8 @@ def main():
         # Pie chart
         fig_pie = create_pie_chart(alert_summary)
         st.plotly_chart(fig_pie)
-
-    # Display the alert summary table
-    st.subheader("Résumé des Alertes")
-    st.dataframe(alert_summary)
-
+    
+    
 
 
     
