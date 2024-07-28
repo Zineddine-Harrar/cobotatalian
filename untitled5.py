@@ -397,8 +397,7 @@ def main():
             unsafe_allow_html=True
         )
 
-    # Ajouter un commentaire sur le coût
-    st.info(f"Basé sur un coût hebdomadaire de {weekly_cost:.2f} € et {heures_cumulees:.1f} heures d'utilisation cette semaine.")
+    
 
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
