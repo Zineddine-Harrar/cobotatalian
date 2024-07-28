@@ -48,7 +48,7 @@ def main():
         st.session_state.pop('username', None)
         st.session_state.pop('selected_app', None)
         st.query_params.clear()
-        st.experimental_rerun()
+        st.rerun()
 
     if not st.session_state['logged_in']:
         login_section()
@@ -68,7 +68,7 @@ def login_section():
             st.session_state['logged_in'] = True
             st.session_state['username'] = username
             st.query_params.clear()
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Nom d'utilisateur ou mot de passe incorrect")
 
@@ -85,24 +85,24 @@ def app_selection_page():
     with col1:
         if st.button("RQUARTZ - IMON"):
             st.session_state['selected_app'] = "RQUARTZ - IMON"
-            st.experimental_rerun()
+            st.rerun()
 
     with col2:
         if st.button("RQUARTZ - T2F"):
             st.session_state['selected_app'] = "RQUARTZ - T2F"
-            st.experimental_rerun()
+            st.rerun()
             
     with col3:
         if st.button("ECOBOT 40"):
             st.session_state['selected_app'] = "ECOBOT 40"
-            st.experimental_rerun()
+            st.rerun()
 
     if st.session_state['selected_app']:
         run_selected_app()
     
     if st.button("Déconnexion"):
         st.query_params.update({"logout": "true"})
-        st.experimental_rerun()
+        st.rerun()
 
 # Exécution de l'application sélectionnée
 def run_selected_app():
