@@ -245,7 +245,7 @@ def main():
         fig_pie.update_traces(textposition='inside', textinfo='percent+label')
         return fig_pie
 
-    def calculate_costs(hours_worked, monthly_cost=900, days_in_month=30):
+    def calculate_costs(hours_worked, surface_nettoyee, monthly_cost=900, days_in_month=30):
         # Coût par heure
         hourly_cost = monthly_cost / (days_in_month * 24)  # Supposons que le robot peut fonctionner 24/7
     
@@ -255,7 +255,7 @@ def main():
         # Coût par m² nettoyé
         cost_per_sqm = total_cost / surface_nettoyee if surface_nettoyee > 0 else 0
     
-        return total_cost, cost_per_sqm, hourly_cost
+        return total_cost, cost_per_sqm, hourly_cost, monthly_cost
     
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/Détails de l'alarme de la machines (4).xlsx"
@@ -323,8 +323,7 @@ def main():
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
     # Calculer les coûts
-    total_cost, cost_per_sqm, hourly_cost = calculate_costs(heures_cumulees)
-
+    total_cost, cost_per_sqm, hourly_cost, monthly_cost = calculate_costs(heures_cumulees, surface_nettoyee)
      
     # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
@@ -565,9 +564,9 @@ def main():
 
     with col2:
         # Calculer le seuil de rentabilité (surface à nettoyer pour couvrir le coût mensuel)
+        # Calculer le seuil de rentabilité (surface à nettoyer pour couvrir le coût mensuel)
         breakeven_sqm = monthly_cost / cost_per_sqm if cost_per_sqm > 0 else 0
         st.metric("Seuil de rentabilité", f"{breakeven_sqm:.2f} m²/mois")
-
     # Ajouter un commentaire sur la rentabilité
     if surface_nettoyee > breakeven_sqm:
         st.success(f"Le robot est rentable ce mois-ci. Il a nettoyé {surface_nettoyee:.2f} m² de plus que le seuil de rentabilité.")
