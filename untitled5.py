@@ -5,6 +5,8 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.io as pio
+from plotly.subplots import make_subplots
+
 def main():
 
     st.markdown(
@@ -229,6 +231,14 @@ def main():
         productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
         
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
+
+    def calculate_average_resolution_time(df):
+        df['Resolution Time'] = (df['Retour'] - df['Apparition']).dt.total_seconds() / 60
+        avg_resolution_time = df.groupby('Description')['Resolution Time'].mean().reset_index()
+        avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
+        return avg_resolution_time
+
+    
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/Détails de l'alarme de la machines (4).xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
@@ -293,12 +303,18 @@ def main():
 
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
-    # Filter alarm data by the selected week
+     
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
     # Calculate the count of alerts by description
     alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
     alert_count_by_description.columns = ['Description', 'Alert Count']
+
+    # Calculate average resolution time by description
+    avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
+
+    # Merge alert count and average resolution time
+    alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
@@ -444,13 +460,29 @@ def main():
     # Afficher l'histogramme dans Streamlit
     st.plotly_chart(fig_hist)
     
-    # Visualize the count of alerts by description
-    st.subheader('Alertes Signalés')
-    fig_hist = px.bar(alert_count_by_description, x='Description', y='Alert Count',
-                      title='Alertes signalés par type // Semaine {} //'.format(semaine),
-                      labels={'Description': 'Type', 'Alert Count': 'Nombre'},
-                      template='plotly_dark')
-    st.plotly_chart(fig_hist)
+    st.subheader('Alertes Signalées')
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    fig.add_trace(
+        go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'alertes"),
+        secondary_y=False,
+    )
+
+    fig.add_trace(
+        go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
+        secondary_y=True,
+    )
+
+    fig.update_layout(
+        title_text='Alertes signalées et temps de résolution moyen par type // Semaine {} //'.format(semaine),
+        xaxis_title="Type d'alerte",
+        template='plotly_dark'
+    )
+
+    fig.update_yaxes(title_text="Nombre d'alertes", secondary_y=False)
+    fig.update_yaxes(title_text="Temps de résolution moyen (min)", secondary_y=True)
+
+    st.plotly_chart(fig)
     
 if __name__ == '__main__':
     main()
