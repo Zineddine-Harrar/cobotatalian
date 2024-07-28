@@ -244,6 +244,18 @@ def main():
                          hole=0.3)
         fig_pie.update_traces(textposition='inside', textinfo='percent+label')
         return fig_pie
+
+    def calculate_costs(hours_worked, monthly_cost=900, days_in_month=30):
+        # Coût par heure
+        hourly_cost = monthly_cost / (days_in_month * 24)  # Supposons que le robot peut fonctionner 24/7
+    
+        # Coût total pour les heures travaillées
+        total_cost = hourly_cost * hours_worked
+    
+        # Coût par m² nettoyé
+        cost_per_sqm = total_cost / surface_nettoyee if surface_nettoyee > 0 else 0
+    
+        return total_cost, cost_per_sqm, hourly_cost
     
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/Détails de l'alarme de la machines (4).xlsx"
@@ -309,6 +321,10 @@ def main():
 
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
+
+    # Calculer les coûts
+    total_cost, cost_per_sqm, hourly_cost = calculate_costs(heures_cumulees)
+
      
     # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
@@ -324,7 +340,7 @@ def main():
     alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         st.markdown(
@@ -365,6 +381,18 @@ def main():
             <div class="metric-container">
                 <div class="metric-label">Vitesse moyenne</div>
                 <div class="metric-value">{vitesse_moyenne:.2f} km/h</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col5:
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Coût total</div>
+                <div class="metric-value">{total_cost:.2f} €</div>
+                <div class="metric-delta">Coût/m²: {cost_per_sqm:.2f} €</div>
             </div>
             """,
             unsafe_allow_html=True
@@ -505,6 +533,45 @@ def main():
     # Display the alert summary table
     st.subheader("Résumé des Alertes")
     st.dataframe(alert_summary)
-    
+
+    # Ajouter un graphique pour visualiser les coûts
+    st.subheader("Analyse des Coûts")
+
+    fig_costs = go.Figure()
+
+    fig_costs.add_trace(go.Bar(
+        x=["Coût Total", "Coût par m²"],
+        y=[total_cost, cost_per_sqm],
+        text=[f"{total_cost:.2f} €", f"{cost_per_sqm:.2f} €/m²"],
+        textposition='auto',
+    ))
+
+    fig_costs.update_layout(
+        title="Répartition des Coûts",
+        xaxis_title="Métrique",
+        yaxis_title="Coût (€)",
+        template='plotly_dark'
+    )
+
+    st.plotly_chart(fig_costs)
+
+    # Ajouter des métriques de rentabilité
+    st.subheader("Métriques de Rentabilité")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric("Coût horaire", f"{hourly_cost:.2f} €/h")
+
+    with col2:
+        # Calculer le seuil de rentabilité (surface à nettoyer pour couvrir le coût mensuel)
+        breakeven_sqm = monthly_cost / cost_per_sqm if cost_per_sqm > 0 else 0
+        st.metric("Seuil de rentabilité", f"{breakeven_sqm:.2f} m²/mois")
+
+    # Ajouter un commentaire sur la rentabilité
+    if surface_nettoyee > breakeven_sqm:
+        st.success(f"Le robot est rentable ce mois-ci. Il a nettoyé {surface_nettoyee:.2f} m² de plus que le seuil de rentabilité.")
+    else:
+        st.warning(f"Le robot n'a pas encore atteint son seuil de rentabilité. Il manque {breakeven_sqm - surface_nettoyee:.2f} m² pour y arriver.")
 if __name__ == '__main__':
     main()
