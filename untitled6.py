@@ -281,7 +281,7 @@ def main():
         return data[data['week'] == week_number]
     # Interface Streamlit
 
-    st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
+    st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
 
     # Créer un dictionnaire pour mapper chaque semaine à la date de début de la semaine
     def get_week_start_dates(year):
