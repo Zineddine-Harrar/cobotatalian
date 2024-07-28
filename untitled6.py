@@ -227,31 +227,6 @@ def main():
         productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
         
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
-
-    def calculate_average_resolution_time(df):
-        df['Resolution Time'] = (df['Retour'] - df['Apparition']).dt.total_seconds() / 60
-        avg_resolution_time = df.groupby('Description')['Resolution Time'].mean().reset_index()
-        avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
-        return avg_resolution_time
-    def create_pie_chart(alert_summary):
-        fig_pie = px.pie(alert_summary, values='Alert Count', names='Description', 
-                         title='Répartition des Alertes',
-                         template='plotly_dark',
-                         hole=0.3)
-        fig_pie.update_traces(textposition='inside', textinfo='percent+label')
-        return fig_pie
-
-    def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=900, weeks_per_month=4):
-        # Coût hebdomadaire
-        weekly_cost = monthly_cost / weeks_per_month
-    
-        # Calculer le coût horaire basé sur les heures cumulées de la semaine
-        hourly_cost = weekly_cost / heures_cumulees if heures_cumulees > 0 else 0
-    
-        # Calculer le coût total pour la semaine
-        total_cost = hourly_cost * heures_cumulees
-    
-        return weekly_cost, hourly_cost, total_cost
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/T2F/Détails de l'alarme de la machines (6).xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
@@ -281,7 +256,7 @@ def main():
         return data[data['week'] == week_number]
     # Interface Streamlit
 
-    st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
+    st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
 
     # Créer un dictionnaire pour mapper chaque semaine à la date de début de la semaine
     def get_week_start_dates(year):
@@ -317,24 +292,17 @@ def main():
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
-    # Calculer les coûts
-    weekly_cost, hourly_cost, total_cost = calculate_weekly_hourly_cost(heures_cumulees)
-     
     # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
     # Calculate the count of alerts by description
     alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
     alert_count_by_description.columns = ['Description', 'Alert Count']
-
-    # Calculate average resolution time by description
-    avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
-
-    # Merge alert count and average resolution time
-    alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
+    
+    # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         st.markdown(
@@ -379,21 +347,6 @@ def main():
             """,
             unsafe_allow_html=True
         )
-
-    with col5:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Coût total</div>
-                <div class="metric-value">{total_cost:.2f} €</div>
-                <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    # Ajouter un commentaire sur le coût
-    st.info(f"Basé sur un coût hebdomadaire de {weekly_cost:.2f} € et {heures_cumulees:.1f} heures d'utilisation cette semaine.")
 
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
@@ -490,43 +443,14 @@ def main():
 
     # Afficher l'histogramme dans Streamlit
     st.plotly_chart(fig_hist)
-    
-    # Visualize the count of alerts and average resolution time by description
-    st.subheader('Alertes Signalées')
 
-    # Create two columns for the charts
-    col1, col2 = st.columns(2)
-
-    with col1:
-        # Bar and line chart
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
-
-        fig.add_trace(
-            go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'alertes"),
-            secondary_y=False,
-        )
-
-        fig.add_trace(
-            go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
-            secondary_y=True,
-        )
-
-        fig.update_layout(
-            title_text='Alertes signalées et temps de résolution moyen par type // Semaine {} //'.format(semaine),
-            xaxis_title="Type d'alerte",
-            template='plotly_dark'
-        )
-
-        fig.update_yaxes(title_text="Nombre d'alertes", secondary_y=False)
-        fig.update_yaxes(title_text="Temps de résolution moyen (min)", secondary_y=True)
-
-        st.plotly_chart(fig)
-
-    with col2:
-        # Pie chart
-        fig_pie = create_pie_chart(alert_summary)
-        st.plotly_chart(fig_pie)
-    
+     # Visualize the count of alerts by description
+    st.subheader('Alertes Signalés')
+    fig_hist = px.bar(alert_count_by_description, x='Description', y='Alert Count',
+                      title='Alertes signalés par type // Semaine {} //'.format(semaine),
+                      labels={'Description': 'Type', 'Alert Count': 'Nombre'},
+                      template='plotly_dark')
+    st.plotly_chart(fig_hist)
     
 if __name__ == '__main__':
     main()
