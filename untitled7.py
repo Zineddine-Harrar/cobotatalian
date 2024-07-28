@@ -36,8 +36,11 @@ def login(username, password):
 
 # Fonction principale
 def main():
-    st.set_page_config(page_title="Simple Auth App", layout="wide")
-
+    st.set_page_config(
+        page_title="COBOT ATALIAN",
+        page_icon="atalian-logo (1).png",  # Remplacez par le chemin de votre icône
+        layout="wide"
+    )
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
 
