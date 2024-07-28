@@ -237,7 +237,13 @@ def main():
         avg_resolution_time = df.groupby('Description')['Resolution Time'].mean().reset_index()
         avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
         return avg_resolution_time
-
+    def create_pie_chart(alert_summary):
+        fig_pie = px.pie(alert_summary, values='Alert Count', names='Description', 
+                         title='Répartition des Alertes',
+                         template='plotly_dark',
+                         hole=0.3)
+        fig_pie.update_traces(textposition='inside', textinfo='percent+label')
+        return fig_pie
     
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/Détails de l'alarme de la machines (4).xlsx"
@@ -304,6 +310,7 @@ def main():
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
      
+    # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
     # Calculate the count of alerts by description
@@ -314,8 +321,7 @@ def main():
     avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
 
     # Merge alert count and average resolution time
-    alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
-    # Afficher les KPI côte à côte
+    alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
     col1, col2, col3, col4 = st.columns(4)
@@ -460,29 +466,45 @@ def main():
     # Afficher l'histogramme dans Streamlit
     st.plotly_chart(fig_hist)
     
+    # Visualize the count of alerts and average resolution time by description
     st.subheader('Alertes Signalées')
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-    fig.add_trace(
-        go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'alertes"),
-        secondary_y=False,
-    )
+    # Create two columns for the charts
+    col1, col2 = st.columns(2)
 
-    fig.add_trace(
-        go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
-        secondary_y=True,
-    )
+    with col1:
+        # Bar and line chart
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-    fig.update_layout(
-        title_text='Alertes signalées et temps de résolution moyen par type // Semaine {} //'.format(semaine),
-        xaxis_title="Type d'alerte",
-        template='plotly_dark'
-    )
+        fig.add_trace(
+            go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'alertes"),
+            secondary_y=False,
+        )
 
-    fig.update_yaxes(title_text="Nombre d'alertes", secondary_y=False)
-    fig.update_yaxes(title_text="Temps de résolution moyen (min)", secondary_y=True)
+        fig.add_trace(
+            go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
+            secondary_y=True,
+        )
 
-    st.plotly_chart(fig)
+        fig.update_layout(
+            title_text='Alertes signalées et temps de résolution moyen par type // Semaine {} //'.format(semaine),
+            xaxis_title="Type d'alerte",
+            template='plotly_dark'
+        )
+
+        fig.update_yaxes(title_text="Nombre d'alertes", secondary_y=False)
+        fig.update_yaxes(title_text="Temps de résolution moyen (min)", secondary_y=True)
+
+        st.plotly_chart(fig)
+
+    with col2:
+        # Pie chart
+        fig_pie = create_pie_chart(alert_summary)
+        st.plotly_chart(fig_pie)
+
+    # Display the alert summary table
+    st.subheader("Résumé des Alertes")
+    st.dataframe(alert_summary)
     
 if __name__ == '__main__':
     main()
