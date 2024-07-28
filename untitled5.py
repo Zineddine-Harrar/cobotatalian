@@ -512,18 +512,18 @@ def main():
         )
 
         fig.add_trace(
-            go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
+            go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Délai d'intervention moyen", mode='lines+markers'),
             secondary_y=True,
         )
 
         fig.update_layout(
-            title_text='Alertes signalées et temps de résolution moyen par type // Semaine {} //'.format(semaine),
+            title_text=" Nombre d'alertes par type et délai d'intervention moyen par minutes// Semaine {} //".format(semaine),
             xaxis_title="Type d'alerte",
             template='plotly_dark'
         )
 
         fig.update_yaxes(title_text="Nombre d'alertes", secondary_y=False)
-        fig.update_yaxes(title_text="Temps de résolution moyen (min)", secondary_y=True)
+        fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
 
         st.plotly_chart(fig)
 
