@@ -245,14 +245,17 @@ def main():
         fig_pie.update_traces(textposition='inside', textinfo='percent+label')
         return fig_pie
 
-    def calculate_weekly_hourly_cost(monthly_cost=900, weeks_per_month=4.3):
+    def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=900, weeks_per_month=4.3):
         # Coût hebdomadaire
         weekly_cost = monthly_cost / weeks_per_month
     
         # Calculer le coût horaire basé sur les heures cumulées de la semaine
         hourly_cost = weekly_cost / heures_cumulees if heures_cumulees > 0 else 0
     
-        return weekly_cost, hourly_cost
+        # Calculer le coût total pour la semaine
+        total_cost = hourly_cost * heures_cumulees
+    
+        return weekly_cost, hourly_cost, total_cost
     
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/Détails de l'alarme de la machines (4).xlsx"
@@ -320,7 +323,7 @@ def main():
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
     # Calculer les coûts
-    weekly_cost, hourly_cost = calculate_weekly_hourly_cost()
+    weekly_cost, hourly_cost, total_cost = calculate_weekly_hourly_cost(heures_cumulees)
      
     # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
@@ -388,11 +391,14 @@ def main():
             <div class="metric-container">
                 <div class="metric-label">Coût total</div>
                 <div class="metric-value">{total_cost:.2f} €</div>
-                <div class="metric-delta">Coût/m²: {cost_per_sqm:.2f} €</div>
+                <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
             </div>
             """,
             unsafe_allow_html=True
         )
+
+    # Ajouter un commentaire sur le coût
+    st.info(f"Basé sur un coût hebdomadaire de {weekly_cost:.2f} € et {heures_cumulees:.1f} heures d'utilisation cette semaine.")
 
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
