@@ -239,7 +239,7 @@ def main():
         return avg_resolution_time
     def create_pie_chart(alert_summary):
         fig_pie = px.pie(alert_summary, values='Alert Count', names='Description', 
-                         title='Répartition des Alertes',
+                         title='Répartition des évènements',
                          template='plotly_dark',
                          hole=0.3)
         fig_pie.update_traces(textposition='inside', textinfo='percent+label')
@@ -496,7 +496,7 @@ def main():
     st.plotly_chart(fig_hist)
     
     # Visualize the count of alerts and average resolution time by description
-    st.subheader('évènements Signalées')
+    st.subheader('Evènements Signalés')
 
     # Create two columns for the charts
     col1, col2 = st.columns(2)
