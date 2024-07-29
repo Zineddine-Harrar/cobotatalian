@@ -496,7 +496,7 @@ def main():
     st.plotly_chart(fig_hist)
     
     # Visualize the count of alerts and average resolution time by description
-    st.subheader('Evenements Signalées')
+    st.subheader('évènements Signalées')
 
     # Create two columns for the charts
     col1, col2 = st.columns(2)
@@ -506,7 +506,7 @@ def main():
         fig = make_subplots(specs=[[{"secondary_y": True}]])
 
         fig.add_trace(
-            go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'evenements"),
+            go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'évènements"),
             secondary_y=False,
         )
 
@@ -516,12 +516,12 @@ def main():
         )
 
         fig.update_layout(
-            title_text=" Nombre d'evenements par type et délai d'intervention moyen par minutes// Semaine {} //".format(semaine),
-            xaxis_title="Type d'alerte",
+            title_text=" Nombre d'évènements par type et délai d'intervention moyen par minutes// Semaine {} //".format(semaine),
+            xaxis_title="Type d'évènements",
             template='plotly_dark'
         )
 
-        fig.update_yaxes(title_text="Nombre d'evenements", secondary_y=False)
+        fig.update_yaxes(title_text="Nombre d'évènements", secondary_y=False)
         fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
 
         st.plotly_chart(fig)
