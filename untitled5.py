@@ -449,7 +449,7 @@ def main():
         st.plotly_chart(fig_suivi)
 
     with col2:
-        st.subheader('Taux de Complétion')
+        st.subheader('Taux de réalisation des parcours')
         st.plotly_chart(fig_completion)
 
     # Appliquer le style conditionnel
