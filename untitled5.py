@@ -488,15 +488,15 @@ def main():
 
     # Créer l'histogramme des taux de complétion par parcours
     fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                  title='Taux de Complétion Hebdomadaire par Parcours',
-                  labels={'parcours': 'Parcours', 'taux_completion': 'Taux de Complétion (%)'},
+                  title='Taux de réalisation des parcours hebdomadaires',
+                  labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
                   template='plotly_dark')
 
     # Afficher l'histogramme dans Streamlit
     st.plotly_chart(fig_hist)
     
     # Visualize the count of alerts and average resolution time by description
-    st.subheader('Alertes Signalées')
+    st.subheader('Evenements Signalées')
 
     # Create two columns for the charts
     col1, col2 = st.columns(2)
@@ -506,7 +506,7 @@ def main():
         fig = make_subplots(specs=[[{"secondary_y": True}]])
 
         fig.add_trace(
-            go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'alertes"),
+            go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'evenements"),
             secondary_y=False,
         )
 
@@ -516,12 +516,12 @@ def main():
         )
 
         fig.update_layout(
-            title_text=" Nombre d'alertes par type et délai d'intervention moyen par minutes// Semaine {} //".format(semaine),
+            title_text=" Nombre d'evenements par type et délai d'intervention moyen par minutes// Semaine {} //".format(semaine),
             xaxis_title="Type d'alerte",
             template='plotly_dark'
         )
 
-        fig.update_yaxes(title_text="Nombre d'alertes", secondary_y=False)
+        fig.update_yaxes(title_text="Nombre d'evenements", secondary_y=False)
         fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
 
         st.plotly_chart(fig)
