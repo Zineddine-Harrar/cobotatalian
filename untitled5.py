@@ -403,7 +403,7 @@ def main():
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
         value=taux_suivi,
-        title={'text': "Taux de Suivi"},
+        title={'text': "Taux de réalisation des parcours"},
         gauge={
             'axis': {'range': [None, 100]},
             'steps': [
@@ -424,7 +424,7 @@ def main():
     fig_completion = go.Figure(go.Indicator(
         mode="gauge+number",
         value=weekly_completion_rate,
-        title={'text': "Taux de Complétion Hebdomadaire"},
+        title={'text': "Taux de réalisation des parcours"},
         gauge={
             'axis': {'range': [None, 100]},
             'steps': [
