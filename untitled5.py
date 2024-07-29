@@ -356,7 +356,7 @@ def main():
         st.markdown(
             f"""
             <div class="metric-container">
-                <div class="metric-label">Surface nettoyée</div>
+                <div class="metric-label">Surfaces nettoyées cumulées</div>
                 <div class="metric-value">{surface_nettoyee:.2f} m²</div>
             </div>
             """,
@@ -516,7 +516,7 @@ def main():
         )
 
         fig.update_layout(
-            title_text=" Nombre d'évènements par type et délai d'intervention moyen par minutes// Semaine {} //".format(semaine),
+            title_text=" Nombre d'évènements par type et délai d'intervention moyen ",
             xaxis_title="Type d'évènements",
             template='plotly_dark'
         )
