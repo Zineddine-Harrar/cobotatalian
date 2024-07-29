@@ -488,7 +488,7 @@ def main():
 
     # Créer l'histogramme des taux de complétion par parcours
     fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                  title='Taux de réalisation des parcours hebdomadaires',
+                  title='Taux de réalisation par parcours ',
                   labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
                   template='plotly_dark')
 
