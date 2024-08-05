@@ -267,7 +267,7 @@ def main():
     # Convert 'Apparition_Date' and 'Retour_Date' columns to string format if not already
     alarm_details_df['Apparition_Date'] = alarm_details_df['Apparition_Date'].astype(str)
     alarm_details_df['Retour_Date'] = alarm_details_df['Retour_Date'].astype(str)
-
+    print(alarm_details_df)
     # Combine 'Apparition_Date' and 'Apparition_Time' into a single datetime column
     alarm_details_df['Apparition'] = pd.to_datetime(alarm_details_df['Apparition_Date'] + ' ' + alarm_details_df['Apparition_Time'], format='%Y-%m-%d %H:%M:%S')
 
