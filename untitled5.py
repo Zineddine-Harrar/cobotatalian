@@ -403,7 +403,7 @@ def main():
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
         value=taux_suivi,
-        title={'text': "Taux de réalisation des parcours"},
+        title={'text': "Taux de suivi des parcours"},
         gauge={
             'axis': {'range': [None, 100]},
             'steps': [
