@@ -318,17 +318,22 @@ def main():
     # Calculer les indicateurs hebdomadaires
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
+    # Calculer les coûts
+    weekly_cost, hourly_cost, total_cost = calculate_weekly_hourly_cost(heures_cumulees)
+     
     # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
     # Calculate the count of alerts by description
     alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
     alert_count_by_description.columns = ['Description', 'Alert Count']
+
     # Calculate average resolution time by description
     avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
 
     # Merge alert count and average resolution time
     alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
+   
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
