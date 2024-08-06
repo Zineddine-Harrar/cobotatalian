@@ -227,6 +227,32 @@ def main():
         productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
         
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
+
+    def calculate_average_resolution_time(df):
+        df['Resolution Time'] = (df['Retour'] - df['Apparition']).dt.total_seconds() / 60
+        avg_resolution_time = df.groupby('Description')['Resolution Time'].mean().reset_index()
+        avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
+        return avg_resolution_time
+    def create_pie_chart(alert_summary):
+        fig_pie = px.pie(alert_summary, values='Alert Count', names='Description', 
+                         title='Répartition des évènements',
+                         template='plotly_dark',
+                         hole=0.3)
+        fig_pie.update_traces(textposition='inside', textinfo='percent+label')
+        return fig_pie
+
+    def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=1600, weeks_per_month=4):
+        # Coût hebdomadaire
+        weekly_cost = monthly_cost / weeks_per_month
+    
+        # Calculer le coût horaire basé sur les heures cumulées de la semaine
+        hourly_cost = weekly_cost / heures_cumulees if heures_cumulees > 0 else 0
+    
+        # Calculer le coût total pour la semaine
+        total_cost = hourly_cost * heures_cumulees
+    
+        return weekly_cost, hourly_cost, total_cost
+        
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/T2F/Alerte T2F  05-08.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
@@ -298,11 +324,15 @@ def main():
     # Calculate the count of alerts by description
     alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
     alert_count_by_description.columns = ['Description', 'Alert Count']
-    
+    # Calculate average resolution time by description
+    avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
+
+    # Merge alert count and average resolution time
+    alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         st.markdown(
@@ -319,7 +349,7 @@ def main():
         st.markdown(
             f"""
             <div class="metric-container">
-                <div class="metric-label">Surface nettoyée</div>
+                <div class="metric-label">Surfaces nettoyées cumulées</div>
                 <div class="metric-value">{surface_nettoyee:.2f} m²</div>
             </div>
             """,
@@ -348,11 +378,25 @@ def main():
             unsafe_allow_html=True
         )
 
+    with col5:
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Coût total</div>
+                <div class="metric-value">{total_cost:.2f} €</div>
+                <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    
+
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
         value=taux_suivi,
-        title={'text': "Taux de Suivi"},
+        title={'text': "Taux de suivi des parcours"},
         gauge={
             'axis': {'range': [None, 100]},
             'steps': [
@@ -373,7 +417,7 @@ def main():
     fig_completion = go.Figure(go.Indicator(
         mode="gauge+number",
         value=weekly_completion_rate,
-        title={'text': "Taux de Complétion Hebdomadaire"},
+        title={'text': "Taux de réalisation des parcours"},
         gauge={
             'axis': {'range': [None, 100]},
             'steps': [
@@ -398,7 +442,7 @@ def main():
         st.plotly_chart(fig_suivi)
 
     with col2:
-        st.subheader('Taux de Complétion')
+        st.subheader('Taux de réalisation des parcours')
         st.plotly_chart(fig_completion)
 
     # Appliquer le style conditionnel
@@ -437,21 +481,49 @@ def main():
 
     # Créer l'histogramme des taux de complétion par parcours
     fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                  title='Taux de Complétion Hebdomadaire par Parcours',
-                  labels={'parcours': 'Parcours', 'taux_completion': 'Taux de Complétion (%)'},
+                  title='Taux de réalisation par parcours ',
+                  labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
                   template='plotly_dark')
 
     # Afficher l'histogramme dans Streamlit
     st.plotly_chart(fig_hist)
-
-     # Visualize the count of alerts by description
-    st.subheader('Alertes Signalés')
-    fig_hist = px.bar(alert_count_by_description, x='Description', y='Alert Count',
-                      title='Alertes signalés par type // Semaine {} //'.format(semaine),
-                      labels={'Description': 'Type', 'Alert Count': 'Nombre'},
-                      template='plotly_dark')
-    st.plotly_chart(fig_hist)
     
+    # Visualize the count of alerts and average resolution time by description
+    st.subheader('Evènements Signalés')
+    st.dataframe(alert_summary)
+    # Create two columns for the charts
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Bar and line chart
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+        fig.add_trace(
+            go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'évènements"),
+            secondary_y=False,
+        )
+
+        fig.add_trace(
+            go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Délai d'intervention moyen", mode='lines+markers'),
+            secondary_y=True,
+        )
+
+        fig.update_layout(
+            title_text=" Nombre d'évènements par type et délai d'intervention moyen ",
+            xaxis_title="Type d'évènements",
+            template='plotly_dark'
+        )
+
+        fig.update_yaxes(title_text="Nombre d'évènements", secondary_y=False)
+        fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
+
+        st.plotly_chart(fig)
+
+    with col2:
+        # Pie chart
+        fig_pie = create_pie_chart(alert_summary)
+        st.plotly_chart(fig_pie)
+        
 if __name__ == '__main__':
     main()
    
