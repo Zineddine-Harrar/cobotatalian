@@ -330,7 +330,7 @@ def main():
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
     # Calculer les coûts
-    weekly_cost, hourly_cost, total_cost = calculate_weekly_hourly_cost(heures_cumulees)
+    weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
      
     # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
@@ -342,7 +342,7 @@ def main():
     # Calculate average resolution time by description
     avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
     # Calculer les coûts et le taux d'utilisation
-    weekly_cost, utilization_rate = calculate_weekly_cost()
+    weekly_cost, utilization_rate = calculate_weekly_cost(heures_cumulees)
     # Merge alert count and average resolution time
     alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
@@ -410,12 +410,11 @@ def main():
             f"""
             <div class="metric-container">
                 <div class="metric-label">Taux d'utilisation</div>
-                <div class="metric-value">{utilization_rate:.2f} %</div>
+                <div class="metric-value">{utilization_rate:.1f}%</div>
             </div>
             """,
             unsafe_allow_html=True
         )
-
     
 
     # Créer la jauge du taux de suivi
