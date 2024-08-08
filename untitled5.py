@@ -262,13 +262,8 @@ def main():
         # Calcul du taux d'utilisation
         planned_weekly_hours = working_hours_per_day * working_days_per_week
         utilization_rate = (heures_cumulees / planned_weekly_hours) * 100 if planned_weekly_hours > 0 else 0
-         # Appliquer la couleur rouge pour les taux d'utilisation en dessous de 30% ou au-dessus de 100%
-        if utilization_rate < 30 or utilization_rate > 100:
-        utilization_rate_style = "color: red;"
-        else:
-        utilization_rate_style = "color: white;"
 
-        return weekly_cost, hourly_cost, total_cost, utilization_rate, utilization_rate_style
+        return weekly_cost, hourly_cost, total_cost, utilization_rate
     
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/Alerte imon 05-08.xlsx"
@@ -409,7 +404,17 @@ def main():
             """,
             unsafe_allow_html=True
         )
-
+    with col6:
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Taux d'utilisation</div>
+                <div class="metric-value">{utilization_rate:.2f} %</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+            
+        )
    
     
 
