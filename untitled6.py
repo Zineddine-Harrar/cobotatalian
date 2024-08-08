@@ -242,6 +242,10 @@ def main():
         fig_pie.update_traces(textposition='inside', textinfo='percent+label')
         return fig_pie
 
+    # Variables pour le calcul du taux d'utilisation
+    working_hours_per_day = 6  # Nombre d'heures de travail prévues par jour
+    working_days_per_week = 7  # Nombre de jours de travail prévus par semaine
+
     def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=1600, weeks_per_month=4):
         # Coût hebdomadaire
         weekly_cost = monthly_cost / weeks_per_month
@@ -251,8 +255,12 @@ def main():
     
         # Calculer le coût total pour la semaine
         total_cost = hourly_cost * heures_cumulees
-    
-        return weekly_cost, hourly_cost, total_cost
+
+        # Calcul du taux d'utilisation
+        planned_weekly_hours = working_hours_per_day * working_days_per_week
+        utilization_rate = (heures_cumulees / planned_weekly_hours) * 100 if planned_weekly_hours > 0 else 0
+
+        return weekly_cost, hourly_cost, total_cost, utilization_rate
         
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/T2F/Alerte T2F  05-08.xlsx"
@@ -320,7 +328,7 @@ def main():
     heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
     # Calculer les coûts
-    weekly_cost, hourly_cost, total_cost = calculate_weekly_hourly_cost(heures_cumulees)
+    weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
      
     # Filter alarm data by the selected week
     filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
@@ -338,7 +346,7 @@ def main():
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
 
     with col1:
         st.markdown(
@@ -395,7 +403,17 @@ def main():
             """,
             unsafe_allow_html=True
         )
-
+    with col6:
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Taux d'utilisation</div>
+                <div class="metric-value">{utilization_rate:.2f} %</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+            
+        )
     
 
     # Créer la jauge du taux de suivi
