@@ -237,12 +237,12 @@ def main():
         avg_resolution_time = df.groupby('Description')['Resolution Time'].mean().reset_index()
         avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
         return avg_resolution_time
-    def create_pie_chart(alert_summary):
+    def create_pie_chart(alert_summary, text_color='white'):
         fig_pie = px.pie(alert_summary, values='Alert Count', names='Description', 
                          title='Répartition des évènements',
                          template='plotly_dark',
                          hole=0.3)
-        fig_pie.update_traces(textposition='inside', textinfo='percent+label')
+        fig_pie.update_traces(textposition='inside', textinfo='percent+label', textfont_color=text_color)
         return fig_pie
 
     def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=1600, weeks_per_month=4):
