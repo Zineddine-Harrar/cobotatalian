@@ -415,7 +415,7 @@ def main():
             f"""
             <div class="metric-container">
                 <div class="metric-label">Taux d'utilisation</div>
-                <div class="metric-value" style="{utilization_rate_style}">{utilization_rate:.1f}%</div>
+                <div class="metric-value">{utilization_rate:.1f}%</div>
             </div>
             """,
             unsafe_allow_html=True
