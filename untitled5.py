@@ -342,7 +342,6 @@ def main():
     # Calculate average resolution time by description
     avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
     # Calculer les coûts et le taux d'utilisation
-    weekly_cost, utilization_rate = calculate_weekly_cost(heures_cumulees)
     # Merge alert count and average resolution time
     alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
