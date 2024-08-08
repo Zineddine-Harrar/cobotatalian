@@ -410,17 +410,7 @@ def main():
             unsafe_allow_html=True
         )
 
-    with col6:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Taux d'utilisation</div>
-                <div class="metric-value">{utilization_rate:.2f} %</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-            
-        )
+   
     
 
     # Créer la jauge du taux de suivi
