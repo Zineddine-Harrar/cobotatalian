@@ -517,7 +517,7 @@ def main():
     # Visualize the count of alerts and average resolution time by description
     st.subheader('Evènements Signalés')
     st.dataframe(alert_summary)
-    st.subheader('Description des événements)
+    st.subheader('Description des événements')
     st.dataframe(description_evenements,width=1500)
     # Create two columns for the charts
     col1, col2 = st.columns(2)
