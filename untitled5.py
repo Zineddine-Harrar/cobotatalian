@@ -264,7 +264,7 @@ def main():
         utilization_rate = (heures_cumulees / planned_weekly_hours) * 100 if planned_weekly_hours > 0 else 0
 
         return weekly_cost, hourly_cost, total_cost, utilization_rate
-    
+    description_evenements = pd.read_excel("Description des evenements.xlsx")
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/Alerte imon 05-08.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
@@ -517,6 +517,7 @@ def main():
     # Visualize the count of alerts and average resolution time by description
     st.subheader('Evènements Signalés')
     st.dataframe(alert_summary)
+    st.dataframe(description_evenements)
     # Create two columns for the charts
     col1, col2 = st.columns(2)
 
