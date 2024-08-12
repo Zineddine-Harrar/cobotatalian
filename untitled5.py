@@ -93,7 +93,7 @@ def main():
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON  (1).csv', delimiter=';', encoding='ISO-8859-1')
-    details_df = pd.read_csv('DATASET/IMON/08-05.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
+    details_df = pd.read_excel('DATASET/IMON/12-08.xlsx', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
     
     # Nettoyer les colonnes dans details_df
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
