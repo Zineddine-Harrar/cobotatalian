@@ -272,19 +272,17 @@ def main():
     # Rename columns for easier access
     alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Modèle_machine', 'Machine_Description', 'N_de_série']
 
-    # Supposons que les colonnes 'Apparition' et 'Retour' contiennent déjà les dates et heures complètes
-    # Si ce n'est pas le cas, vous devrez d'abord les combiner comme dans votre code original
+    # Combine 'Apparition_Date' and 'Apparition_Time' into a single datetime column
+    alarm_details_df['Apparition'] = pd.to_datetime(alarm_details_df['Apparition_Date'] + ' ' + alarm_details_df['Apparition_Time'], format='%Y-%m-%d %H:%M:%S')
 
-    # Convertir directement les colonnes 'Apparition' et 'Retour' en datetime
-    alarm_details_df['Apparition'] = pd.to_datetime(alarm_details_df['Apparition'], format='%d/%m/%Y %H:%M:%S')
-    alarm_details_df['Retour'] = pd.to_datetime(alarm_details_df['Retour'], format='%d/%m/%Y %H:%M:%S')
+    # Combine 'Retour_Date' and 'Retour_Time' into a single datetime column
+    alarm_details_df['Retour'] = pd.to_datetime(alarm_details_df['Retour_Date'] + ' ' + alarm_details_df['Retour_Time'], format='%Y-%m-%d %H:%M:%S')
 
-    # Calculer le temps de résolution en minutes
+    # Calculate resolution time in minutes
     alarm_details_df['Resolution Time'] = (alarm_details_df['Retour'] - alarm_details_df['Apparition']).dt.total_seconds() / 60
 
-    # Si vous avez besoin de supprimer des colonnes, assurez-vous qu'elles existent
-    columns_to_drop = ['Index']  # Ajoutez d'autres colonnes si nécessaire
-    alarm_details_df.drop(columns=[col for col in columns_to_drop if col in alarm_details_df.columns], inplace=True)
+    # Drop intermediate columns
+    alarm_details_df.drop(columns=['Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Index'], inplace=True)
 
     # Function to filter data by week
     def filter_data_by_week(data, week_number):
