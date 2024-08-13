@@ -276,9 +276,9 @@ def main():
     elif num_columns == 9:
         alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition', 'Retour', 'Modèle_machine', 'Machine_Description', 'N_de_série']
     else:
-    print(f"Le nombre de colonnes inattendu : {num_columns}")
-    print("Colonnes actuelles :")
-    print(alarm_details_df.columns)
+        print(f"Le nombre de colonnes inattendu : {num_columns}")
+        print("Colonnes actuelles :")
+        print(alarm_details_df.columns)
     # Fonction pour convertir en toute sécurité en datetime
     def safe_to_datetime(x):
         if isinstance(x, str):
