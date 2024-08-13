@@ -275,17 +275,16 @@ def main():
     # Supposons que les colonnes 'Apparition' et 'Retour' contiennent déjà les dates et heures complètes
     # Si ce n'est pas le cas, vous devrez d'abord les combiner comme dans votre code original
 
-    # Convertir les colonnes 'Apparition' et 'Retour' en datetime
+    # Convertir directement les colonnes 'Apparition' et 'Retour' en datetime
     alarm_details_df['Apparition'] = pd.to_datetime(alarm_details_df['Apparition'], format='%d/%m/%Y %H:%M:%S')
     alarm_details_df['Retour'] = pd.to_datetime(alarm_details_df['Retour'], format='%d/%m/%Y %H:%M:%S')
 
     # Calculer le temps de résolution en minutes
     alarm_details_df['Resolution Time'] = (alarm_details_df['Retour'] - alarm_details_df['Apparition']).dt.total_seconds() / 60
 
-    # Si vous avez besoin de supprimer des colonnes intermédiaires, vous pouvez le faire ici
-    # alarm_details_df.drop(columns=['colonnes_à_supprimer'], inplace=True)
-    # Drop intermediate columns
-    alarm_details_df.drop(columns=['Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Index'], inplace=True)
+    # Si vous avez besoin de supprimer des colonnes, assurez-vous qu'elles existent
+    columns_to_drop = ['Index']  # Ajoutez d'autres colonnes si nécessaire
+    alarm_details_df.drop(columns=[col for col in columns_to_drop if col in alarm_details_df.columns], inplace=True)
 
     # Function to filter data by week
     def filter_data_by_week(data, week_number):
