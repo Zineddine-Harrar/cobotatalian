@@ -268,42 +268,47 @@ def main():
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/12-08.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
-    
+    # Vérifier le nombre de colonnes
+    num_columns = len(alarm_details_df.columns)
+
+    if num_columns == 11:
+        alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Modèle_machine', 'Machine_Description', 'N_de_série']
+    elif num_columns == 9:
+        alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition', 'Retour', 'Modèle_machine', 'Machine_Description', 'N_de_série']
+    else:
+    print(f"Le nombre de colonnes inattendu : {num_columns}")
+    print("Colonnes actuelles :")
+    print(alarm_details_df.columns)
     # Fonction pour convertir en toute sécurité en datetime
     def safe_to_datetime(x):
         if isinstance(x, str):
             try:
                 return pd.to_datetime(x, format='%d/%m/%Y %H:%M:%S')
             except:
-                return pd.NaT
+                try:
+                    return pd.to_datetime(x)
+                except:
+                    return pd.NaT
         elif isinstance(x, pd.Timestamp):
             return x
         else:
             return pd.NaT
 
-    # Rename columns for easier access
-    alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition', 'Retour', 'Modèle_machine', 'Machine_Description', 'N_de_série']
+    # Si les colonnes de date et heure sont séparées, les combiner
+    if 'Apparition_Date' in alarm_details_df.columns and 'Apparition_Time' in alarm_details_df.columns:
+        alarm_details_df['Apparition'] = alarm_details_df['Apparition_Date'] + ' ' + alarm_details_df['Apparition_Time']
+        alarm_details_df['Retour'] = alarm_details_df['Retour_Date'] + ' ' + alarm_details_df['Retour_Time']
 
     # Convertir les colonnes 'Apparition' et 'Retour' en datetime
     alarm_details_df['Apparition'] = alarm_details_df['Apparition'].apply(safe_to_datetime)
     alarm_details_df['Retour'] = alarm_details_df['Retour'].apply(safe_to_datetime)
 
-    # Vérifier les valeurs non converties
-    print("Lignes avec des dates d'apparition non valides:")
-    print(alarm_details_df[alarm_details_df['Apparition'].isna()])
-    print("\nLignes avec des dates de retour non valides:")
-    print(alarm_details_df[alarm_details_df['Retour'].isna()])
-
     # Calculer le temps de résolution en minutes
     alarm_details_df['Resolution Time'] = (alarm_details_df['Retour'] - alarm_details_df['Apparition']).dt.total_seconds() / 60
 
-    # Vérifier les temps de résolution négatifs ou NaN
-    print("\nLignes avec des temps de résolution problématiques:")
-    print(alarm_details_df[(alarm_details_df['Resolution Time'] < 0) | (alarm_details_df['Resolution Time'].isna())])
-
-    # Supprimer la colonne 'Index' si nécessaire
-    if 'Index' in alarm_details_df.columns:
-        alarm_details_df.drop(columns=['Index'], inplace=True)
+    # Supprimer les colonnes intermédiaires si elles existent
+    columns_to_drop = ['Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Index']
+    alarm_details_df.drop(columns=[col for col in columns_to_drop if col in alarm_details_df.columns], inplace=True)
 
     # Afficher les premières lignes du DataFrame résultant
     print("\nAperçu du DataFrame final:")
