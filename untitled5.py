@@ -269,21 +269,24 @@ def main():
     file_path = "DATASET/ALERTE/IMON/12-08.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
     
-    # Rename columns for easier access
-    alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Modèle_machine', 'Machine_Description', 'N_de_série']
-
     # Fonction pour convertir en toute sécurité en datetime
-    def safe_to_datetime(date, time):
-        try:
-            return pd.to_datetime(date + ' ' + time, format='%d/%m/%Y %H:%M:%S')
-        except:
-            return pd.NaT  # Not a Time
+    def safe_to_datetime(x):
+        if isinstance(x, str):
+            try:
+                return pd.to_datetime(x, format='%d/%m/%Y %H:%M:%S')
+            except:
+                return pd.NaT
+        elif isinstance(x, pd.Timestamp):
+            return x
+        else:
+            return pd.NaT
 
-    # Combiner 'Apparition_Date' et 'Apparition_Time' en une seule colonne datetime
-    alarm_details_df['Apparition'] = alarm_details_df.apply(lambda row: safe_to_datetime(row['Apparition_Date'], row['Apparition_Time']), axis=1)
+    # Rename columns for easier access
+    alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition', 'Retour', 'Modèle_machine', 'Machine_Description', 'N_de_série']
 
-    # Combiner 'Retour_Date' et 'Retour_Time' en une seule colonne datetime
-    alarm_details_df['Retour'] = alarm_details_df.apply(lambda row: safe_to_datetime(row['Retour_Date'], row['Retour_Time']), axis=1)
+    # Convertir les colonnes 'Apparition' et 'Retour' en datetime
+    alarm_details_df['Apparition'] = alarm_details_df['Apparition'].apply(safe_to_datetime)
+    alarm_details_df['Retour'] = alarm_details_df['Retour'].apply(safe_to_datetime)
 
     # Vérifier les valeurs non converties
     print("Lignes avec des dates d'apparition non valides:")
@@ -298,9 +301,9 @@ def main():
     print("\nLignes avec des temps de résolution problématiques:")
     print(alarm_details_df[(alarm_details_df['Resolution Time'] < 0) | (alarm_details_df['Resolution Time'].isna())])
 
-    # Supprimer les colonnes intermédiaires
-    columns_to_drop = ['Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Index']
-    alarm_details_df.drop(columns=[col for col in columns_to_drop if col in alarm_details_df.columns], inplace=True)
+    # Supprimer la colonne 'Index' si nécessaire
+    if 'Index' in alarm_details_df.columns:
+        alarm_details_df.drop(columns=['Index'], inplace=True)
 
     # Afficher les premières lignes du DataFrame résultant
     print("\nAperçu du DataFrame final:")
@@ -309,7 +312,6 @@ def main():
     # Afficher les informations sur le DataFrame
     print("\nInformations sur le DataFrame:")
     print(alarm_details_df.info())
-
     # Function to filter data by week
     def filter_data_by_week(data, week_number):
         data['week'] = data['Apparition'].dt.isocalendar().week
