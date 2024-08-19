@@ -268,62 +268,32 @@ def main():
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/12-08.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
-    # Vérifier le nombre de colonnes
-    num_columns = len(alarm_details_df.columns)
+   # Rename columns for easier access
+    alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Modèle_machine', 'Machine_Description', 'N_de_série']
 
-    if num_columns == 11:
-        alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Modèle_machine', 'Machine_Description', 'N_de_série']
-    elif num_columns == 9:
-        alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition', 'Retour', 'Modèle_machine', 'Machine_Description', 'N_de_série']
-    else:
-        print(f"Le nombre de colonnes inattendu : {num_columns}")
-        print("Colonnes actuelles :")
-        print(alarm_details_df.columns)
-    # Fonction pour convertir en toute sécurité en datetime
-    def safe_to_datetime(x):
-        if isinstance(x, str):
-            try:
-                return pd.to_datetime(x, format='%d/%m/%Y %H:%M:%S')
-            except:
-                try:
-                    return pd.to_datetime(x)
-                except:
-                    return pd.NaT
-        elif isinstance(x, pd.Timestamp):
-            return x
-        else:
-            return pd.NaT
+    # Convert 'Apparition_Date' and 'Retour_Date' columns to string format if not already
+    alarm_details_df['Apparition_Date'] = alarm_details_df['Apparition_Date'].astype(str)
+    alarm_details_df['Retour_Date'] = alarm_details_df['Retour_Date'].astype(str)
 
-    # Si les colonnes de date et heure sont séparées, les combiner
-    if 'Apparition_Date' in alarm_details_df.columns and 'Apparition_Time' in alarm_details_df.columns:
-        alarm_details_df['Apparition'] = alarm_details_df['Apparition_Date'] + ' ' + alarm_details_df['Apparition_Time']
-        alarm_details_df['Retour'] = alarm_details_df['Retour_Date'] + ' ' + alarm_details_df['Retour_Time']
+    # Combine 'Apparition_Date' and 'Apparition_Time' into a single datetime column
+    alarm_details_df['Apparition'] = pd.to_datetime(alarm_details_df['Apparition_Date'] + ' ' + alarm_details_df['Apparition_Time'], format='%Y-%m-%d %H:%M:%S')
 
-    # Convertir les colonnes 'Apparition' et 'Retour' en datetime
-    alarm_details_df['Apparition'] = alarm_details_df['Apparition'].apply(safe_to_datetime)
-    alarm_details_df['Retour'] = alarm_details_df['Retour'].apply(safe_to_datetime)
+    # Combine 'Retour_Date' and 'Retour_Time' into a single datetime column
+    alarm_details_df['Retour'] = pd.to_datetime(alarm_details_df['Retour_Date'] + ' ' + alarm_details_df['Retour_Time'], format='%Y-%m-%d %H:%M:%S')
 
-    # Calculer le temps de résolution en minutes
+    # Calculate resolution time in minutes
     alarm_details_df['Resolution Time'] = (alarm_details_df['Retour'] - alarm_details_df['Apparition']).dt.total_seconds() / 60
 
-    # Supprimer les colonnes intermédiaires si elles existent
-    columns_to_drop = ['Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Index']
-    alarm_details_df.drop(columns=[col for col in columns_to_drop if col in alarm_details_df.columns], inplace=True)
+    # Drop intermediate columns
+    alarm_details_df.drop(columns=['Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Index'], inplace=True)
 
-    # Afficher les premières lignes du DataFrame résultant
-    print("\nAperçu du DataFrame final:")
-    print(alarm_details_df.head())
-
-    # Afficher les informations sur le DataFrame
-    print("\nInformations sur le DataFrame:")
-    print(alarm_details_df.info())
     # Function to filter data by week
     def filter_data_by_week(data, week_number):
         data['week'] = data['Apparition'].dt.isocalendar().week
         return data[data['week'] == week_number]
     # Interface Streamlit
 
-    st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
+    st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
 
     # Créer un dictionnaire pour mapper chaque semaine à la date de début de la semaine
     def get_week_start_dates(year):
@@ -371,9 +341,11 @@ def main():
 
     # Calculate average resolution time by description
     avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
-    # Calculer les coûts et le taux d'utilisation
+
     # Merge alert count and average resolution time
     alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
+   
+    # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
 
     col1, col2, col3, col4, col5, col6 = st.columns(6)
@@ -444,7 +416,6 @@ def main():
             unsafe_allow_html=True
             
         )
-   
     
 
     # Créer la jauge du taux de suivi
@@ -545,7 +516,7 @@ def main():
     
     # Visualize the count of alerts and average resolution time by description
     st.subheader('Evènements Signalés')
-    
+    st.dataframe(alert_summary)
     # Create two columns for the charts
     col1, col2 = st.columns(2)
 
@@ -578,9 +549,9 @@ def main():
         # Pie chart
         fig_pie = create_pie_chart(alert_summary)
         st.plotly_chart(fig_pie)
-    
-    st.subheader('Description des événements')
-    st.dataframe(description_evenements,width=1500)
+        
+if __name__ == '__main__':
+    main()
 
 
     
