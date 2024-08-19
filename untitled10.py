@@ -208,8 +208,24 @@ def main():
         productivite_moyenne = weekly_details['work_efficiency_(?/h)'].mean()
         return heures_cumulees, surface_nettoyee, productivite_moyenne
 
-    testkpi = calculate_weekly_indicators(details_df, 28)
-    print(testkpi)
+     # Variables pour le calcul du taux d'utilisation
+    working_hours_per_day = 3  # Nombre d'heures de travail prévues par jour
+    working_days_per_week = 7  # Nombre de jours de travail prévus par semaine
+     def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=840, weeks_per_month=4):
+        # Coût hebdomadaire
+        weekly_cost = monthly_cost / weeks_per_month
+    
+        # Calculer le coût horaire basé sur les heures cumulées de la semaine
+        hourly_cost = weekly_cost / heures_cumulees if heures_cumulees > 0 else 0
+    
+        # Calculer le coût total pour la semaine
+        total_cost = hourly_cost * heures_cumulees
+
+        # Calcul du taux d'utilisation
+        planned_weekly_hours = working_hours_per_day * working_days_per_week
+        utilization_rate = (heures_cumulees / planned_weekly_hours) * 100 if planned_weekly_hours > 0 else 0
+
+        return weekly_cost, hourly_cost, total_cost, utilization_rate
 
     # Interface Streamlit
     st.title('Indicateurs de Suivi des Parcours du ECOBOT 40')
@@ -237,9 +253,10 @@ def main():
     taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
     completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df1, semaine)
     heures_cumulees, surface_nettoyee, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
-
+    # Calculer les coûts
+    weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
     st.markdown("## **Indicateurs Hebdomadaires**")
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         st.markdown(
@@ -273,7 +290,28 @@ def main():
             """,
             unsafe_allow_html=True,
         )
-
+     with col4:
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Coût total</div>
+                <div class="metric-value">{total_cost:.2f} €</div>
+                <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    with col5:
+        st.markdown(
+            f"""
+            <div class="metric-container">
+                <div class="metric-label">Taux d'utilisation</div>
+                <div class="metric-value">{utilization_rate:.2f} %</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+            
+        )
     # Créer la jauge du taux de suivi
     fig_suivi = go.Figure(go.Indicator(
         mode="gauge+number",
