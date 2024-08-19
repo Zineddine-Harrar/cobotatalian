@@ -290,7 +290,7 @@ def main():
             """,
             unsafe_allow_html=True,
         )
-     with col4:
+    with col4:
         st.markdown(
             f"""
             <div class="metric-container">
