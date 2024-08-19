@@ -211,7 +211,7 @@ def main():
      # Variables pour le calcul du taux d'utilisation
     working_hours_per_day = 3  # Nombre d'heures de travail prévues par jour
     working_days_per_week = 7  # Nombre de jours de travail prévus par semaine
-     def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=840, weeks_per_month=4):
+    def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=840, weeks_per_month=4):
         # Coût hebdomadaire
         weekly_cost = monthly_cost / weeks_per_month
     
