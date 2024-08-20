@@ -62,6 +62,56 @@ def calculate_taux_suivi_from_table(comparison_table):
     taux_suivi = (parcours_faits / total_parcours) * 100 if total_parcours > 0 else 0
     
     return taux_suivi
+def calculate_weekly_completion_rate(details_df, semaine):
+    weekly_details = details_df[details_df['semaine'] == semaine]
+    parcours_counts = weekly_details.groupby('parcours').size()
+    parcours_planned = planning_df[planning_df['semaine'] == semaine]['parcours'].unique()
+    completion_rates = []
+    for parcours in parcours_planned:
+        if parcours in parcours_counts:
+            taux_completion = (parcours_counts[parcours] / planning_df[(planning_df['semaine'] == semaine) & (planning_df['parcours'] == parcours)].shape[0]) * 100
+        else:
+            taux_completion = 0
+        completion_rates.append({'parcours': parcours, 'taux_completion': taux_completion})
+    weekly_completion_rate = sum(row['taux_completion'] for row in completion_rates) / len(completion_rates) if completion_rates else 0
+    return weekly_completion_rate, pd.DataFrame(completion_rates)
+
+def calculate_monthly_completion_rate(details_df, mois):
+    monthly_details = details_df[details_df['mois'] == mois]
+    parcours_counts = monthly_details.groupby('parcours').size()
+    parcours_planned = planning_df[planning_df['semaine'].isin(details_df[details_df['mois'] == mois]['semaine'].unique())]['parcours'].unique()
+    completion_rates = []
+    for parcours in parcours_planned:
+        if parcours in parcours_counts:
+            taux_completion = (parcours_counts[parcours] / planning_df[(planning_df['semaine'].isin(details_df[details_df['mois'] == mois]['semaine'].unique())) & (planning_df['parcours'] == parcours)].shape[0]) * 100
+        else:
+            taux_completion = 0
+        completion_rates.append({'parcours': parcours, 'taux_completion': taux_completion})
+    monthly_completion_rate = sum(row['taux_completion'] for row in completion_rates) / len(completion_rates) if completion_rates else 0
+    return monthly_completion_rate, pd.DataFrame(completion_rates)
+
+def calculate_weekly_indicators(details_df, semaine):
+    weekly_details = details_df[details_df['semaine'] == semaine]
+    heures_cumulees = weekly_details['durée[mn]'].sum() / 60
+    surface_nettoyee = weekly_details['surfacepropre_[mq]'].sum()
+    vitesse_moyenne = weekly_details['vitesse_moyenne[km/h]'].mean()
+    productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
+    return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
+
+def calculate_monthly_indicators(details_df, mois):
+    monthly_details = details_df[details_df['mois'] == mois]
+    heures_cumulees = monthly_details['durée[mn]'].sum() / 60
+    surface_nettoyee = monthly_details['surfacepropre_[mq]'].sum()
+    vitesse_moyenne = monthly_details['vitesse_moyenne[km/h]'].mean()
+    productivite_moyenne = monthly_details['productivitéhoraire_[mq/h]'].mean()
+    return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
+
+def calculate_weekly_hourly_cost(heures_cumulees):
+    total_cost = 1000  # Coût total hypothétique
+    hourly_cost = total_cost / heures_cumulees if heures_cumulees > 0 else 0
+    utilization_rate = (heures_cumulees / 40) * 100  # Hypothèse de 40 heures par semaine
+    return weekly_cost, hourly_cost, total_cost, utilization_rate
+
 
 def main():
 
