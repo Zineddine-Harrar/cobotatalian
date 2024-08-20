@@ -111,7 +111,8 @@ def calculate_weekly_hourly_cost(heures_cumulees):
     total_cost = 1000  # Coût total hypothétique
     hourly_cost = total_cost / heures_cumulees if heures_cumulees > 0 else 0
     utilization_rate = (heures_cumulees / 40) * 100  # Hypothèse de 40 heures par semaine
-    return weekly_cost, hourly_cost, total_cost, utilization_rate
+    return hourly_cost, total_cost, utilization_rate
+
 
 
 def main():
@@ -271,7 +272,7 @@ def main():
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
         weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df1, planning_df, semaine)
         heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
-        weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
+        hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
 
         # Afficher les KPI hebdomadaires
         display_kpi(heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne, total_cost, hourly_cost, utilization_rate)
@@ -286,7 +287,7 @@ def main():
 
         heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_monthly_indicators(details_df, mois)
         monthly_completion_rate, completion_rates = calculate_monthly_completion_rate(details_df1, planning_df, mois)
-        monthly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
+        hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
 
         # Afficher les KPI mensuels
         display_kpi(heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne, total_cost, hourly_cost, utilization_rate)
