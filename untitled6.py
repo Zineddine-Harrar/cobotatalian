@@ -53,6 +53,16 @@ def create_parcours_comparison_table(semaine, details_df, planning_df):
     
     return comparison_table
 
+def calculate_taux_suivi_from_table(comparison_table):
+    # Calculer le nombre total de parcours
+    total_parcours = comparison_table.shape[0] * (comparison_table.shape[1] - 1)  # Parcours par jours de la semaine
+    parcours_faits = comparison_table.apply(lambda row: row[1:].tolist().count("Fait"), axis=1).sum()
+    
+    # Calculer le taux de suivi
+    taux_suivi = (parcours_faits / total_parcours) * 100 if total_parcours > 0 else 0
+    
+    return taux_suivi
+
 def main():
 
     st.markdown(
