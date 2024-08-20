@@ -269,7 +269,7 @@ def main():
 
         weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-        weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df1, semaine)
+        weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df1, planning_df, semaine)
         heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
         weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
 
@@ -285,14 +285,14 @@ def main():
         mois = selected_month
 
         heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_monthly_indicators(details_df, mois)
-        monthly_completion_rate, completion_rates = calculate_monthly_completion_rate(details_df1, mois)
+        monthly_completion_rate, completion_rates = calculate_monthly_completion_rate(details_df1, planning_df, mois)
         monthly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
 
         # Afficher les KPI mensuels
         display_kpi(heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne, total_cost, hourly_cost, utilization_rate)
         display_gauges(None, monthly_completion_rate)
         display_completion_histogram(completion_rates)
-
+        
 # Fonctions utilitaires
 def display_kpi(heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne, total_cost, hourly_cost, utilization_rate):
     col1, col2, col3, col4, col5, col6 = st.columns(6)
