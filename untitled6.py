@@ -62,7 +62,7 @@ def calculate_taux_suivi_from_table(comparison_table):
     taux_suivi = (parcours_faits / total_parcours) * 100 if total_parcours > 0 else 0
     
     return taux_suivi
-def calculate_weekly_completion_rate(details_df, semaine):
+def calculate_weekly_completion_rate(details_df, planning_df, semaine):
     weekly_details = details_df[details_df['semaine'] == semaine]
     parcours_counts = weekly_details.groupby('parcours').size()
     parcours_planned = planning_df[planning_df['semaine'] == semaine]['parcours'].unique()
@@ -76,7 +76,8 @@ def calculate_weekly_completion_rate(details_df, semaine):
     weekly_completion_rate = sum(row['taux_completion'] for row in completion_rates) / len(completion_rates) if completion_rates else 0
     return weekly_completion_rate, pd.DataFrame(completion_rates)
 
-def calculate_monthly_completion_rate(details_df, mois):
+
+def calculate_monthly_completion_rate(details_df, mois, planning_df):
     monthly_details = details_df[details_df['mois'] == mois]
     parcours_counts = monthly_details.groupby('parcours').size()
     parcours_planned = planning_df[planning_df['semaine'].isin(details_df[details_df['mois'] == mois]['semaine'].unique())]['parcours'].unique()
