@@ -77,20 +77,22 @@ def calculate_weekly_completion_rate(details_df, planning_df, semaine):
     return weekly_completion_rate, pd.DataFrame(completion_rates)
 
 
-def calculate_monthly_completion_rate(details_df, mois, planning_df):
+def calculate_monthly_completion_rate(details_df, planning_df, mois):
     monthly_details = details_df[details_df['mois'] == mois]
+    planning_df_monthly = planning_df[planning_df['semaine'].isin(details_df[details_df['mois'] == mois]['semaine'].unique())]
+    planning_df_monthly, monthly_details = planning_df_monthly.align(monthly_details, axis=0, copy=False)
     parcours_counts = monthly_details.groupby('parcours').size()
-    parcours_planned = planning_df[planning_df['semaine'].isin(details_df[details_df['mois'] == mois]['semaine'].unique())]['parcours'].unique()
+    parcours_planned = planning_df_monthly['parcours'].unique()
     completion_rates = []
     for parcours in parcours_planned:
         if parcours in parcours_counts:
-            taux_completion = (parcours_counts[parcours] / planning_df[(planning_df['semaine'].isin(details_df[details_df['mois'] == mois]['semaine'].unique())) & (planning_df['parcours'] == parcours)].shape[0]) * 100
+            taux_completion = (parcours_counts[parcours] / planning_df_monthly[planning_df_monthly['parcours'] == parcours].shape[0]) * 100
         else:
             taux_completion = 0
         completion_rates.append({'parcours': parcours, 'taux_completion': taux_completion})
     monthly_completion_rate = sum(row['taux_completion'] for row in completion_rates) / len(completion_rates) if completion_rates else 0
     return monthly_completion_rate, pd.DataFrame(completion_rates)
-
+    
 def calculate_weekly_indicators(details_df, semaine):
     weekly_details = details_df[details_df['semaine'] == semaine]
     heures_cumulees = weekly_details['durée[mn]'].sum() / 60
@@ -293,6 +295,7 @@ def main():
         display_kpi(heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne, total_cost, hourly_cost, utilization_rate)
         display_gauges(None, monthly_completion_rate)
         display_completion_histogram(completion_rates)
+
         
 # Fonctions utilitaires
 def display_kpi(heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne, total_cost, hourly_cost, utilization_rate):
