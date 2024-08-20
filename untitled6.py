@@ -7,6 +7,15 @@ import plotly.express as px
 import plotly.io as pio
 from plotly.subplots import make_subplots
 
+def get_week_start_dates(year):
+    start_date = datetime(year, 1, 1)
+    if start_date.weekday() > 0:  # Si le 1er janvier n'est pas un lundi
+        start_date += timedelta(days=(7 - start_date.weekday()))  # Aller au prochain lundi
+    week_dates = {}
+    for week in range(1, 54):  # Assumer jusqu'à 53 semaines
+        week_dates[week] = start_date + timedelta(weeks=(week - 1))
+    return week_dates
+
 def main():
 
     st.markdown(
