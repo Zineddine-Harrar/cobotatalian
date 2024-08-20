@@ -265,7 +265,7 @@ def main():
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/T2F/Alerte T2F  19-08.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
-    
+    description_evenements = pd.read_excel("Description des evenements.xlsx")
     # Rename columns for easier access
     alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Modèle_machine', 'Machine_Description', 'N_de_série']
 
@@ -514,7 +514,6 @@ def main():
     
     # Visualize the count of alerts and average resolution time by description
     st.subheader('Evènements Signalés')
-    st.dataframe(alert_summary)
     # Create two columns for the charts
     col1, col2 = st.columns(2)
 
@@ -547,7 +546,8 @@ def main():
         # Pie chart
         fig_pie = create_pie_chart(alert_summary)
         st.plotly_chart(fig_pie)
-        
+    st.subheader("Description des événements")
+    st.dataframe(description_evenements,width=2000)    
 if __name__ == '__main__':
     main()
    
