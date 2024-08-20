@@ -107,7 +107,7 @@ def main():
 
     # Ajouter la colonne semaine
     details_df['semaine'] = details_df['début'].dt.isocalendar().week
-
+    details_df['mois'] = details_df['début'].dt.month
     # Dictionnaire pour traduire les noms des jours de l'anglais au français
     day_translation = {
         'Monday': 'Lundi',
@@ -135,6 +135,18 @@ def main():
         planning_df['semaine'] = planning_df['date'].dt.isocalendar().week
         return planning_df
 
+    # Créer un dictionnaire pour mapper chaque mois à la date de début du mois
+    def get_month_start_dates(year):
+        start_date = datetime(year, 1, 1)
+        month_dates = {}
+        for month in range(1, 13):
+            month_dates[month] = datetime(year, month, 1)
+        return month_dates
+
+    def filter_data_by_month(data, month):
+        data['mois'] = data['Apparition'].dt.month
+        return data[data['mois'] == month]
+        
     planning_df = add_weeks_to_planning_df(planning_df)
     # Fonction pour nettoyer les doublons
     def clean_duplicates(details_df):
@@ -261,7 +273,29 @@ def main():
         utilization_rate = (heures_cumulees / planned_weekly_hours) * 100 if planned_weekly_hours > 0 else 0
 
         return weekly_cost, hourly_cost, total_cost, utilization_rate
-        
+
+    def calculate_monthly_indicators(details_df, mois):
+        # Filtrer les données pour le mois spécifié
+        monthly_details = details_df[details_df['mois'] == mois]
+    
+        # Calculer les indicateurs
+        heures_cumulees = monthly_details['durée[mn]'].sum() / 60  # Convertir les minutes en heures
+        surface_nettoyee = monthly_details['surfacepropre_[mq]'].sum()
+        vitesse_moyenne = monthly_details['vitesse_moyenne[km/h]'].mean()
+        productivite_moyenne = monthly_details['productivitéhoraire_[mq/h]'].mean()
+    
+        return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
+
+    def calculate_monthly_completion_rate(details_df, mois):
+        # Filtrer les données pour le mois spécifié
+        monthly_details = details_df[details_df['mois'] == mois]
+        # Calculer le taux de complétion pour chaque parcours
+        completion_rates = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
+        # Calculer le taux de complétion mensuel
+        completed_routes = (completion_rates >= 90).sum()
+        total_routes = len(completion_rates)
+        monthly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
+        return monthly_completion_rate, completion_rates
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/T2F/Alerte T2F  19-08.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
@@ -306,42 +340,58 @@ def main():
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
 
-   # Afficher le sélecteur de semaine avec les dates
-    selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
+   # Créer un dictionnaire pour mapper chaque mois à la date de début du mois
+    month_start_dates = get_month_start_dates(2024)
+    month_options = {month: date.strftime('%B %Y') for month, date in month_start_dates.items()}
 
-    # Sélection de la semaine
-    semaine = selected_week
+    # Afficher le sélecteur de semaine ou de mois
+    display_mode = st.radio("Afficher les données par :", options=["Semaine", "Mois"])
 
-    # Créer le tableau de suivi par parcours pour la semaine spécifiée
-    weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-    
+    if display_mode == "Semaine":
+        # Afficher le sélecteur de semaine
+        selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
+        period = selected_week
+        period_type = "semaine"
+
+        # Filtrer les données pour la semaine sélectionnée
+        weekly_details = details_df[details_df['semaine'] == period]
+        filtered_alarm_details_df = filter_data_by_week(alarm_details_df, period)
+
+    else:
+        # Afficher le sélecteur de mois
+        selected_month = st.selectbox("Sélectionnez le mois", options=list(month_options.keys()), format_func=lambda x: month_options[x])
+        period = selected_month
+        period_type = "mois"
+
+        # Filtrer les données pour le mois sélectionné
+        monthly_details = details_df[details_df['mois'] == period]
+        filtered_alarm_details_df = filter_data_by_month(alarm_details_df, period)
+
+    # Nettoyer les doublons dans le dataframe details_df
+    details_df1 = clean_duplicates(details_df)
+
+    # Créer le tableau de suivi par parcours pour la période sélectionnée
+    comparison_table = create_parcours_comparison_table(period_type, period, details_df1, planning_df)
 
     # Calculer le taux de suivi à partir du tableau de suivi
-    taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
+    taux_suivi = calculate_taux_suivi_from_table(comparison_table)
 
-    # Calculer le taux de complétion hebdomadaire
-    weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df1, semaine)
-
-    
-
-    # Calculer les indicateurs hebdomadaires
-    heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
+    # Calculer les indicateurs pour la période sélectionnée
+    if period_type == "semaine":
+        heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, period)
+        completion_rate, completion_rates = calculate_weekly_completion_rate(details_df1, period)
+    else:
+        heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_monthly_indicators(details_df, period)
+        completion_rate, completion_rates = calculate_monthly_completion_rate(details_df1, period)
 
     # Calculer les coûts
     weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
-     
-    # Filter alarm data by the selected week
-    filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
-    # Calculate the count of alerts by description
+    # Calculer les informations sur les événements
     alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
     alert_count_by_description.columns = ['Description', 'Alert Count']
-
-    # Calculate average resolution time by description
     avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
-
-    # Merge alert count and average resolution time
-    alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
+    alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
    
     # Afficher les KPI côte à côte
     st.markdown("## **Indicateurs Hebdomadaires**")
