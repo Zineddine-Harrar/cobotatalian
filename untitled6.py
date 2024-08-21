@@ -872,14 +872,6 @@ def main():
         })
         st.session_state.actions_correctives = pd.concat([st.session_state.actions_correctives, new_action], ignore_index=True)
 
-    # Formulaire pour ajouter une nouvelle action
-    with st.form(key='add_action_form'):
-        action = st.text_input("Action corrective", key="new_action_input")
-        delai = st.date_input("Délai", key="new_action_date")
-        statut = st.selectbox("Statut", options=['En cours', 'Terminé', 'En retard'], key="new_action_status")
-        submit_button = st.form_submit_button(label='Ajouter une action')
-        if submit_button:
-            add_action()
 
     # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
     edited_df = st.data_editor(
