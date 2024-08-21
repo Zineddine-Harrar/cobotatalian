@@ -576,6 +576,9 @@ def main():
         filtered_alarm_details_df_mois = filtered_alarm_details_df[filtered_alarm_details_df['mois'] == selected_month]
         alert_count_by_description_mois = filtered_alarm_details_df_mois['Description'].value_counts().reset_index()
         alert_count_by_description_mois.columns = ['Description', 'Alert Count']
+        # Assurez-vous que filtered_alarm_details_df est défini avant son utilisation
+        if 'filtered_alarm_details_df' not in locals():
+            filtered_alarm_details_df = alarm_details_df.copy()
 
         # Calcul du temps de résolution moyen pour les événements sur le mois
         avg_resolution_time_mois = calculate_average_resolution_time(filtered_alarm_details_df_mois)
