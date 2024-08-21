@@ -795,67 +795,67 @@ def main():
         monthly_alerts = alarm_details_df.groupby('mois')['Description'].count().reset_index()
         monthly_alerts['Mois'] = monthly_alerts['mois'].map(mois_dict)
 
-    # Create the bar chart
-    fig_monthly_alerts = px.bar(monthly_alerts, x='Mois', y='Description', 
-                           title='Nombre de événements signalés par mois',
-                           template='plotly_dark')
-    fig_monthly_alerts.update_layout(xaxis_title="Mois", yaxis_title="Nombre d'événements")
+        # Create the bar chart
+        fig_monthly_alerts = px.bar(monthly_alerts, x='Mois', y='Description', 
+                               title='Nombre de événements signalés par mois',
+                               template='plotly_dark')
+        fig_monthly_alerts.update_layout(xaxis_title="Mois", yaxis_title="Nombre d'événements")
 
-    st.plotly_chart(fig_monthly_alerts)
+        st.plotly_chart(fig_monthly_alerts)
 
-    # Récupérer les données de taux de suivi pour tous les mois
-    all_months_taux_suivi = []
-    for month in range(1, 13):
-        monthly_details = details_df1[details_df1['mois'] == month]
-        semaines_du_mois = monthly_details['semaine'].unique()
-        weekly_taux_suivi = []
-        for semaine in semaines_du_mois:
-            weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-            taux_suivi_semaine = calculate_taux_suivi_from_table(weekly_comparison_table)
-            weekly_taux_suivi.append(taux_suivi_semaine)
-        taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
-        all_months_taux_suivi.append(taux_suivi_moyen_mois)
+        # Récupérer les données de taux de suivi pour tous les mois
+        all_months_taux_suivi = []
+        for month in range(1, 13):
+            monthly_details = details_df1[details_df1['mois'] == month]
+            semaines_du_mois = monthly_details['semaine'].unique()
+            weekly_taux_suivi = []
+            for semaine in semaines_du_mois:
+                weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+                taux_suivi_semaine = calculate_taux_suivi_from_table(weekly_comparison_table)
+                weekly_taux_suivi.append(taux_suivi_semaine)
+            taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
+            all_months_taux_suivi.append(taux_suivi_moyen_mois)
 
-    # Créer l'histogramme des taux de suivi par mois
-    fig_taux_suivi = px.bar(x=list(mois_dict.values()), y=all_months_taux_suivi,
-                           title='Taux de suivi des parcours par mois',
-                           labels={'x': 'Mois', 'y': 'Taux de suivi (%)'},
-                           template='plotly_dark')
-    st.plotly_chart(fig_taux_suivi)
+        # Créer l'histogramme des taux de suivi par mois
+        fig_taux_suivi = px.bar(x=list(mois_dict.values()), y=all_months_taux_suivi,
+                               title='Taux de suivi des parcours par mois',
+                               labels={'x': 'Mois', 'y': 'Taux de suivi (%)'},
+                               template='plotly_dark')
+        st.plotly_chart(fig_taux_suivi)
 
     
 
-    # Bar chart for route completion rates over several months
-    st.subheader("Taux de réalisation des parcours")
-    # Récupérer les données de taux de suivi pour tous les mois
-    all_months_taux_completion = []
-    for month in range(1, 13):
-        monthly_details = details_df1[details_df1['mois'] == month]
-        semaines_du_mois = monthly_details['semaine'].unique()
-        weekly_completion_rates = []
-        # Calculer le taux de suivi et de réalisation pour chaque semaine du mois
-        for semaine in semaines_du_mois:
-            # Calculer le taux de réalisation hebdomadaire
-            weekly_completion_rate, _ = calculate_weekly_completion_rate(details_df1, semaine)
-            weekly_completion_rates.append(weekly_completion_rate)
+        # Bar chart for route completion rates over several months
+        st.subheader("Taux de réalisation des parcours")
+        # Récupérer les données de taux de suivi pour tous les mois
+        all_months_taux_completion = []
+        for month in range(1, 13):
+            monthly_details = details_df1[details_df1['mois'] == month]
+            semaines_du_mois = monthly_details['semaine'].unique()
+            weekly_completion_rates = []
+            # Calculer le taux de suivi et de réalisation pour chaque semaine du mois
+            for semaine in semaines_du_mois:
+                # Calculer le taux de réalisation hebdomadaire
+                weekly_completion_rate, _ = calculate_weekly_completion_rate(details_df1, semaine)
+                weekly_completion_rates.append(weekly_completion_rate)
 
-        taux_realisation_moyen_mois = sum(weekly_completion_rates) / len(weekly_completion_rates) if weekly_completion_rates else 0
-        all_months_taux_completion.append(taux_realisation_moyen_mois)
+            taux_realisation_moyen_mois = sum(weekly_completion_rates) / len(weekly_completion_rates) if weekly_completion_rates else 0
+            all_months_taux_completion.append(taux_realisation_moyen_mois)
     
-    # Create the bar chart
-    fig_completion = go.Figure(data=[
-        go.Bar(x=list(mois_dict.values()), y=all_months_taux_completion, name='Taux de réalisation des parcours', marker_color='royalblue'),
-        go.Scatter(x=list(mois_dict.values()), y=[90] * 12, mode='lines', name='Objectif 90%', marker_color='red')
-    ])
+        # Create the bar chart
+        fig_completion = go.Figure(data=[
+            go.Bar(x=list(mois_dict.values()), y=all_months_taux_completion, name='Taux de réalisation des parcours', marker_color='royalblue'),
+            go.Scatter(x=list(mois_dict.values()), y=[90] * 12, mode='lines', name='Objectif 90%', marker_color='red')
+        ])
     
-    fig_completion.update_layout(
-        title='Taux de réalisation des parcours par mois',
-        xaxis_title='Mois',
-        yaxis_title='Taux de réalisation (%)',
-        template='plotly_dark'
-    )
+        fig_completion.update_layout(
+            title='Taux de réalisation des parcours par mois',
+            xaxis_title='Mois',
+            yaxis_title='Taux de réalisation (%)',
+            template='plotly_dark'
+        )
     
-    st.plotly_chart(fig_completion)
+        st.plotly_chart(fig_completion)
 if __name__ == '__main__':
     main()
    
