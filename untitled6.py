@@ -830,7 +830,7 @@ def main():
     completion_rates_by_month = []
     for month in range(1, 13):
         monthly_details = details_df1[details_df1['mois'] == month]
-        _, monthly_completion_rate = calculate_weekly_completion_rate(monthly_details, None)
+        monthly_completion_rate = calculate_weekly_completion_rate(monthly_details, None)
         completion_rates_by_month.append(monthly_completion_rate)
     
     # Create the bar chart
