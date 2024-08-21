@@ -825,31 +825,38 @@ def main():
 
     
 
-    # Histogramme du taux de réalisation et de suivi par mois
-    months = list(mois_dict.values())
-    completion_rates = [taux_realisation_moyen_mois]
-    follow_up_rates = [taux_suivi_moyen_mois]
-
-    fig_hist = go.Figure(data=[
-        go.Bar(name='Taux de réalisation', x=months, y=completion_rates, marker_color='green'),
-        go.Bar(name='Taux de suivi', x=months, y=follow_up_rates, marker_color='orange')
+    # Bar chart for route completion rates over several months
+    st.subheader("Taux de réalisation des parcours")
+    # Récupérer les données de taux de suivi pour tous les mois
+    all_months_taux_completion = []
+    for month in range(1, 13):
+        monthly_details = details_df1[details_df1['mois'] == month]
+        semaines_du_mois = monthly_details['semaine'].unique()
+        weekly_taux_suivi = []
+        # Calculer le taux de suivi et de réalisation pour chaque semaine du mois
+        for semaine in semaines_du_mois:
+            # Créer le tableau de suivi par parcours pour la semaine spécifiée
+            weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+            # Calculer le taux de réalisation hebdomadaire
+            weekly_completion_rate, _ = calculate_weekly_completion_rate(weekly_comparison_table,semaine)
+            weekly_completion_rates.append(weekly_completion_rate)
+        taux_realisation_moyen_mois = sum(weekly_completion_rates) / len(weekly_completion_rates) if weekly_completion_rates else 0
+        all_months_taux_completion.append(taux_realisation_moyen_mois)
+    
+    # Create the bar chart
+    fig_completion = go.Figure(data=[
+        go.Bar(x=list(mois_dict.values()), y=all_months_taux_completion, marker_color='royalblue'),
+        go.Scatter(x=list(mois_dict.values()), y=[90] * 12, mode='lines', name='Objectif 90%', marker_color='red')
     ])
-
-    # Définir l'objectif à 90%
-    objective_line = 90
-
-    # Ajouter la ligne d'objectif
-    fig_hist.add_hline(y=objective_line, line_color='red', line_width=2, annotation_text="Objectif 90%", annotation_position="top left")
-
-    fig_hist.update_layout(
-        title='Taux de réalisation et de suivi par mois',
-        barmode='group',
+    
+    fig_completion.update_layout(
+        title='Taux de réalisation des parcours par mois',
         xaxis_title='Mois',
-        yaxis_title='Taux (%)',
+        yaxis_title='Taux de réalisation (%)',
         template='plotly_dark'
     )
-
-    st.plotly_chart(fig_hist)
+    
+    st.plotly_chart(fig_completion)
 if __name__ == '__main__':
     main()
    
