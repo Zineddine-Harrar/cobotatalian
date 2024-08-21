@@ -603,7 +603,7 @@ def main():
 
         # Calcul du temps de réalisation moyen des événements sur le mois
         avg_resolution_time_month = filtered_alarm_details_df_month['Resolution Time'].mean()
-
+        st.dataframe(avg_resolution_time_month)
         # Calculate the count of alerts by description
         alert_count_by_description = filtered_alarm_details_df_month['Description'].value_counts().reset_index()
         alert_count_by_description.columns = ['Description', 'Alert Count']
