@@ -571,20 +571,7 @@ def main():
         completion_rates_mois = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
         taux_realisation_mois = (completion_rates_mois >= 90).sum() / len(completion_rates_mois) * 100 if len(completion_rates_mois) > 0 else 0
 
-        # Calculer les événements signalés cumulés sur le mois
-        filtered_alarm_details_df['mois'] = filtered_alarm_details_df['Apparition'].dt.month
-        filtered_alarm_details_df_mois = filtered_alarm_details_df[filtered_alarm_details_df['mois'] == selected_month]
-        alert_count_by_description_mois = filtered_alarm_details_df_mois['Description'].value_counts().reset_index()
-        alert_count_by_description_mois.columns = ['Description', 'Alert Count']
-        # Assurez-vous que filtered_alarm_details_df est défini avant son utilisation
-        if 'filtered_alarm_details_df' not in locals():
-            filtered_alarm_details_df = alarm_details_df.copy()
-
-        # Calcul du temps de résolution moyen pour les événements sur le mois
-        avg_resolution_time_mois = calculate_average_resolution_time(filtered_alarm_details_df_mois)
-
-        # Merge alert count and average resolution time for the month
-        alert_summary_mois = pd.merge(alert_count_by_description_mois, avg_resolution_time_mois, on='Description', how='left')
+       
 
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
@@ -655,40 +642,7 @@ def main():
             font={'color': "white"}
         )
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.subheader('Taux de Réalisation (Mois)')
-            st.plotly_chart(fig_suivi_mois)
-
-        # Affichage des événements signalés sur le mois
-        st.subheader('Événements Signalés (Mois)')
-
-        col1, col2 = st.columns(2)
-        with col1:
-            fig = make_subplots(specs=[[{"secondary_y": True}]])
-            fig.add_trace(
-                go.Bar(x=alert_summary_mois['Description'], y=alert_summary_mois['Alert Count'], name="Nombre d'événements"),
-                secondary_y=False,
-            )
-            fig.add_trace(
-                go.Scatter(x=alert_summary_mois['Description'], y=alert_summary_mois['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
-                secondary_y=True,
-            )
-
-            fig.update_layout(
-                title_text="Nombre d'événements par type et temps de résolution moyen (Mois)",
-                xaxis_title="Type d'événements",
-                template='plotly_dark'
-            )
-
-            fig.update_yaxes(title_text="Nombre d'événements", secondary_y=False)
-            fig.update_yaxes(title_text="Temps de résolution (min)", secondary_y=True)
-
-            st.plotly_chart(fig)
-
-        with col2:
-            fig_pie_mois = create_pie_chart(alert_summary_mois)
-            st.plotly_chart(fig_pie_mois)
+       
 
     
 if __name__ == '__main__':
