@@ -552,6 +552,7 @@ def main():
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
     # Mois
+    # Mois
     elif period_selection == "Mois":
         mois_dict = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
         # Sélection du mois
@@ -582,7 +583,7 @@ def main():
 
         # Calculer la moyenne des taux de suivi pour le mois
         taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
-    
+
         # Calculer la moyenne des taux de réalisation pour le mois
         taux_realisation_moyen_mois = sum(weekly_completion_rates) / len(weekly_completion_rates) if weekly_completion_rates else 0
 
@@ -595,7 +596,7 @@ def main():
         # Moyennes mensuelles pour la productivité et la vitesse
         vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
         productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
-    
+
         # Calcul du nombre d'événements signalés cumulés sur le mois
         filtered_alarm_details_df_month = filter_data_by_week(alarm_details_df, selected_month)
         total_alerts_month = len(filtered_alarm_details_df_month)
@@ -715,7 +716,7 @@ def main():
             plot_bgcolor="black",
             font={'color': "white"}
         )
-    
+
         # Afficher les jauges côte à côte
         col1, col2 = st.columns(2)
 
@@ -726,8 +727,45 @@ def main():
         with col2:
             st.subheader('Taux de réalisation des parcours')
             st.plotly_chart(fig_completion)
-        
 
+        # Visualize the count of alerts and average resolution time by description
+        st.subheader('Evènements Signalés')
+        # Create two columns for the charts
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # Bar and line chart
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+            fig.add_trace(
+                go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'évènements"),
+                secondary_y=False,
+            )
+
+            fig.add_trace(
+                go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Délai d'intervention moyen", mode='lines+markers'),
+                secondary_y=True,
+            )
+
+            fig.update_layout(
+                title_text=f"Nombre d'évènements par type et délai d'intervention moyen (Mois {mois_dict[selected_month]})",
+                xaxis_title="Type d'évènements",
+                template='plotly_dark'
+            )
+
+            fig.update_yaxes(title_text="Nombre d'évènements", secondary_y=False)
+            fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
+    
+            st.plotly_chart(fig)
+
+        with col2:
+            # Pie chart
+            fig_pie = create_pie_chart(alert_summary)
+            fig_pie.update_layout(
+                title_text=f"Répartition des évènements (Mois {mois_dict[selected_month]})",
+                template='plotly_dark'
+            )
+            st.plotly_chart(fig_pie)
     
 if __name__ == '__main__':
     main()
