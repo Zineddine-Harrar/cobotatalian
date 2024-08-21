@@ -590,6 +590,20 @@ def main():
         vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
         productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
 
+        # Filtrer les événements signalés pour le mois sélectionné
+        alarm_details_df['mois'] = alarm_details_df['Apparition'].dt.month
+        monthly_alarms = alarm_details_df[alarm_details_df['mois'] == selected_month]
+    
+        # Calculer le nombre total d'événements par type
+        alert_count_by_description_mois = monthly_alarms['Description'].value_counts().reset_index()
+        alert_count_by_description_mois.columns = ['Description', 'Alert Count']
+
+        # Calculer le temps moyen de résolution par type d'événement
+        avg_resolution_time_mois = calculate_average_resolution_time(monthly_alarms)
+    
+        # Fusionner les données sur le nombre d'événements et le temps moyen de résolution
+        alert_summary_mois = pd.merge(alert_count_by_description_mois, avg_resolution_time_mois, on='Description', how='left')
+
 
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
@@ -704,6 +718,39 @@ def main():
 
         def style_header(val):
             return 'background-color: black; color: white;'
+
+         # ---- Affichage des événements signalés ----
+        st.subheader('Événements Signalés (Mois)')
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # Graphique barres pour les événements et temps moyen de résolution
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
+            fig.add_trace(
+                go.Bar(x=alert_summary_mois['Description'], y=alert_summary_mois['Alert Count'], name="Nombre d'événements"),
+                secondary_y=False,
+            )
+            fig.add_trace(
+                go.Scatter(x=alert_summary_mois['Description'], y=alert_summary_mois['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
+                secondary_y=True,
+            )
+
+            fig.update_layout(
+                title_text="Nombre d'événements par type et temps de résolution moyen (Mois)",
+                xaxis_title="Type d'événements",
+                template='plotly_dark'
+            )
+
+            fig.update_yaxes(title_text="Nombre d'événements", secondary_y=False)
+            fig.update_yaxes(title_text="Temps de résolution (min)", secondary_y=True)
+
+            st.plotly_chart(fig)
+
+        with col2:
+            # Camembert pour la répartition des événements
+            fig_pie_mois = create_pie_chart(alert_summary_mois)
+            st.plotly_chart(fig_pie_mois)
        
 
     
