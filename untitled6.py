@@ -107,7 +107,7 @@ def main():
 
     # Ajouter la colonne semaine
     details_df['semaine'] = details_df['début'].dt.isocalendar().week
-    details_df['mois'] = details_df['début'].dt.month
+
     # Dictionnaire pour traduire les noms des jours de l'anglais au français
     day_translation = {
         'Monday': 'Lundi',
@@ -135,18 +135,6 @@ def main():
         planning_df['semaine'] = planning_df['date'].dt.isocalendar().week
         return planning_df
 
-    # Créer un dictionnaire pour mapper chaque mois à la date de début du mois
-    def get_month_start_dates(year):
-        start_date = datetime(year, 1, 1)
-        month_dates = {}
-        for month in range(1, 13):
-            month_dates[month] = datetime(year, month, 1)
-        return month_dates
-
-    def filter_data_by_month(data, month):
-        data['mois'] = data['Apparition'].dt.month
-        return data[data['mois'] == month]
-        
     planning_df = add_weeks_to_planning_df(planning_df)
     # Fonction pour nettoyer les doublons
     def clean_duplicates(details_df):
@@ -170,7 +158,7 @@ def main():
     details_df1 = clean_duplicates(details_df)
 
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
-    def create_parcours_comparison_table(period_type, period, details_df1, planning_df):
+    def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
         
@@ -273,29 +261,7 @@ def main():
         utilization_rate = (heures_cumulees / planned_weekly_hours) * 100 if planned_weekly_hours > 0 else 0
 
         return weekly_cost, hourly_cost, total_cost, utilization_rate
-
-    def calculate_monthly_indicators(details_df, mois):
-        # Filtrer les données pour le mois spécifié
-        monthly_details = details_df[details_df['mois'] == mois]
-    
-        # Calculer les indicateurs
-        heures_cumulees = monthly_details['durée[mn]'].sum() / 60  # Convertir les minutes en heures
-        surface_nettoyee = monthly_details['surfacepropre_[mq]'].sum()
-        vitesse_moyenne = monthly_details['vitesse_moyenne[km/h]'].mean()
-        productivite_moyenne = monthly_details['productivitéhoraire_[mq/h]'].mean()
-    
-        return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
-
-    def calculate_monthly_completion_rate(details_df, mois):
-        # Filtrer les données pour le mois spécifié
-        monthly_details = details_df[details_df['mois'] == mois]
-        # Calculer le taux de complétion pour chaque parcours
-        completion_rates = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
-        # Calculer le taux de complétion mensuel
-        completed_routes = (completion_rates >= 90).sum()
-        total_routes = len(completion_rates)
-        monthly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
-        return monthly_completion_rate, completion_rates
+        
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/T2F/Alerte T2F  19-08.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
@@ -340,264 +306,251 @@ def main():
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
 
-   # Créer un dictionnaire pour mapper chaque mois à la date de début du mois
-    month_start_dates = get_month_start_dates(2024)
-    month_options = {month: date.strftime('%B %Y') for month, date in month_start_dates.items()}
-
-    # Afficher le sélecteur de semaine ou de mois
-    display_mode = st.radio("Afficher les données par :", options=["Semaine", "Mois"])
-
-    if display_mode == "Semaine":
-        # Afficher le sélecteur de semaine
+    period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
+    if period_selection == "Semaine":
         selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
-        period = selected_week
-        period_type = "semaine"
 
-        # Filtrer les données pour la semaine sélectionnée
-        weekly_details = details_df[details_df['semaine'] == period]
-        filtered_alarm_details_df = filter_data_by_week(alarm_details_df, period)
+        # Sélection de la semaine
+        semaine = selected_week
 
-    else:
-        # Afficher le sélecteur de mois
-        selected_month = st.selectbox("Sélectionnez le mois", options=list(month_options.keys()), format_func=lambda x: month_options[x])
-        period = selected_month
-        period_type = "mois"
+        # Créer le tableau de suivi par parcours pour la semaine spécifiée
+        weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+    
 
-        # Filtrer les données pour le mois sélectionné
-        monthly_details = details_df[details_df['mois'] == period]
-        filtered_alarm_details_df = filter_data_by_month(alarm_details_df, period)
+        # Calculer le taux de suivi à partir du tableau de suivi
+        taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
 
-    # Nettoyer les doublons dans le dataframe details_df
-    details_df1 = clean_duplicates(details_df)
+        # Calculer le taux de complétion hebdomadaire
+        weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df1, semaine)
 
-    # Créer le tableau de suivi par parcours pour la période sélectionnée
-    comparison_table = create_parcours_comparison_table(period_type, period, details_df1, planning_df)
+    
 
-    # Calculer le taux de suivi à partir du tableau de suivi
-    taux_suivi = calculate_taux_suivi_from_table(comparison_table)
+        # Calculer les indicateurs hebdomadaires
+        heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
-    # Calculer les indicateurs pour la période sélectionnée
-    if period_type == "semaine":
-        heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, period)
-        completion_rate, completion_rates = calculate_weekly_completion_rate(details_df1, period)
-    else:
-        heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_monthly_indicators(details_df, period)
-        completion_rate, completion_rates = calculate_monthly_completion_rate(details_df1, period)
+        # Calculer les coûts
+        weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
+     
+        # Filter alarm data by the selected week
+        filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
-    # Calculer les coûts
-    weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
+        # Calculate the count of alerts by description
+        alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
+        alert_count_by_description.columns = ['Description', 'Alert Count']
 
-    # Calculer les informations sur les événements
-    alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
-    alert_count_by_description.columns = ['Description', 'Alert Count']
-    avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
-    alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
+        # Calculate average resolution time by description
+        avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
+
+        # Merge alert count and average resolution time
+        alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
    
-    # Afficher les KPI côte à côte
-    st.markdown("## **Indicateurs Hebdomadaires**")
+        # Afficher les KPI côte à côte
+        st.markdown("## **Indicateurs Hebdomadaires**")
 
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
+        col1, col2, col3, col4, col5, col6 = st.columns(6)
 
-    with col1:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Heures cumulées</div>
-                <div class="metric-value">{heures_cumulees:.2f} heures</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        with col1:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Heures cumulées</div>
+                    <div class="metric-value">{heures_cumulees:.2f} heures</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-    with col2:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Surfaces nettoyées cumulées</div>
-                <div class="metric-value">{surface_nettoyee:.2f} m²</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        with col2:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Surfaces nettoyées cumulées</div>
+                    <div class="metric-value">{surface_nettoyee:.2f} m²</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-    with col3:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Productivité moyenne</div>
-                <div class="metric-value">{productivite_moyenne:.2f} m²/h</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        with col3:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Productivité moyenne</div>
+                    <div class="metric-value">{productivite_moyenne:.2f} m²/h</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-    with col4:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Vitesse moyenne</div>
-                <div class="metric-value">{vitesse_moyenne:.2f} km/h</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        with col4:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Vitesse moyenne</div>
+                    <div class="metric-value">{vitesse_moyenne:.2f} km/h</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
-    with col5:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Coût total</div>
-                <div class="metric-value">{total_cost:.2f} €</div>
-                <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    with col6:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Taux d'utilisation</div>
-                <div class="metric-value">{utilization_rate:.2f} %</div>
-            </div>
-            """,
-            unsafe_allow_html=True
+        with col5:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Coût total</div>
+                    <div class="metric-value">{total_cost:.2f} €</div>
+                    <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        with col6:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Taux d'utilisation</div>
+                    <div class="metric-value">{utilization_rate:.2f} %</div>
+                </div>
+                """,
+                unsafe_allow_html=True
             
+            )
+    
+
+        # Créer la jauge du taux de suivi
+        fig_suivi = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=taux_suivi,
+            title={'text': "Taux de suivi des parcours"},
+            gauge={
+                'axis': {'range': [None, 100]},
+                'steps': [
+                    {'range': [0, 50], 'color': "orange"},
+                    {'range': [50, 100], 'color': "green"}],
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}
+            }
+        ))
+
+        # Mettre à jour le fond en noir
+        fig_suivi.update_layout(
+            paper_bgcolor="black",
+            plot_bgcolor="black",
+            font={'color': "white"}
         )
+
+        # Créer la jauge du taux de complétion
+        fig_completion = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=weekly_completion_rate,
+            title={'text': "Taux de réalisation des parcours"},
+            gauge={
+                'axis': {'range': [None, 100]},
+                'steps': [
+                    {'range': [0, 50], 'color': "orange"},
+                    {'range': [50, 100], 'color': "green"}],
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}
+            }
+        ))
+
+        # Mettre à jour le fond en noir
+        fig_completion.update_layout(
+            paper_bgcolor="black",
+            plot_bgcolor="black",
+            font={'color': "white"}
+        )
+
+        # Afficher les jauges côte à côte
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.subheader('Taux de Suivi')
+            st.plotly_chart(fig_suivi)
+
+        with col2:
+            st.subheader('Taux de réalisation des parcours')
+            st.plotly_chart(fig_completion)
+
+        # Appliquer le style conditionnel
+        def style_cell(val):
+            if val == 'Fait':
+                return 'background-color: #13FF1A; color: black;'
+            elif val == 'Pas fait':
+                return 'background-color: #FF1313; color: #CACFD2;'
+            else:
+                return ''
+
+        def style_header(val):
+            return 'background-color: black; color: white;'
+
+        # Appliquer le style sur tout le DataFrame
+        styled_table = weekly_comparison_table.style.applymap(style_cell)
     
+        # Appliquer le style sur la colonne "Parcours Prévu"
+        styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
+        # Appliquer le style sur les en-têtes de colonne
+        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
-    # Créer la jauge du taux de suivi
-    fig_suivi = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=taux_suivi,
-        title={'text': "Taux de suivi des parcours"},
-        gauge={
-            'axis': {'range': [None, 100]},
-            'steps': [
-                {'range': [0, 50], 'color': "orange"},
-                {'range': [50, 100], 'color': "green"}],
-            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}
-        }
-    ))
-
-    # Mettre à jour le fond en noir
-    fig_suivi.update_layout(
-        paper_bgcolor="black",
-        plot_bgcolor="black",
-        font={'color': "white"}
-    )
-
-    # Créer la jauge du taux de complétion
-    fig_completion = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=weekly_completion_rate,
-        title={'text': "Taux de réalisation des parcours"},
-        gauge={
-            'axis': {'range': [None, 100]},
-            'steps': [
-                {'range': [0, 50], 'color': "orange"},
-                {'range': [50, 100], 'color': "green"}],
-            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}
-        }
-    ))
-
-    # Mettre à jour le fond en noir
-    fig_completion.update_layout(
-        paper_bgcolor="black",
-        plot_bgcolor="black",
-        font={'color': "white"}
-    )
-
-    # Afficher les jauges côte à côte
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader('Taux de Suivi')
-        st.plotly_chart(fig_suivi)
-
-    with col2:
-        st.subheader('Taux de réalisation des parcours')
-        st.plotly_chart(fig_completion)
-
-    # Appliquer le style conditionnel
-    def style_cell(val):
-        if val == 'Fait':
-            return 'background-color: #13FF1A; color: black;'
-        elif val == 'Pas fait':
-            return 'background-color: #FF1313; color: #CACFD2;'
-        else:
-            return ''
-
-    def style_header(val):
-        return 'background-color: black; color: white;'
-
-    # Appliquer le style sur tout le DataFrame
-    styled_table = weekly_comparison_table.style.applymap(style_cell)
-    
-    # Appliquer le style sur la colonne "Parcours Prévu"
-    styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
-    # Appliquer le style sur les en-têtes de colonne
-    styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
-
-    # Afficher le tableau de suivi par parcours
-    st.subheader('Tableau de Suivi des Parcours')
-    st.dataframe(styled_table, width=2000)
+        # Afficher le tableau de suivi par parcours
+        st.subheader('Tableau de Suivi des Parcours')
+        st.dataframe(styled_table, width=2000)
 
     
-    completion_rates_df = completion_rates.reset_index()
-    # Renommer les colonnes pour supprimer les caractères spéciaux
-    completion_rates_df.columns = ['parcours', 'taux_completion']
+        completion_rates_df = completion_rates.reset_index()
+        # Renommer les colonnes pour supprimer les caractères spéciaux
+        completion_rates_df.columns = ['parcours', 'taux_completion']
 
         
-    # Transformer en DataFrame pour Plotly
-    completion_rates_df = completion_rates.reset_index()
-    completion_rates_df.columns = ['parcours', 'taux_completion']
+        # Transformer en DataFrame pour Plotly
+        completion_rates_df = completion_rates.reset_index()
+        completion_rates_df.columns = ['parcours', 'taux_completion']
 
-    # Créer l'histogramme des taux de complétion par parcours
-    fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                  title='Taux de réalisation par parcours ',
-                  labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
-                  template='plotly_dark')
+        # Créer l'histogramme des taux de complétion par parcours
+        fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
+                      title='Taux de réalisation par parcours ',
+                      labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
+                      template='plotly_dark')
 
-    # Afficher l'histogramme dans Streamlit
-    st.plotly_chart(fig_hist)
+        # Afficher l'histogramme dans Streamlit
+        st.plotly_chart(fig_hist)
     
-    # Visualize the count of alerts and average resolution time by description
-    st.subheader('Evènements Signalés')
-    # Create two columns for the charts
-    col1, col2 = st.columns(2)
+        # Visualize the count of alerts and average resolution time by description
+        st.subheader('Evènements Signalés')
+        # Create two columns for the charts
+        col1, col2 = st.columns(2)
 
-    with col1:
-        # Bar and line chart
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
+        with col1:
+            # Bar and line chart
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-        fig.add_trace(
-            go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'évènements"),
-            secondary_y=False,
-        )
+            fig.add_trace(
+                go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'évènements"),
+                secondary_y=False,
+            )
+    
+            fig.add_trace(
+                go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Délai d'intervention moyen", mode='lines+markers'),
+                secondary_y=True,
+            )
 
-        fig.add_trace(
-            go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Délai d'intervention moyen", mode='lines+markers'),
-            secondary_y=True,
-        )
+            fig.update_layout(
+                title_text=" Nombre d'évènements par type et délai d'intervention moyen ",
+                xaxis_title="Type d'évènements",
+                template='plotly_dark'
+            )
 
-        fig.update_layout(
-            title_text=" Nombre d'évènements par type et délai d'intervention moyen ",
-            xaxis_title="Type d'évènements",
-            template='plotly_dark'
-        )
+            fig.update_yaxes(title_text="Nombre d'évènements", secondary_y=False)
+            fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
 
-        fig.update_yaxes(title_text="Nombre d'évènements", secondary_y=False)
-        fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
+            st.plotly_chart(fig)
 
-        st.plotly_chart(fig)
-
-    with col2:
-        # Pie chart
-        fig_pie = create_pie_chart(alert_summary)
-        st.plotly_chart(fig_pie)
-    st.subheader("Description des événements")
-    st.dataframe(description_evenements,width=2000)    
+        with col2:
+            # Pie chart
+            fig_pie = create_pie_chart(alert_summary)
+            st.plotly_chart(fig_pie)
+        st.subheader("Description des événements")
+        st.dataframe(description_evenements,width=2000)
+    
+   #Afficher le sélecteur de semaine avec les date    
 if __name__ == '__main__':
     main()
    
