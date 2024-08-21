@@ -595,9 +595,8 @@ def main():
 
         # Filtrer les événements signalés pour le mois sélectionné
         alarm_details_df['mois'] = alarm_details_df['Apparition'].dt.month
-        monthly_alarms = alarm_details_df[alarm_details_df['mois'] == selected_month]
         
-        st.dataframe(monthly_alarms)
+        st.dataframe(alarm_details_df)
        
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
