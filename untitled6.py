@@ -822,6 +822,31 @@ def main():
                            labels={'x': 'Mois', 'y': 'Taux de suivi (%)'},
                            template='plotly_dark')
     st.plotly_chart(fig_taux_suivi)
+
+    # Bar chart for route completion rates over several months
+    st.subheader("Taux de réalisation des parcours")
+    
+    # Retrieve the completion rates for all months
+    completion_rates_by_month = []
+    for month in range(1, 13):
+        monthly_details = details_df1[details_df1['mois'] == month]
+        _, monthly_completion_rate = calculate_weekly_completion_rate(monthly_details, None)
+        completion_rates_by_month.append(monthly_completion_rate)
+    
+    # Create the bar chart
+    fig_completion = go.Figure(data=[
+        go.Bar(x=list(mois_dict.values()), y=completion_rates_by_month, marker_color='royalblue'),
+        go.Scatter(x=list(mois_dict.values()), y=[90] * 12, mode='lines', name='Objectif 90%', marker_color='red')
+    ])
+    
+    fig_completion.update_layout(
+        title='Taux de réalisation des parcours par mois',
+        xaxis_title='Mois',
+        yaxis_title='Taux de réalisation (%)',
+        template='plotly_dark'
+    )
+    
+    st.plotly_chart(fig_completion)
 if __name__ == '__main__':
     main()
    
