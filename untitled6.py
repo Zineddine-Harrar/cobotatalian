@@ -550,6 +550,8 @@ def main():
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
     elif period_selection == "Mois":
+        # Récupérer toutes les semaines du mois sélectionné
+        semaines_du_mois = monthly_details['semaine'].unique()
          # Initialiser des listes pour stocker les taux de suivi et de réalisation hebdomadaires
         weekly_taux_suivi = []
         weekly_completion_rates = []
