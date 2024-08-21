@@ -550,13 +550,28 @@ def main():
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
     elif period_selection == "Mois":
-        # Sélection du mois
-        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: datetime(2024, x, 1).strftime("%B"))
+         # Initialiser des listes pour stocker les taux de suivi et de réalisation hebdomadaires
+        weekly_taux_suivi = []
+        weekly_completion_rates = []
 
-        # Filtrer les données pour le mois sélectionné
-        details_df['mois'] = details_df['début'].dt.month
-        monthly_details = details_df[details_df['mois'] == selected_month]
+        # Calculer le taux de suivi et de réalisation pour chaque semaine du mois
+        for semaine in semaines_du_mois:
+            # Créer le tableau de suivi par parcours pour la semaine spécifiée
+            weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+        
+            # Calculer le taux de suivi à partir du tableau de suivi
+            taux_suivi_semaine = calculate_taux_suivi_from_table(weekly_comparison_table)
+            weekly_taux_suivi.append(taux_suivi_semaine)
 
+            # Calculer le taux de réalisation hebdomadaire
+            weekly_completion_rate, _ = calculate_weekly_completion_rate(details_df1, semaine)
+            weekly_completion_rates.append(weekly_completion_rate)
+
+        # Calculer la moyenne des taux de suivi pour le mois
+        taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
+
+        # Calculer la moyenne des taux de réalisation pour le mois
+        taux_realisation_moyen_mois = sum(weekly_completion_rates) / len(weekly_completion_rates) if weekly_completion_rates else 0
         # Calcul des KPI mensuels
 
         # Heures cumulées et surfaces nettoyées sur le mois
@@ -567,11 +582,6 @@ def main():
         vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
         productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
 
-        # Calcul du taux de réalisation mensuel
-        completion_rates_mois = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
-        taux_realisation_mois = (completion_rates_mois >= 90).sum() / len(completion_rates_mois) * 100 if len(completion_rates_mois) > 0 else 0
-
-       
 
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
@@ -622,26 +632,70 @@ def main():
                 unsafe_allow_html=True,
             )
 
-        # Créer les jauges pour le taux de suivi et le taux de réalisation des parcours sur le mois
-        fig_suivi_mois = go.Figure(go.Indicator(
+        # Créer la jauge du taux de suivi
+        fig_suivi = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=taux_realisation_mois,
-            title={'text': "Taux de réalisation des parcours (Mois)"},
+            value=taux_suivi_moyen_mois,
+            title={'text': "Taux de suivi des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
                 'steps': [
                     {'range': [0, 50], 'color': "orange"},
                     {'range': [50, 100], 'color': "green"}],
-                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_realisation_mois}
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi_moyen_mois}
             }
         ))
 
-        fig_suivi_mois.update_layout(
+        # Mettre à jour le fond en noir
+        fig_suivi.update_layout(
+            paper_bgcolor="black",
+            plot_bgcolor="black",
+            font={'color': "white"}
+        )
+        
+        # Créer la jauge du taux de complétion
+        fig_completion = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=taux_realisation_moyen_mois,
+            title={'text': "Taux de réalisation des parcours"},
+            gauge={
+                'axis': {'range': [None, 100]},
+                'steps': [
+                    {'range': [0, 50], 'color': "orange"},
+                    {'range': [50, 100], 'color': "green"}],
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_realisation_moyen_mois}
+            }
+        ))
+
+        # Mettre à jour le fond en noir
+        fig_completion.update_layout(
             paper_bgcolor="black",
             plot_bgcolor="black",
             font={'color': "white"}
         )
 
+        # Afficher les jauges côte à côte
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.subheader('Taux de Suivi')
+            st.plotly_chart(fig_suivi)
+
+        with col2:
+            st.subheader('Taux de réalisation des parcours')
+            st.plotly_chart(fig_completion)
+
+        # Appliquer le style conditionnel
+        def style_cell(val):
+            if val == 'Fait':
+                return 'background-color: #13FF1A; color: black;'
+            elif val == 'Pas fait':
+                return 'background-color: #FF1313; color: #CACFD2;'
+            else:
+                return ''
+
+        def style_header(val):
+            return 'background-color: black; color: white;'
        
 
     
