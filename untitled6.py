@@ -598,21 +598,29 @@ def main():
         productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
 
         # Calcul du nombre d'événements signalés cumulés sur le mois
-        filtered_alarm_details_df_month = filter_data_by_week(alarm_details_df, selected_month)
+        filtered_alarm_details_df_month = alarm_details_df[alarm_details_df['mois'] == selected_month]
+        print("filtered_alarm_details_df_month:")
+        print(filtered_alarm_details_df_month)
         total_alerts_month = len(filtered_alarm_details_df_month)
-
+    
         # Calcul du temps de réalisation moyen des événements sur le mois
         avg_resolution_time_month = filtered_alarm_details_df_month['Resolution Time'].mean()
+
         # Calculate the count of alerts by description
         alert_count_by_description = filtered_alarm_details_df_month['Description'].value_counts().reset_index()
         alert_count_by_description.columns = ['Description', 'Alert Count']
+        print("alert_count_by_description:")
+        print(alert_count_by_description)
 
         # Calculate average resolution time by description
         avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df_month)
+        print("avg_resolution_time:")
+        print(avg_resolution_time)
 
         # Merge alert count and average resolution time
         alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
-        st.dataframe(alert_summary)
+        print("alert_summary:")
+        print(alert_summary)
 
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
