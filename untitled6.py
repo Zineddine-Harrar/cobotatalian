@@ -872,6 +872,8 @@ def main():
         })
         st.session_state.actions_correctives = pd.concat([st.session_state.actions_correctives, new_action], ignore_index=True)
 
+    # Convertir la colonne 'Délai' en datetime
+    st.session_state.actions_correctives['Délai'] = pd.to_datetime(st.session_state.actions_correctives['Délai'])
 
     # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
     edited_df = st.data_editor(
