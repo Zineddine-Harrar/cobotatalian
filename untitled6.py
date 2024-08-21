@@ -575,6 +575,9 @@ def main():
             weekly_completion_rate, _ = calculate_weekly_completion_rate(details_df1, semaine)
             weekly_completion_rates.append(weekly_completion_rate)
 
+            # Calculer le temps moyen de résolution par type d'événement
+            avg_resolution_time_mois = calculate_average_resolution_time(monthly_alarms)
+
         # Calculer la moyenne des taux de suivi pour le mois
         taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
 
@@ -593,15 +596,16 @@ def main():
         # Filtrer les événements signalés pour le mois sélectionné
         alarm_details_df['mois'] = alarm_details_df['Apparition'].dt.month
         monthly_alarms = alarm_details_df[alarm_details_df['mois'] == selected_month]
-    
-        # Calculer le nombre total d'événements par type
+
+        # Calculer le nombre d'événements par description
         alert_count_by_description_mois = monthly_alarms['Description'].value_counts().reset_index()
         alert_count_by_description_mois.columns = ['Description', 'Alert Count']
 
-        # Calculer le temps moyen de résolution par type d'événement
-        avg_resolution_time_mois = calculate_average_resolution_time(monthly_alarms)/4
-    
-        # Fusionner les données sur le nombre d'événements et le temps moyen de résolution
+        # Calculer le temps moyen de réalisation par description
+        avg_resolution_time_mois = monthly_alarms.groupby('Description')['Resolution Time'].mean().reset_index()
+        avg_resolution_time_mois.columns = ['Description', 'Avg Resolution Time (min)']
+
+        # Fusionner les données d'alerte pour le nombre et le temps moyen
         alert_summary_mois = pd.merge(alert_count_by_description_mois, avg_resolution_time_mois, on='Description', how='left')
 
 
@@ -722,6 +726,7 @@ def main():
          # ---- Affichage des événements signalés ----
         st.subheader('Événements Signalés (Mois)')
 
+        # Afficher les données sous forme de graphiques
         col1, col2 = st.columns(2)
 
         with col1:
@@ -749,7 +754,11 @@ def main():
 
         with col2:
             # Camembert pour la répartition des événements
-            fig_pie_mois = create_pie_chart(alert_summary_mois)
+            fig_pie_mois = px.pie(alert_summary_mois, values='Alert Count', names='Description',
+                                  title='Répartition des événements',
+                                  template='plotly_dark',
+                                  hole=0.3)
+            fig_pie_mois.update_traces(textposition='inside', textinfo='percent+label')
             st.plotly_chart(fig_pie_mois)
        
 
