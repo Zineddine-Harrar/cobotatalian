@@ -802,6 +802,26 @@ def main():
     fig_monthly_alerts.update_layout(xaxis_title="Mois", yaxis_title="Nombre d'événements")
 
     st.plotly_chart(fig_monthly_alerts)
+
+    # Récupérer les données de taux de suivi pour tous les mois
+    all_months_taux_suivi = []
+    for month in range(1, 13):
+        monthly_details = details_df1[details_df1['mois'] == month]
+        semaines_du_mois = monthly_details['semaine'].unique()
+        weekly_taux_suivi = []
+        for semaine in semaines_du_mois:
+            weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+            taux_suivi_semaine = calculate_taux_suivi_from_table(weekly_comparison_table)
+            weekly_taux_suivi.append(taux_suivi_semaine)
+        taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
+        all_months_taux_suivi.append(taux_suivi_moyen_mois)
+
+    # Créer l'histogramme des taux de suivi par mois
+    fig_taux_suivi = px.bar(x=list(mois_dict.values()), y=all_months_taux_suivi,
+                           title='Taux de suivi des parcours par mois',
+                           labels={'x': 'Mois', 'y': 'Taux de suivi (%)'},
+                           template='plotly_dark')
+    st.plotly_chart(fig_taux_suivi)
 if __name__ == '__main__':
     main()
    
