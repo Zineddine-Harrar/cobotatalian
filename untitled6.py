@@ -239,7 +239,7 @@ def main():
                          title='Répartition des évènements',
                          template='plotly_dark',
                          hole=0.3)
-        fig_pie.update_traces(textposition='inside', textinfo='percent+label')
+        fig_pie.update_traces(textposition='inside', textinfo='percent+label', textfont_color='white')
         return fig_pie
 
     # Variables pour le calcul du taux d'utilisation
