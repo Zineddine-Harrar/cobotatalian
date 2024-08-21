@@ -616,7 +616,6 @@ def main():
         avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df_month)
         print("avg_resolution_time:")
         print(avg_resolution_time)
-        st.dataframe(filtered_alarm_details_df_month)
 
         # Merge alert count and average resolution time
         alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
@@ -785,6 +784,9 @@ def main():
                 template='plotly_dark'
             )
             st.plotly_chart(fig_pie)
+
+        st.subheader("Description des événements")
+        st.dataframe(description_evenements,width=2000)
     
 if __name__ == '__main__':
     main()
