@@ -867,13 +867,15 @@ def main():
     def add_action():
         new_action = pd.DataFrame({
             'Action corrective': [action],
-            'Délai': [delai],
+            'Délai d\'intervention': [delai],
+            'Date d\'ajout': [datetime.now().date()],
             'Statut': [statut]
         })
         st.session_state.actions_correctives = pd.concat([st.session_state.actions_correctives, new_action], ignore_index=True)
 
     # Convertir la colonne 'Délai' en datetime
-    st.session_state.actions_correctives['Délai'] = pd.to_datetime(st.session_state.actions_correctives['Délai'])
+    st.session_state.actions_correctives['Délai d\'intervention'] = pd.to_datetime(st.session_state.actions_correctives['Délai d\'intervention'])
+    st.session_state.actions_correctives['Date d\'ajout'] = pd.to_datetime(st.session_state.actions_correctives['Date d\'ajout'])
 
     # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
     edited_df = st.data_editor(
@@ -885,10 +887,17 @@ def main():
                 help="Décrivez l'action corrective",
                 max_chars=100,
             ),
-            "Délai": st.column_config.DateColumn(
-                "Délai",
+            "Date d'ajout": st.column_config.DateColumn(
+                "Date d'ajout",
+                help="Date d'ajout de l'action",
+                format="DD/MM/YYYY",
+                width="medium",
+            ),
+            "Délai d'intervention": st.column_config.DateColumn(
+                "Délai d'intervention",
                 help="Date limite pour l'action",
                 format="DD/MM/YYYY",
+                width="medium",
             ),
             "Statut": st.column_config.SelectboxColumn(
                 "Statut",
