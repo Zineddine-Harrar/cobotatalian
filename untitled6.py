@@ -787,7 +787,21 @@ def main():
 
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
-    
+
+        # Create the monthly alerts comparison chart
+        st.subheader("Comparaison du nombre d'événements signalés par mois")
+
+        # Get the count of alerts for each month
+        monthly_alerts = alarm_details_df.groupby('mois')['Description'].count().reset_index()
+        monthly_alerts['Mois'] = monthly_alerts['mois'].map(mois_dict)
+
+    # Create the bar chart
+    fig_monthly_alerts = px.bar(monthly_alerts, x='Mois', y='Description', 
+                           title='Nombre de événements signalés par mois',
+                           template='plotly_dark')
+    fig_monthly_alerts.update_layout(xaxis_title="Mois", yaxis_title="Nombre d'événements")
+
+    st.plotly_chart(fig_monthly_alerts)
 if __name__ == '__main__':
     main()
    
