@@ -856,6 +856,53 @@ def main():
         )
     
         st.plotly_chart(fig_completion)
+
+st.subheader("Actions correctives")
+
+# Initialiser le DataFrame des actions correctives dans le state de la session s'il n'existe pas déjà
+if 'actions_correctives' not in st.session_state:
+    st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Délai', 'Statut'])
+
+# Fonction pour ajouter une nouvelle action
+def add_action():
+    new_action = pd.DataFrame({
+        'Action corrective': [action],
+        'Délai': [delai],
+        'Statut': [statut]
+    })
+    st.session_state.actions_correctives = pd.concat([st.session_state.actions_correctives, new_action], ignore_index=True)
+
+# Formulaire pour ajouter une nouvelle action
+with st.form(key='add_action_form'):
+    action = st.text_input("Action corrective")
+    delai = st.date_input("Délai")
+    statut = st.selectbox("Statut", options=['En cours', 'Terminé', 'En retard'])
+    submit_button = st.form_submit_button(label='Ajouter une action')
+    if submit_button:
+        add_action()
+
+# Afficher le tableau des actions correctives
+st.dataframe(st.session_state.actions_correctives, use_container_width=True)
+
+# Fonction pour mettre à jour une action
+def update_action(index, column, value):
+    st.session_state.actions_correctives.at[index, column] = value
+
+# Permettre la modification du tableau
+for i, row in st.session_state.actions_correctives.iterrows():
+    with st.expander(f"Modifier l'action {i+1}"):
+        new_action = st.text_input("Action corrective", value=row['Action corrective'])
+        new_delai = st.date_input("Délai", value=pd.to_datetime(row['Délai']))
+        new_statut = st.selectbox("Statut", options=['En cours', 'Terminé', 'En retard'], index=['En cours', 'Terminé', 'En retard'].index(row['Statut']))
+        if st.button(f"Mettre à jour l'action {i+1}"):
+            update_action(i, 'Action corrective', new_action)
+            update_action(i, 'Délai', new_delai)
+            update_action(i, 'Statut', new_statut)
+
+# Bouton pour supprimer toutes les actions
+if st.button("Supprimer toutes les actions"):
+    st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Délai', 'Statut'])
+    st.success("Toutes les actions ont été supprimées.")
 if __name__ == '__main__':
     main()
    
