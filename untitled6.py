@@ -575,9 +575,7 @@ def main():
             weekly_completion_rate, _ = calculate_weekly_completion_rate(details_df1, semaine)
             weekly_completion_rates.append(weekly_completion_rate)
 
-            # Calculer le temps moyen de résolution par type d'événement
-            avg_resolution_time_mois = calculate_average_resolution_time(monthly_alarms)
-
+            
         # Calculer la moyenne des taux de suivi pour le mois
         taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
 
