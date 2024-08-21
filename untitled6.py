@@ -897,6 +897,7 @@ def main():
             ),
         },
         hide_index=True,
+        width=1000,  # Définir la largeur à 1000 pixels
     )
 
     # Mettre à jour le DataFrame dans le session state
