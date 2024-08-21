@@ -902,7 +902,7 @@ def main():
     # Bouton pour supprimer toutes les actions
     if st.button("Supprimer toutes les actions", key="delete_all"):
         st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Délai', 'Statut'])
-        st.success("Toutes les actions ont été supprimées.")es.")
+        st.success("Toutes les actions ont été supprimées.")
 if __name__ == '__main__':
     main()
    
