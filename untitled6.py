@@ -597,17 +597,21 @@ def main():
         alarm_details_df['mois'] = alarm_details_df['Apparition'].dt.month
         monthly_alarms = alarm_details_df[alarm_details_df['mois'] == selected_month]
 
+        # Vérifier si monthly_alarms contient des données avant de poursuivre
+        if monthly_alarms.empty:
+            st.warning(f"Aucun événement signalé pour {datetime(2024, selected_month, 1).strftime('%B')}.")
+            return
+
         # Calculer le nombre d'événements par description
         alert_count_by_description_mois = monthly_alarms['Description'].value_counts().reset_index()
         alert_count_by_description_mois.columns = ['Description', 'Alert Count']
-
+    
         # Calculer le temps moyen de réalisation par description
         avg_resolution_time_mois = monthly_alarms.groupby('Description')['Resolution Time'].mean().reset_index()
         avg_resolution_time_mois.columns = ['Description', 'Avg Resolution Time (min)']
 
         # Fusionner les données d'alerte pour le nombre et le temps moyen
         alert_summary_mois = pd.merge(alert_count_by_description_mois, avg_resolution_time_mois, on='Description', how='left')
-
 
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
