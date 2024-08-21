@@ -835,11 +835,10 @@ def main():
         weekly_taux_suivi = []
         # Calculer le taux de suivi et de réalisation pour chaque semaine du mois
         for semaine in semaines_du_mois:
-            # Créer le tableau de suivi par parcours pour la semaine spécifiée
-            weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
             # Calculer le taux de réalisation hebdomadaire
-            weekly_completion_rate, _ = calculate_weekly_completion_rate(weekly_comparison_table,semaine)
+            weekly_completion_rate, _ = calculate_weekly_completion_rate(details_df1, semaine)
             weekly_completion_rates.append(weekly_completion_rate)
+
         taux_realisation_moyen_mois = sum(weekly_completion_rates) / len(weekly_completion_rates) if weekly_completion_rates else 0
         all_months_taux_completion.append(taux_realisation_moyen_mois)
     
