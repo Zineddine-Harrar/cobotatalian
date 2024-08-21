@@ -596,27 +596,9 @@ def main():
         # Filtrer les événements signalés pour le mois sélectionné
         alarm_details_df['mois'] = alarm_details_df['Apparition'].dt.month
         monthly_alarms = alarm_details_df[alarm_details_df['mois'] == selected_month]
-        # Fonction pour calculer le temps moyen de résolution
-        def calculate_average_resolution_time(df):
-            df['Resolution Time'] = (df['Retour'] - df['Apparition']).dt.total_seconds() / 60
-            avg_resolution_time = df.groupby('Description')['Resolution Time'].mean().reset_index()
-            avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
-            return avg_resolution_time
-        # Vérifier si `monthly_alarms` contient des données avant d'appeler `calculate_average_resolution_time`
-        if monthly_alarms.empty:
-            st.warning(f"Aucun événement signalé pour {datetime(2024, selected_month, 1).strftime('%B')}.")
-            return
-
-        # Calculer le temps moyen de résolution pour le mois
-        avg_resolution_time_mois = calculate_average_resolution_time(monthly_alarms)
-
-        # Calculer le nombre d'événements par description
-        alert_count_by_description_mois = monthly_alarms['Description'].value_counts().reset_index()
-        alert_count_by_description_mois.columns = ['Description', 'Alert Count']
-
-        # Fusionner les données d'alerte pour le nombre et le temps moyen
-        alert_summary_mois = pd.merge(alert_count_by_description_mois, avg_resolution_time_mois, on='Description', how='left')
-
+        
+        st.dataframe(monthly_alarms)
+       
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
 
@@ -731,43 +713,6 @@ def main():
         def style_header(val):
             return 'background-color: black; color: white;'
 
-         # ---- Affichage des événements signalés ----
-        st.subheader('Événements Signalés (Mois)')
-
-        # Afficher les données sous forme de graphiques
-        col1, col2 = st.columns(2)
-
-        with col1:
-            # Graphique barres pour les événements et temps moyen de résolution
-            fig = make_subplots(specs=[[{"secondary_y": True}]])
-            fig.add_trace(
-                go.Bar(x=alert_summary_mois['Description'], y=alert_summary_mois['Alert Count'], name="Nombre d'événements"),
-                secondary_y=False,
-            )
-            fig.add_trace(
-                go.Scatter(x=alert_summary_mois['Description'], y=alert_summary_mois['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
-                secondary_y=True,
-            )
-
-            fig.update_layout(
-                title_text="Nombre d'événements par type et temps de résolution moyen (Mois)",
-                xaxis_title="Type d'événements",
-                template='plotly_dark'
-            )
-
-            fig.update_yaxes(title_text="Nombre d'événements", secondary_y=False)
-            fig.update_yaxes(title_text="Temps de résolution (min)", secondary_y=True)
-
-            st.plotly_chart(fig)
-
-        with col2:
-            # Camembert pour la répartition des événements
-            fig_pie_mois = px.pie(alert_summary_mois, values='Alert Count', names='Description',
-                                  title='Répartition des événements',
-                                  template='plotly_dark',
-                                  hole=0.3)
-            fig_pie_mois.update_traces(textposition='inside', textinfo='percent+label')
-            st.plotly_chart(fig_pie_mois)
        
 
     
