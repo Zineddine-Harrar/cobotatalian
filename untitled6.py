@@ -870,6 +870,9 @@ def main():
         # Ajouter la colonne 'Date d'ajout' si elle n'existe pas
         if 'Date d\'ajout' not in st.session_state.actions_correctives.columns:
             st.session_state.actions_correctives['Date d\'ajout'] = pd.NaT
+
+        # Réorganiser les colonnes dans l'ordre souhaité
+        st.session_state.actions_correctives = st.session_state.actions_correctives[['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Statut']]
         # Fonction pour ajouter une nouvelle action
     def add_action():
         new_action = pd.DataFrame({
