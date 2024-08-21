@@ -861,9 +861,16 @@ def main():
 
     # Initialiser le DataFrame des actions correctives dans le state de la session s'il n'existe pas déjà
     if 'actions_correctives' not in st.session_state:
-        st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Délai', 'Statut'])
-
-    # Fonction pour ajouter une nouvelle action
+        st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Délai d\'intervention', 'Date d\'ajout', 'Statut'])
+    else:
+        # Migration : renommer la colonne 'Délai' en 'Délai d'intervention' si elle existe
+        if 'Délai' in st.session_state.actions_correctives.columns:
+            st.session_state.actions_correctives = st.session_state.actions_correctives.rename(columns={'Délai': 'Délai d\'intervention'})
+    
+        # Ajouter la colonne 'Date d'ajout' si elle n'existe pas
+        if 'Date d\'ajout' not in st.session_state.actions_correctives.columns:
+            st.session_state.actions_correctives['Date d\'ajout'] = pd.NaT
+        # Fonction pour ajouter une nouvelle action
     def add_action():
         new_action = pd.DataFrame({
             'Action corrective': [action],
