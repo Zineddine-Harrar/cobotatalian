@@ -599,7 +599,7 @@ def main():
         alert_count_by_description_mois.columns = ['Description', 'Alert Count']
 
         # Calculer le temps moyen de résolution par type d'événement
-        avg_resolution_time_mois = calculate_average_resolution_time(monthly_alarms)
+        avg_resolution_time_mois = calculate_average_resolution_time(monthly_alarms)/4
     
         # Fusionner les données sur le nombre d'événements et le temps moyen de résolution
         alert_summary_mois = pd.merge(alert_count_by_description_mois, avg_resolution_time_mois, on='Description', how='left')
