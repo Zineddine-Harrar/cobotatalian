@@ -550,6 +550,12 @@ def main():
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
     elif period_selection == "Mois":
+        # Sélection du mois
+        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: datetime(2024, x, 1).strftime("%B"))
+
+        # Filtrer les données pour le mois sélectionné
+        details_df1['mois'] = details_df1['début'].dt.month
+        monthly_details = details_df1[details_df1['mois'] == selected_month]
         # Récupérer toutes les semaines du mois sélectionné
         semaines_du_mois = monthly_details['semaine'].unique()
          # Initialiser des listes pour stocker les taux de suivi et de réalisation hebdomadaires
