@@ -596,8 +596,13 @@ def main():
         # Filtrer les événements signalés pour le mois sélectionné
         alarm_details_df['mois'] = alarm_details_df['Apparition'].dt.month
         monthly_alarms = alarm_details_df[alarm_details_df['mois'] == selected_month]
-
-       # Vérifier si `monthly_alarms` contient des données avant d'appeler `calculate_average_resolution_time`
+        # Fonction pour calculer le temps moyen de résolution
+        def calculate_average_resolution_time(df):
+            df['Resolution Time'] = (df['Retour'] - df['Apparition']).dt.total_seconds() / 60
+            avg_resolution_time = df.groupby('Description')['Resolution Time'].mean().reset_index()
+            avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
+            return avg_resolution_time
+        # Vérifier si `monthly_alarms` contient des données avant d'appeler `calculate_average_resolution_time`
         if monthly_alarms.empty:
             st.warning(f"Aucun événement signalé pour {datetime(2024, selected_month, 1).strftime('%B')}.")
             return
