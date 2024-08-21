@@ -823,30 +823,33 @@ def main():
                            template='plotly_dark')
     st.plotly_chart(fig_taux_suivi)
 
-    # Bar chart for route completion rates over several months
-    st.subheader("Taux de réalisation des parcours")
     
-    # Retrieve the completion rates for all months
-    completion_rates_by_month = []
-    for month in range(1, 13):
-        monthly_details = details_df1[details_df1['mois'] == month]
-        monthly_completion_rate = calculate_weekly_completion_rate(monthly_details, None)
-        completion_rates_by_month.append(monthly_completion_rate)
-    
-    # Create the bar chart
-    fig_completion = go.Figure(data=[
-        go.Bar(x=list(mois_dict.values()), y=completion_rates_by_month, marker_color='royalblue'),
-        go.Scatter(x=list(mois_dict.values()), y=[90] * 12, mode='lines', name='Objectif 90%', marker_color='red')
+
+    # Histogramme du taux de réalisation et de suivi par mois
+    months = list(mois_dict.values())
+    completion_rates = [taux_realisation_moyen_mois]
+    follow_up_rates = [taux_suivi_moyen_mois]
+
+    fig_hist = go.Figure(data=[
+        go.Bar(name='Taux de réalisation', x=months, y=completion_rates, marker_color='green'),
+        go.Bar(name='Taux de suivi', x=months, y=follow_up_rates, marker_color='orange')
     ])
-    
-    fig_completion.update_layout(
-        title='Taux de réalisation des parcours par mois',
+
+    # Définir l'objectif à 90%
+    objective_line = 90
+
+    # Ajouter la ligne d'objectif
+    fig_hist.add_hline(y=objective_line, line_color='red', line_width=2, annotation_text="Objectif 90%", annotation_position="top left")
+
+    fig_hist.update_layout(
+        title='Taux de réalisation et de suivi par mois',
+        barmode='group',
         xaxis_title='Mois',
-        yaxis_title='Taux de réalisation (%)',
+        yaxis_title='Taux (%)',
         template='plotly_dark'
     )
-    
-    st.plotly_chart(fig_completion)
+
+    st.plotly_chart(fig_hist)
 if __name__ == '__main__':
     main()
    
