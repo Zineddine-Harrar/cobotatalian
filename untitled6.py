@@ -549,8 +549,145 @@ def main():
             st.plotly_chart(fig_pie)
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
+    elif period_selection == "Mois":
+        # Sélection du mois
+        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: datetime(2024, x, 1).strftime("%B"))
+
+        # Filtrer les données pour le mois sélectionné
+        details_df['mois'] = details_df['début'].dt.month
+        monthly_details = details_df[details_df['mois'] == selected_month]
+
+        # Calcul des KPI mensuels
+
+        # Heures cumulées et surfaces nettoyées sur le mois
+        heures_cumulees_mois = monthly_details['durée[mn]'].sum() / 60  # Convertir les minutes en heures
+        surface_nettoyee_mois = monthly_details['surfacepropre_[mq]'].sum()
+
+        # Moyennes mensuelles pour la productivité et la vitesse
+        vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
+        productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
+
+        # Calcul du taux de réalisation mensuel
+        completion_rates_mois = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
+        taux_realisation_mois = (completion_rates_mois >= 90).sum() / len(completion_rates_mois) * 100 if len(completion_rates_mois) > 0 else 0
+
+        # Calculer les événements signalés cumulés sur le mois
+        filtered_alarm_details_df['mois'] = filtered_alarm_details_df['Apparition'].dt.month
+        filtered_alarm_details_df_mois = filtered_alarm_details_df[filtered_alarm_details_df['mois'] == selected_month]
+        alert_count_by_description_mois = filtered_alarm_details_df_mois['Description'].value_counts().reset_index()
+        alert_count_by_description_mois.columns = ['Description', 'Alert Count']
+
+        # Calcul du temps de résolution moyen pour les événements sur le mois
+        avg_resolution_time_mois = calculate_average_resolution_time(filtered_alarm_details_df_mois)
+
+        # Merge alert count and average resolution time for the month
+        alert_summary_mois = pd.merge(alert_count_by_description_mois, avg_resolution_time_mois, on='Description', how='left')
+
+        # Affichage des KPI pour le mois
+        st.markdown("### Indicateurs Mensuels")
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Heures cumulées (Mois)</div>
+                    <div class="metric-value">{heures_cumulees_mois:.2f} heures</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col2:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Surfaces nettoyées cumulées (Mois)</div>
+                    <div class="metric-value">{surface_nettoyee_mois:.2f} m²</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col3:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Productivité moyenne (Mois)</div>
+                    <div class="metric-value">{productivite_moyenne_mois:.2f} m²/h</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col4:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Vitesse moyenne (Mois)</div>
+                    <div class="metric-value">{vitesse_moyenne_mois:.2f} km/h</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        # Créer les jauges pour le taux de suivi et le taux de réalisation des parcours sur le mois
+        fig_suivi_mois = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=taux_realisation_mois,
+            title={'text': "Taux de réalisation des parcours (Mois)"},
+            gauge={
+                'axis': {'range': [None, 100]},
+                'steps': [
+                    {'range': [0, 50], 'color': "orange"},
+                    {'range': [50, 100], 'color': "green"}],
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_realisation_mois}
+            }
+        ))
+
+        fig_suivi_mois.update_layout(
+            paper_bgcolor="black",
+            plot_bgcolor="black",
+            font={'color': "white"}
+        )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader('Taux de Réalisation (Mois)')
+            st.plotly_chart(fig_suivi_mois)
+
+        # Affichage des événements signalés sur le mois
+        st.subheader('Événements Signalés (Mois)')
+
+        col1, col2 = st.columns(2)
+        with col1:
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
+            fig.add_trace(
+                go.Bar(x=alert_summary_mois['Description'], y=alert_summary_mois['Alert Count'], name="Nombre d'événements"),
+                secondary_y=False,
+            )
+            fig.add_trace(
+                go.Scatter(x=alert_summary_mois['Description'], y=alert_summary_mois['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
+                secondary_y=True,
+            )
+
+            fig.update_layout(
+                title_text="Nombre d'événements par type et temps de résolution moyen (Mois)",
+                xaxis_title="Type d'événements",
+                template='plotly_dark'
+            )
+
+            fig.update_yaxes(title_text="Nombre d'événements", secondary_y=False)
+            fig.update_yaxes(title_text="Temps de résolution (min)", secondary_y=True)
+
+            st.plotly_chart(fig)
+
+        with col2:
+            fig_pie_mois = create_pie_chart(alert_summary_mois)
+            st.plotly_chart(fig_pie_mois)
+
     
-   #Afficher le sélecteur de semaine avec les date    
 if __name__ == '__main__':
     main()
    
