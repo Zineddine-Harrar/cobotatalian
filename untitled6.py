@@ -551,6 +551,7 @@ def main():
             st.plotly_chart(fig_pie)
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
+    # Mois
     elif period_selection == "Mois":
         mois_dict = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
         # Sélection du mois
@@ -561,7 +562,8 @@ def main():
         monthly_details = details_df1[details_df1['mois'] == selected_month]
         # Récupérer toutes les semaines du mois sélectionné
         semaines_du_mois = monthly_details['semaine'].unique()
-         # Initialiser des listes pour stocker les taux de suivi et de réalisation hebdomadaires
+
+        # Initialiser des listes pour stocker les taux de suivi et de réalisation hebdomadaires
         weekly_taux_suivi = []
         weekly_completion_rates = []
 
@@ -569,7 +571,7 @@ def main():
         for semaine in semaines_du_mois:
             # Créer le tableau de suivi par parcours pour la semaine spécifiée
             weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-        
+    
             # Calculer le taux de suivi à partir du tableau de suivi
             taux_suivi_semaine = calculate_taux_suivi_from_table(weekly_comparison_table)
             weekly_taux_suivi.append(taux_suivi_semaine)
@@ -578,12 +580,12 @@ def main():
             weekly_completion_rate, _ = calculate_weekly_completion_rate(details_df1, semaine)
             weekly_completion_rates.append(weekly_completion_rate)
 
-            
         # Calculer la moyenne des taux de suivi pour le mois
         taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
-
+    
         # Calculer la moyenne des taux de réalisation pour le mois
         taux_realisation_moyen_mois = sum(weekly_completion_rates) / len(weekly_completion_rates) if weekly_completion_rates else 0
+
         # Calcul des KPI mensuels
 
         # Heures cumulées et surfaces nettoyées sur le mois
@@ -593,12 +595,18 @@ def main():
         # Moyennes mensuelles pour la productivité et la vitesse
         vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
         productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
+    
+        # Calcul du nombre d'événements signalés cumulés sur le mois
+        filtered_alarm_details_df_month = filter_data_by_week(alarm_details_df, selected_month)
+        total_alerts_month = len(filtered_alarm_details_df_month)
 
-        
+        # Calcul du temps de réalisation moyen des événements sur le mois
+        avg_resolution_time_month = filtered_alarm_details_df_month['Resolution Time'].mean()
+
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
 
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5, col6 = st.columns(6)
 
         with col1:
             st.markdown(
@@ -644,6 +652,28 @@ def main():
                 unsafe_allow_html=True,
             )
 
+        with col5:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Nombre d'événements signalés (Mois)</div>
+                    <div class="metric-value">{total_alerts_month}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col6:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Temps de réalisation moyen (Mois)</div>
+                    <div class="metric-value">{avg_resolution_time_month:.2f} min</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
         # Créer la jauge du taux de suivi
         fig_suivi = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -664,7 +694,7 @@ def main():
             plot_bgcolor="black",
             font={'color': "white"}
         )
-        
+
         # Créer la jauge du taux de complétion
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -685,7 +715,7 @@ def main():
             plot_bgcolor="black",
             font={'color': "white"}
         )
-
+    
         # Afficher les jauges côte à côte
         col1, col2 = st.columns(2)
 
@@ -696,19 +726,6 @@ def main():
         with col2:
             st.subheader('Taux de réalisation des parcours')
             st.plotly_chart(fig_completion)
-
-        # Appliquer le style conditionnel
-        def style_cell(val):
-            if val == 'Fait':
-                return 'background-color: #13FF1A; color: black;'
-            elif val == 'Pas fait':
-                return 'background-color: #FF1313; color: #CACFD2;'
-            else:
-                return ''
-
-        def style_header(val):
-            return 'background-color: black; color: white;'
-
         
 
     
