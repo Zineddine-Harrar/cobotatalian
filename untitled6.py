@@ -595,8 +595,7 @@ def main():
         vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
         productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
 
-        monthly_alarms = alarm_details_df[alarm_details_df['mois'] == selected_month]
-        st.dataframe(monthly_alarms)
+        
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
 
@@ -711,40 +710,7 @@ def main():
         def style_header(val):
             return 'background-color: black; color: white;'
 
-        # Afficher les données sous forme de graphiques
-        col1, col2 = st.columns(2)
-
-        with col1:
-            # Graphique barres pour les événements et temps moyen de résolution
-            fig = make_subplots(specs=[[{"secondary_y": True}]])
-            fig.add_trace(
-                go.Bar(x=alert_summary_mois['Description'], y=alert_summary_mois['Alert Count'], name="Nombre d'événements"),
-                secondary_y=False,
-            )
-            fig.add_trace(
-                go.Scatter(x=alert_summary_mois['Description'], y=alert_summary_mois['Avg Resolution Time (min)'], name="Temps de résolution moyen", mode='lines+markers'),
-                secondary_y=True,
-            )
-
-            fig.update_layout(
-                title_text="Nombre d'événements par type et temps de résolution moyen (Mois)",
-                xaxis_title="Type d'événements",
-                template='plotly_dark'
-            )
-
-            fig.update_yaxes(title_text="Nombre d'événements", secondary_y=False)
-            fig.update_yaxes(title_text="Temps de résolution (min)", secondary_y=True)
-
-            st.plotly_chart(fig)
-
-        with col2:
-            # Camembert pour la répartition des événements
-            fig_pie_mois = px.pie(alert_summary_mois, values='Alert Count', names='Description',
-                                  title='Répartition des événements',
-                                  template='plotly_dark',
-                                  hole=0.3)
-            fig_pie_mois.update_traces(textposition='inside', textinfo='percent+label')
-            st.plotly_chart(fig_pie_mois)
+        
 
     
 if __name__ == '__main__':
