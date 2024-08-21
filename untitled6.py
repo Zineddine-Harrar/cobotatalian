@@ -616,7 +616,7 @@ def main():
         avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df_month)
         print("avg_resolution_time:")
         print(avg_resolution_time)
-        st.text(filtered_alarm_details_df_month)
+        st.dataframe(filtered_alarm_details_df_month)
 
         # Merge alert count and average resolution time
         alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
