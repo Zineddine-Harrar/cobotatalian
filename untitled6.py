@@ -604,6 +604,15 @@ def main():
         # Calcul du temps de réalisation moyen des événements sur le mois
         avg_resolution_time_month = filtered_alarm_details_df_month['Resolution Time'].mean()
 
+        # Calculate the count of alerts by description
+        alert_count_by_description = filtered_alarm_details_df_month['Description'].value_counts().reset_index()
+        alert_count_by_description.columns = ['Description', 'Alert Count']
+
+        # Calculate average resolution time by description
+        avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df_month)
+
+        # Merge alert count and average resolution time
+        alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
 
