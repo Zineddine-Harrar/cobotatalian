@@ -844,7 +844,7 @@ def main():
     
     # Create the bar chart
     fig_completion = go.Figure(data=[
-        go.Bar(x=list(mois_dict.values()), y=all_months_taux_completion, marker_color='royalblue'),
+        go.Bar(x=list(mois_dict.values()), y=all_months_taux_completion, name='Taux de réalisation des parcours', marker_color='royalblue'),
         go.Scatter(x=list(mois_dict.values()), y=[90] * 12, mode='lines', name='Objectif 90%', marker_color='red')
     ])
     
