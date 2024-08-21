@@ -832,7 +832,7 @@ def main():
     for month in range(1, 13):
         monthly_details = details_df1[details_df1['mois'] == month]
         semaines_du_mois = monthly_details['semaine'].unique()
-        weekly_taux_suivi = []
+        weekly_completion_rates = []
         # Calculer le taux de suivi et de réalisation pour chaque semaine du mois
         for semaine in semaines_du_mois:
             # Calculer le taux de réalisation hebdomadaire
