@@ -588,8 +588,13 @@ def main():
         details_df1['mois'] = details_df1['début'].dt.month
         monthly_details = details_df1[details_df1['mois'] == selected_month]
         # Calculer le taux de suivi pour le mois
-        monthly_comparison_table = create_parcours_comparison_table(selected_month, details_df1, planning_df)
-        taux_suivi_moyen_mois = calculate_taux_suivi_from_table(monthly_comparison_table)
+        taux_suivi_moyen_mois = 0
+        semaines_du_mois = monthly_details['semaine'].unique()
+        for semaine in semaines_du_mois:
+            weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+            taux_suivi_semaine = calculate_taux_suivi_from_table(weekly_comparison_table)
+            taux_suivi_moyen_mois += taux_suivi_semaine
+        taux_suivi_moyen_mois /= len(semaines_du_mois) if len(semaines_du_mois) > 0 else 1
 
         # Calculer le taux de réalisation pour le mois
         completion_rates, taux_realisation_moyen_mois = calculate_completion_rates(monthly_details)
