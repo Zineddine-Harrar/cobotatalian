@@ -792,35 +792,35 @@ def main():
         col1, col2 = st.columns(2)
 
         with col1:
-        # Bar and line chart
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
+            # Bar and line chart
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-        fig.add_trace(
-            go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'évènements"),
-            secondary_y=False,
-        )
+            fig.add_trace(
+                go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'évènements"),
+                secondary_y=False,
+            )
 
-        fig.add_trace(
-            go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Délai d'intervention moyen", mode='lines+markers'),
-            secondary_y=True,
-        )
+            fig.add_trace(
+                go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Délai d'intervention moyen", mode='lines+markers'),
+                secondary_y=True,
+            )
 
-        fig.update_layout(
-            title_text=f"Nombre d'évènements par type et délai d'intervention moyen ({categorie_filter})",
-            xaxis_title="Type d'évènements",
-            template='plotly_dark'
-        )
+            fig.update_layout(
+                title_text=f"Nombre d'évènements par type et délai d'intervention moyen ({categorie_filter})",
+                xaxis_title="Type d'évènements",
+                template='plotly_dark'
+            )
 
-        fig.update_yaxes(title_text="Nombre d'évènements", secondary_y=False)
-        fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
+            fig.update_yaxes(title_text="Nombre d'évènements", secondary_y=False)
+            fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
 
-        st.plotly_chart(fig)
+            st.plotly_chart(fig)
 
         with col2:
-        # Pie chart
-        fig_pie = create_pie_chart(alert_summary)
-        fig_pie.update_layout(title_text=f"Répartition des évènements ({categorie_filter})")
-        st.plotly_chart(fig_pie)
+            # Pie chart
+            fig_pie = create_pie_chart(alert_summary)
+            fig_pie.update_layout(title_text=f"Répartition des évènements ({categorie_filter})")
+            st.plotly_chart(fig_pie)
 
 
 
