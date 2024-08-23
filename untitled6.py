@@ -903,7 +903,8 @@ def main():
 
         # Afficher l'histogramme dans Streamlit
         st.plotly_chart(fig_hist, use_container_width=True)
-
+        print("completion_rates_df:")
+        print(completion_rates_df)
     st.subheader("Actions correctives")
 
     # Initialiser le DataFrame des actions correctives dans le state de la session s'il n'existe pas déjà
