@@ -465,7 +465,7 @@ def main():
             
             )
 
-         with col7:
+        with col7:
             st.markdown(
                 f"""
                 <div class="metric-container">
@@ -476,7 +476,7 @@ def main():
                 unsafe_allow_html=True
             
             )
-          with col8:
+        with col8:
             st.markdown(
                 f"""
                 <div class="metric-container">
