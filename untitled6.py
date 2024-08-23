@@ -204,17 +204,18 @@ def main():
         
         return taux_suivi
 
-    # Fonction pour calculer le taux de complétion hebdomadaire
-    def calculate_weekly_completion_rate(details_df, semaine):
-        # Filtrer les données pour la semaine spécifiée
-        weekly_details = details_df[details_df['semaine'] == semaine]
+    def calculate_completion_rates(details_df, threshold=90):
         # Calculer le taux de complétion pour chaque parcours
-        completion_rates = weekly_details.groupby('parcours')['terminerà_[%]'].mean()
-        # Calculer le taux de complétion hebdomadaire
-        completed_routes = (completion_rates >= 90).sum()
-        total_routes = len(completion_rates)
-        weekly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
-        return weekly_completion_rate, completion_rates
+        completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
+    
+        # Calculer le nombre de parcours réalisés (>= 90%)
+        parcours_realises = (completion_rates >= threshold).sum()
+        
+        # Calculer le taux de réalisation
+        total_parcours = len(completion_rates)
+        taux_realisation = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
+    
+        return completion_rates, taux_realisation
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -322,8 +323,9 @@ def main():
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
 
-        # Calculer le taux de complétion hebdomadaire
-        weekly_completion_rate, completion_rates = calculate_weekly_completion_rate(details_df1, semaine)
+        weekly_details = details_df1[details_df1['semaine'] == semaine]
+        completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
+
 
     
 
@@ -516,18 +518,27 @@ def main():
         completion_rates_df.columns = ['parcours', 'taux_completion']
 
         
-        # Transformer en DataFrame pour Plotly
+        # Créer l'histogramme des taux de complétion par parcours
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
 
-        # Créer l'histogramme des taux de complétion par parcours
         fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                      title='Taux de réalisation par parcours ',
-                      labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
-                      template='plotly_dark')
+                          title=f'Taux de réalisation par parcours (Semaine {semaine})',
+                          labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
+                          template='plotly_dark')
+
+        # Ajouter une ligne horizontale à 90%
+        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+
+        # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
+        fig_hist.update_layout(
+            xaxis_tickangle=-45,
+            xaxis_title="",
+            margin=dict(b=150)  # Augmenter la marge en bas pour les noms de parcours
+        )
 
         # Afficher l'histogramme dans Streamlit
-        st.plotly_chart(fig_hist)
+        st.plotly_chart(fig_hist, use_container_width=True)
     
         # Visualize the count of alerts and average resolution time by description
         st.subheader('Evènements Signalés')
@@ -575,31 +586,13 @@ def main():
         # Filtrer les données pour le mois sélectionné
         details_df1['mois'] = details_df1['début'].dt.month
         monthly_details = details_df1[details_df1['mois'] == selected_month]
-        # Récupérer toutes les semaines du mois sélectionné
-        semaines_du_mois = monthly_details['semaine'].unique()
+        # Calculer le taux de suivi pour le mois
+        monthly_comparison_table = create_parcours_comparison_table(selected_month, details_df1, planning_df)
+        taux_suivi_moyen_mois = calculate_taux_suivi_from_table(monthly_comparison_table)
 
-        # Initialiser des listes pour stocker les taux de suivi et de réalisation hebdomadaires
-        weekly_taux_suivi = []
-        weekly_completion_rates = []
-
-        # Calculer le taux de suivi et de réalisation pour chaque semaine du mois
-        for semaine in semaines_du_mois:
-            # Créer le tableau de suivi par parcours pour la semaine spécifiée
-            weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-    
-            # Calculer le taux de suivi à partir du tableau de suivi
-            taux_suivi_semaine = calculate_taux_suivi_from_table(weekly_comparison_table)
-            weekly_taux_suivi.append(taux_suivi_semaine)
-
-            # Calculer le taux de réalisation hebdomadaire
-            weekly_completion_rate, _ = calculate_weekly_completion_rate(details_df1, semaine)
-            weekly_completion_rates.append(weekly_completion_rate)
-
-        # Calculer la moyenne des taux de suivi pour le mois
-        taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
-
-        # Calculer la moyenne des taux de réalisation pour le mois
-        taux_realisation_moyen_mois = sum(weekly_completion_rates) / len(weekly_completion_rates) if weekly_completion_rates else 0
+        # Calculer le taux de réalisation pour le mois
+        completion_rates, taux_realisation_moyen_mois = calculate_completion_rates(monthly_details)
+        
 
         # Calcul des KPI mensuels
 
@@ -883,17 +876,19 @@ def main():
         )
     
         st.plotly_chart(fig_completion)
-        monthly_details = details_df1
-        # Calculer les taux de complétion pour tous les parcours du mois
-        completion_rates = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
+       
+
+        # Créer l'histogramme des taux de complétion par parcours
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
 
-        # Créer l'histogramme des taux de complétion par parcours
         fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
                           title=f'Taux de réalisation par parcours (Mois {mois_dict[selected_month]})',
                           labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
                           template='plotly_dark')
+
+        # Ajouter une ligne horizontale à 90%
+        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
 
         # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
         fig_hist.update_layout(
@@ -904,22 +899,6 @@ def main():
 
         # Afficher l'histogramme dans Streamlit
         st.plotly_chart(fig_hist, use_container_width=True)
-        # Afficher les données pour le débogage
-        st.write("Contenu de details_df1:")
-        st.write(details_df1.head())
-        st.write("Nombre total de lignes dans details_df1:", len(details_df1))
-
-        st.write("Contenu de monthly_details:")
-        st.write(monthly_details.head())
-        st.write("Nombre total de lignes dans monthly_details:", len(monthly_details))
-        st.write("Mois sélectionné:", selected_month)
-        st.write("Valeurs uniques dans la colonne 'mois' de details_df1:")
-        st.write(details_df1['mois'].unique())
-        st.write("Mois sélectionné:", selected_month)
-        st.write("Valeurs uniques dans la colonne 'mois' de details_df1:")
-        st.write(details_df1['mois'].unique())
-        st.write("Taux de complétion calculés:")
-        st.write(monthly_details.groupby('parcours')['terminerà_[%]'].mean())
     st.subheader("Actions correctives")
 
     # Initialiser le DataFrame des actions correctives dans le state de la session s'il n'existe pas déjà
