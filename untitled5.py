@@ -402,7 +402,7 @@ def main():
         col1, col2, col3, col4, col5, col6 = st.columns(6)
 
         with col1:
-            st.markdown(display_metric("Heures cumulées", f"{heures_cumulees:.2f}", "⏰", "heures"), unsafe_allow_html=True)
+            st.markdown(display_metric("Heures cumulées", f"{heures_cumulees:.2f}", "https://img.icons8.com/?size=100&id=19100&format=png&color=000000", "heures"), unsafe_allow_html=True)
 
         with col2:
             st.markdown(display_metric("Surfaces nettoyées", f"{surface_nettoyee:.2f}", "📏", "m²"), unsafe_allow_html=True)
