@@ -615,10 +615,7 @@ def main():
         print("filtered_alarm_details_df_month:")
         print(filtered_alarm_details_df_month)
         total_alerts_month = len(filtered_alarm_details_df_month)
-        # Ajouter une colonne pour la catégorie (Journée/Nuit)
-        filtered_alarm_details_df['Catégorie'] = filtered_alarm_details_df['Apparition'].dt.hour.map(categorize_hour)
-        
-
+    
         # Calcul du temps de réalisation moyen des événements sur le mois
         avg_resolution_time_month = filtered_alarm_details_df_month['Resolution Time'].mean()
 
@@ -637,6 +634,7 @@ def main():
         alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
         print("alert_summary:")
         print(alert_summary)
+
 
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
