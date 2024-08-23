@@ -856,10 +856,7 @@ def main():
         )
     
         st.plotly_chart(fig_completion)
-    import pandas as pd
-    import streamlit as st
-    from datetime import datetime, timedelta
-
+    
 
 
     st.subheader("Actions correctives")
