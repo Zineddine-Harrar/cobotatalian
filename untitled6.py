@@ -861,31 +861,45 @@ def main():
 
     # Initialiser le DataFrame des actions correctives dans le state de la session s'il n'existe pas déjà
     if 'actions_correctives' not in st.session_state:
-        st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Délai d\'intervention', 'Date d\'ajout', 'Statut'])
+        st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
     else:
         # Migration : renommer la colonne 'Délai' en 'Délai d'intervention' si elle existe
         if 'Délai' in st.session_state.actions_correctives.columns:
             st.session_state.actions_correctives = st.session_state.actions_correctives.rename(columns={'Délai': 'Délai d\'intervention'})
     
-        # Ajouter la colonne 'Date d'ajout' si elle n'existe pas
-        if 'Date d\'ajout' not in st.session_state.actions_correctives.columns:
-            st.session_state.actions_correctives['Date d\'ajout'] = pd.NaT
-
+        # Ajouter les nouvelles colonnes si elles n'existent pas
+        for col in ['Date d\'ajout', 'Responsable Action', 'Commentaires']:
+            if col not in st.session_state.actions_correctives.columns:
+                st.session_state.actions_correctives[col] = ''
+    
         # Réorganiser les colonnes dans l'ordre souhaité
-        st.session_state.actions_correctives = st.session_state.actions_correctives[['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Statut']]
-        # Fonction pour ajouter une nouvelle action
+        st.session_state.actions_correctives = st.session_state.actions_correctives[['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires']]
+
+    # Fonction pour ajouter une nouvelle action
     def add_action():
         new_action = pd.DataFrame({
             'Action corrective': [action],
-            'Délai d\'intervention': [delai],
             'Date d\'ajout': [datetime.now().date()],
-            'Statut': [statut]
+            'Délai d\'intervention': [delai],
+            'Responsable Action': [responsable],
+            'Statut': [statut],
+            'Commentaires': ['']
         })
         st.session_state.actions_correctives = pd.concat([st.session_state.actions_correctives, new_action], ignore_index=True)
 
-    # Convertir la colonne 'Délai' en datetime
-    st.session_state.actions_correctives['Délai d\'intervention'] = pd.to_datetime(st.session_state.actions_correctives['Délai d\'intervention'])
+    # Formulaire pour ajouter une nouvelle action
+    with st.form(key='add_action_form'):
+        action = st.text_input("Action corrective", key="new_action_input")
+        delai = st.date_input("Délai d'intervention", key="new_action_date")
+        responsable = st.text_input("Responsable Action", key="new_action_responsable")
+        statut = st.selectbox("Statut", options=['En cours', 'Terminé', 'En retard'], key="new_action_status")
+        submit_button = st.form_submit_button(label='Ajouter une action')
+        if submit_button:
+            add_action()
+
+    # Convertir les colonnes de date en datetime
     st.session_state.actions_correctives['Date d\'ajout'] = pd.to_datetime(st.session_state.actions_correctives['Date d\'ajout'])
+    st.session_state.actions_correctives['Délai d\'intervention'] = pd.to_datetime(st.session_state.actions_correctives['Délai d\'intervention'])
 
     # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
     edited_df = st.data_editor(
@@ -896,6 +910,7 @@ def main():
                 "Action corrective",
                 help="Décrivez l'action corrective",
                 max_chars=100,
+                width="large",
             ),
             "Date d'ajout": st.column_config.DateColumn(
                 "Date d'ajout",
@@ -909,14 +924,27 @@ def main():
                 format="DD/MM/YYYY",
                 width="medium",
             ),
+            "Responsable Action": st.column_config.TextColumn(
+                "Responsable Action",
+                help="Personne responsable de l'action",
+                max_chars=50,
+                width="medium",
+            ),
             "Statut": st.column_config.SelectboxColumn(
                 "Statut",
                 help="Statut actuel de l'action",
                 options=['En cours', 'Terminé', 'En retard'],
+                width="small",
+            ),
+            "Commentaires": st.column_config.TextColumn(
+                "Commentaires",
+                help="Commentaires additionnels",
+                max_chars=200,
+                width="large",
             ),
         },
         hide_index=True,
-        width=1000,  # Définir la largeur à 1000 pixels
+        width=1200,
     )
 
     # Mettre à jour le DataFrame dans le session state
@@ -924,7 +952,7 @@ def main():
 
     # Bouton pour supprimer toutes les actions
     if st.button("Supprimer toutes les actions", key="delete_all"):
-        st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Délai', 'Statut'])
+        st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
         st.success("Toutes les actions ont été supprimées.")
 if __name__ == '__main__':
     main()
