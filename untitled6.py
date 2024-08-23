@@ -883,20 +883,36 @@ def main():
         )
     
         st.plotly_chart(fig_completion)
-        # Calculer les taux de complétion pour tous les parcours du mois
+        # Obtenir la liste de tous les parcours uniques
+        all_parcours = details_df1['parcours'].unique()
+
+        # Calculer les taux de complétion moyens pour tous les parcours du mois
         completion_rates = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
-        completion_rates_df = completion_rates.reset_index()
+
+        # Créer un DataFrame avec tous les parcours, même ceux non réalisés ce mois-ci
+        completion_rates_df = pd.DataFrame(index=all_parcours, columns=['taux_completion']).fillna(0)
+        completion_rates_df.update(completion_rates)
+        completion_rates_df = completion_rates_df.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
+
+        # Trier les parcours par ordre alphabétique
+        completion_rates_df = completion_rates_df.sort_values('parcours')
 
         # Créer l'histogramme des taux de complétion par parcours
         fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                          title=f'Taux de réalisation par parcours (Mois {mois_dict[selected_month]})',
-                          labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
+                          title=f'Taux de réalisation moyen par parcours (Mois {mois_dict[selected_month]})',
+                          labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation moyen (%)'},
                           template='plotly_dark')
 
-        # Afficher l'histogramme dans Streamlit
-        st.plotly_chart(fig_hist)
+        # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
+        fig_hist.update_layout(
+            xaxis_tickangle=-45,
+            xaxis_title="",
+            margin=dict(b=150)  # Augmenter la marge en bas pour les noms de parcours
+        )
 
+        # Afficher l'histogramme dans Streamlit
+        st.plotly_chart(fig_hist, use_container_width=True)
 
     st.subheader("Actions correctives")
 
