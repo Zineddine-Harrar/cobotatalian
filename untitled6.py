@@ -615,7 +615,20 @@ def main():
         print("filtered_alarm_details_df_month:")
         print(filtered_alarm_details_df_month)
         total_alerts_month = len(filtered_alarm_details_df_month)
-    
+        # Ajouter une colonne pour la catégorie (Journée/Nuit)
+        filtered_alarm_details_df['Catégorie'] = filtered_alarm_details_df['Apparition'].dt.hour.map(categorize_hour)
+        # Créer un sélecteur pour filtrer par catégorie
+        categorie_filter = st.selectbox(
+            "Filtrer par période",
+            options=['Tous', 'Journée', 'Nuit']
+        )
+
+        # Filtrer les données en fonction de la sélection
+        if categorie_filter != 'Tous':
+            filtered_data = filtered_alarm_details_df[filtered_alarm_details_df['Catégorie'] == categorie_filter]
+        else:
+            filtered_data = filtered_alarm_details_df
+
         # Calcul du temps de réalisation moyen des événements sur le mois
         avg_resolution_time_month = filtered_alarm_details_df_month['Resolution Time'].mean()
 
@@ -792,23 +805,20 @@ def main():
             )
 
             fig.update_layout(
-                title_text=f"Nombre d'évènements par type et délai d'intervention moyen (Mois {mois_dict[selected_month]})",
+                title_text=f"Nombre d'évènements par type et délai d'intervention moyen ({categorie_filter})",
                 xaxis_title="Type d'évènements",
                 template='plotly_dark'
             )
 
             fig.update_yaxes(title_text="Nombre d'évènements", secondary_y=False)
             fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
-    
+
             st.plotly_chart(fig)
 
         with col2:
             # Pie chart
             fig_pie = create_pie_chart(alert_summary)
-            fig_pie.update_layout(
-                title_text=f"Répartition des évènements (Mois {mois_dict[selected_month]})",
-                template='plotly_dark'
-            )
+            fig_pie.update_layout(title_text=f"Répartition des évènements ({categorie_filter})")
             st.plotly_chart(fig_pie)
 
        
