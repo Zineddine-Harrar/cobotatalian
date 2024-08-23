@@ -640,7 +640,8 @@ def main():
             filtered_data = filtered_alarm_details_df
         # Calculer le nombre total d'alertes pour le mois
         total_alerts_month = len(filtered_data)
-
+        # Calculer le temps de réalisation moyen des événements sur le mois
+        avg_resolution_time_month = filtered_data['Resolution Time'].mean()
         # Calculer les statistiques filtrées
         alert_count_by_description = filtered_data['Description'].value_counts().reset_index()
         alert_count_by_description.columns = ['Description', 'Alert Count']
