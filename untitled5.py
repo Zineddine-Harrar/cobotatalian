@@ -324,45 +324,40 @@ def main():
     period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
     if period_selection == "Semaine":
         selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
-
-        # Sélection de la semaine
         semaine = selected_week
-
-        # Créer le tableau de suivi par parcours pour la semaine spécifiée
+         # Créer le tableau de suivi par parcours pour la semaine spécifiée
         weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+        # Calculer le taux de suivi à partir du tableau de suivi
+        taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
+        
 
         # Filtrer les données pour la semaine sélectionnée
         weekly_details = details_df1[details_df1['semaine'] == semaine]
+        filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
+        completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
 
         # Créer un sélecteur pour filtrer par catégorie
         categorie_filter = st.selectbox(
             "Filtrer par période",
             options=['Tous', 'Journée', 'Nuit']
         )
+
         # Appliquer le filtre par période
-        
+        filtered_data = filter_data_by_period(filtered_alarm_details_df, categorie_filter)
         filtered_weekly_details = filter_data_by_period(weekly_details, categorie_filter)
 
-        # Calculer le taux de suivi à partir du tableau de suivi
-        taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-
-        completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
-
-
+        # Calculer les indicateurs avec les données filtrées
+        heures_cumulees = filtered_weekly_details['durée[mn]'].sum() / 60
+        surface_nettoyee = filtered_weekly_details['surfacepropre_[mq]'].sum()
+        vitesse_moyenne = filtered_weekly_details['vitesse_moyenne[km/h]'].mean()
+        productivite_moyenne = filtered_weekly_details['productivitéhoraire_[mq/h]'].mean()
     
-
-        # Calculer les indicateurs hebdomadaires
-        heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(filtered_weekly_details, semaine)
-
         # Calculer les coûts
         weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
-     
-        # Sélection de la semaine
-        semaine = selected_week
 
-        # Filtrer les données pour la semaine sélectionnée
-        filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
-
+        # Calculer les statistiques des événements
+        total_alerts_week = len(filtered_data)
+        avg_resolution_time_week = filtered_data['Resolution Time'].mean()
         # Fonction pour catégoriser les heures
         def categorize_hour(hour):
             if 6 <= hour < 22:
