@@ -470,7 +470,7 @@ def main():
                 f"""
                 <div class="metric-container">
                     <div class="metric-label">Nombre d'événements</div>
-                    <div class="metric-value">{otal_alerts_week:.2f} %</div>
+                    <div class="metric-value">{total_alerts_week:.2f} %</div>
                 </div>
                 """,
                 unsafe_allow_html=True
