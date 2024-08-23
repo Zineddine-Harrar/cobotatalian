@@ -734,8 +734,8 @@ def main():
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
 
-        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
-
+        col1, col2, col3, col4 = st.columns(4)
+        col5, col6, col7 = st.columns(3)
         with col1:
             st.markdown(
                 f"""
