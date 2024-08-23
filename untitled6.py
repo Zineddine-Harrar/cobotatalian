@@ -432,7 +432,7 @@ def main():
                     {'range': [40, 80], 'color': "orange"},
                     {'range': [80, 100], 'color': "green"}
                 ],
-                 'threshold': {
+                'threshold': {
                     'line': {'color': "white", 'width': 4},
                     'thickness': 0.75,
                     'value': taux_suivi
@@ -460,10 +460,10 @@ def main():
                     {'range': [40, 80], 'color': "orange"},
                     {'range': [80, 100], 'color': "green"}
                 ],
-        '        threshold': {
+                'threshold': {
                     'line': {'color': "white", 'width': 4},
                     'thickness': 0.75,
-                    'value': taux_suivi
+                    'value': weekly_completion_rate
                 }
             }
         ))
