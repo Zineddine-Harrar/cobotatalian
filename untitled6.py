@@ -887,16 +887,6 @@ def main():
         })
         st.session_state.actions_correctives = pd.concat([st.session_state.actions_correctives, new_action], ignore_index=True)
 
-    # Formulaire pour ajouter une nouvelle action
-    with st.form(key='add_action_form'):
-        action = st.text_input("Action corrective", key="new_action_input")
-        delai = st.date_input("Délai d'intervention", key="new_action_date")
-        responsable = st.text_input("Responsable Action", key="new_action_responsable")
-        statut = st.selectbox("Statut", options=['En cours', 'Terminé', 'En retard'], key="new_action_status")
-        submit_button = st.form_submit_button(label='Ajouter une action')
-        if submit_button:
-            add_action()
-
     # Convertir les colonnes de date en datetime
     st.session_state.actions_correctives['Date d\'ajout'] = pd.to_datetime(st.session_state.actions_correctives['Date d\'ajout'])
     st.session_state.actions_correctives['Délai d\'intervention'] = pd.to_datetime(st.session_state.actions_correctives['Délai d\'intervention'])
@@ -944,7 +934,7 @@ def main():
             ),
         },
         hide_index=True,
-        width=1200,
+        width=1800,
     )
 
     # Mettre à jour le DataFrame dans le session state
