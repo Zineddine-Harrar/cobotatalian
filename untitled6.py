@@ -890,7 +890,8 @@ def main():
     # Convertir les colonnes de date en datetime
     st.session_state.actions_correctives['Date d\'ajout'] = pd.to_datetime(st.session_state.actions_correctives['Date d\'ajout'])
     st.session_state.actions_correctives['Délai d\'intervention'] = pd.to_datetime(st.session_state.actions_correctives['Délai d\'intervention'])
-
+    mask_missing_dates = st.session_state.actions_correctives['Date d\'ajout'].isnull()
+    st.session_state.actions_correctives.loc[mask_missing_dates, 'Date d\'ajout'] = datetime.now().date()
     # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
     edited_df = st.data_editor(
         st.session_state.actions_correctives,
@@ -907,6 +908,7 @@ def main():
                 help="Date d'ajout de l'action",
                 format="DD/MM/YYYY",
                 width="medium",
+                disabled=True,
             ),
             "Délai d'intervention": st.column_config.DateColumn(
                 "Délai d'intervention",
