@@ -218,12 +218,14 @@ def main():
         comparison_table = pd.DataFrame(rows)
         
         return comparison_table
-    def display_metric(label, value, icon, unit=""):
+    def display_metric(label, value, icon_html, unit=""):
         return f"""
         <div class="metric-container">
-            <i class="metric-icon fas {icon}"></i>
-            <div class="metric-label">{label}</div>
-            <div class="metric-value">{value} {unit}</div>
+            <div class="metric-icon">{icon_html}</div>
+            <div class="metric-content">
+                <div class="metric-label">{label}</div>
+                <div class="metric-value">{value} {unit}</div>
+            </div>
         </div>
         """
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
@@ -421,7 +423,7 @@ def main():
         col1, col2, col3, col4, col5, col6 = st.columns(6)
 
         with col1:
-            st.markdown(display_metric("Heures cumulées", f"{heures_cumulees:.2f}", "fa-clock", "heures"), unsafe_allow_html=True)
+            st.markdown(display_metric("Heures cumulées", f"{heures_cumulees:.2f}", '<i class="fa-regular fa-clock"></i>', "heures"), unsafe_allow_html=True)
 
         with col2:
             st.markdown(display_metric("Surfaces nettoyées", f"{surface_nettoyee:.2f}", "fa-expand", "m²"), unsafe_allow_html=True)
