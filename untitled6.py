@@ -861,23 +861,41 @@ def main():
         # Bar chart for route completion rates over several months
         st.subheader("Taux de réalisation des parcours")
 
+        # Définir l'ordre des parcours
+        ordre_parcours = [
+            'Porte 1-3d H',
+            'Pt 3-5d Triplex',
+            'Triplex 6d F14',
+            'F14 Pt9 H',
+            'Porte 9-11d H',
+            'Pt 12-14d H',
+            'Pt 14d Triplex',
+            'Triplex 17d H'
+        ]
+
         # Créer l'histogramme des taux de complétion par parcours
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
 
+        # Filtrer et trier le DataFrame selon l'ordre spécifié
+        completion_rates_df = completion_rates_df[completion_rates_df['parcours'].isin(ordre_parcours)]
+        completion_rates_df['parcours'] = pd.Categorical(completion_rates_df['parcours'], categories=ordre_parcours, ordered=True)
+        completion_rates_df = completion_rates_df.sort_values('parcours')
+
         fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                          title=f'Taux de réalisation par parcours (Mois {mois_dict[selected_month]})',
+                          title=f'Taux de réalisation par parcours ({"Semaine " + str(semaine) if period_selection == "Semaine" else "Mois " + mois_dict[selected_month]})',
                           labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
-                          template='plotly_dark')
+                          template='plotly_dark',
+                          category_orders={"parcours": ordre_parcours})
 
         # Ajouter une ligne horizontale à 90%
         fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
 
-        # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
+        # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours et fixer l'échelle de 0 à 100%
         fig_hist.update_layout(
             xaxis_tickangle=-45,
             xaxis_title="",
-            yaxis=dict(range=[0, 100]),
+            yaxis=dict(range=[0, 100]),  # Fixer l'échelle de l'axe y de 0 à 100%
             margin=dict(b=150)  # Augmenter la marge en bas pour les noms de parcours
         )
 
