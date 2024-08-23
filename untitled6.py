@@ -641,6 +641,11 @@ def main():
         # Afficher un échantillon des données filtrées pour vérification
         st.write("Échantillon des données filtrées:")
         st.write(filtered_data[['Apparition', 'Catégorie']].head())
+        # Calculer le nombre total d'alertes pour le mois
+        total_alerts_month = len(filtered_data)
+
+        # Calculer le temps de réalisation moyen des événements sur le mois
+        avg_resolution_time_month = filtered_data['Resolution Time'].mean()
 
         # Calculer le temps de réalisation moyen des événements sur le mois
         avg_resolution_time_month = filtered_data['Resolution Time'].mean()
