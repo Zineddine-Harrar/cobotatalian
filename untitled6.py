@@ -534,6 +534,7 @@ def main():
         fig_hist.update_layout(
             xaxis_tickangle=-45,
             xaxis_title="",
+            yaxis=dict(range=[0, 100]),
             margin=dict(b=150)  # Augmenter la marge en bas pour les noms de parcours
         )
 
@@ -841,6 +842,13 @@ def main():
                                title='Taux de suivi des parcours par mois',
                                labels={'x': 'Mois', 'y': 'Taux de suivi (%)'},
                                template='plotly_dark')
+        # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
+        fig_taux_suivi.update_layout(
+            xaxis_tickangle=-45,
+            xaxis_title="",
+            yaxis=dict(range=[0, 100]),
+            margin=dict(b=150)  # Augmenter la marge en bas pour les noms de parcours
+        )
         st.plotly_chart(fig_taux_suivi)
 
     
@@ -864,6 +872,7 @@ def main():
         fig_hist.update_layout(
             xaxis_tickangle=-45,
             xaxis_title="",
+            yaxis=dict(range=[0, 100]),
             margin=dict(b=150)  # Augmenter la marge en bas pour les noms de parcours
         )
 
