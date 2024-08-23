@@ -941,7 +941,7 @@ def main():
             ),
         },
         hide_index=True,
-        width=1200,
+        width=2000,
     )
 
     # Préserver les valeurs après l'édition
