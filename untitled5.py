@@ -370,9 +370,7 @@ def main():
         else:
             filtered_data = filtered_alarm_details_df
     
-        # Afficher un échantillon des données filtrées pour vérification
-        st.write("Échantillon des données filtrées:")
-        st.write(filtered_data[['Apparition', 'Catégorie']].head())
+      
 
         # Calculer le nombre total d'alertes pour la semaine
         total_alerts_week = len(filtered_data)
