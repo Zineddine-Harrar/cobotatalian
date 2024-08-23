@@ -883,25 +883,15 @@ def main():
         )
     
         st.plotly_chart(fig_completion)
-        # Obtenir la liste de tous les parcours uniques
-        all_parcours = details_df1['parcours'].unique()
-
-        # Calculer les taux de complétion moyens pour tous les parcours du mois
+        # Calculer les taux de complétion pour tous les parcours du mois
         completion_rates = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
-
-        # Créer un DataFrame avec tous les parcours, même ceux non réalisés ce mois-ci
-        completion_rates_df = pd.DataFrame(index=all_parcours, columns=['taux_completion']).fillna(0)
-        completion_rates_df.update(completion_rates)
-        completion_rates_df = completion_rates_df.reset_index()
+        completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
-
-        # Trier les parcours par ordre alphabétique
-        completion_rates_df = completion_rates_df.sort_values('parcours')
 
         # Créer l'histogramme des taux de complétion par parcours
         fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
-                          title=f'Taux de réalisation moyen par parcours (Mois {mois_dict[selected_month]})',
-                          labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation moyen (%)'},
+                          title=f'Taux de réalisation par parcours (Mois {mois_dict[selected_month]})',
+                          labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
                           template='plotly_dark')
 
         # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
