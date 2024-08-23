@@ -85,7 +85,40 @@ def main():
             background-color: #000 !important;
             color: #fff !important;
         }
-        
+        .metric-container {
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            height: 150px;  /* Ajustez selon vos besoins */
+        }
+        .metric-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;  /* Ajustez selon vos besoins */
+            height: 80%;  /* Ajustez selon vos besoins */
+            opacity: 0.1;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .metric-content {
+            position: relative;
+            z-index: 1;
+        }
+        .metric-label {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -198,10 +231,10 @@ def main():
         comparison_table = pd.DataFrame(rows)
         
         return comparison_table
-    def display_metric(label, value, icon, unit=""):
+    def display_metric(label, value, icon_path, unit=""):
         return f"""
         <div class="metric-container">
-            <div class="metric-icon">{icon}</div>
+            <div class="metric-icon" style="background-image: url('{icon_path}');"></div>
             <div class="metric-content">
                 <div class="metric-label">{label}</div>
                 <div class="metric-value">{value} {unit}</div>
