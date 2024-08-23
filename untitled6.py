@@ -883,6 +883,7 @@ def main():
         )
     
         st.plotly_chart(fig_completion)
+        monthly_details = details_df1
         # Calculer les taux de complétion pour tous les parcours du mois
         completion_rates = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
         completion_rates_df = completion_rates.reset_index()
