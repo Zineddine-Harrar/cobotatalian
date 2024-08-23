@@ -85,27 +85,7 @@ def main():
             background-color: #000 !important;
             color: #fff !important;
         }
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        .metric-container {
-            border-radius: 10px;
-            background-color: #1e1e1e;
-            padding: 20px;
-            text-align: center;
-            color: #fff;
-            position: relative;
-        }
-        .metric-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        .metric-label {
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        .metric-value {
-            font-size: 2em;
-            font-weight: bold;
-        }
+        
         </style>
         """,
         unsafe_allow_html=True
@@ -218,10 +198,10 @@ def main():
         comparison_table = pd.DataFrame(rows)
         
         return comparison_table
-    def display_metric(label, value, icon_html, unit=""):
+    def display_metric(label, value, icon, unit=""):
         return f"""
         <div class="metric-container">
-            <div class="metric-icon">{icon_html}</div>
+            <div class="metric-icon">{icon}</div>
             <div class="metric-content">
                 <div class="metric-label">{label}</div>
                 <div class="metric-value">{value} {unit}</div>
@@ -417,29 +397,27 @@ def main():
 
         alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
    
-        # Afficher les KPI côte à côte
         st.markdown("## **Indicateurs Hebdomadaires**")
 
         col1, col2, col3, col4, col5, col6 = st.columns(6)
 
         with col1:
-            st.markdown(display_metric("Heures cumulées", f"{heures_cumulees:.2f}", '<i class="fa-regular fa-clock"></i>', "heures"), unsafe_allow_html=True)
+            st.markdown(display_metric("Heures cumulées", f"{heures_cumulees:.2f}", "⏰", "heures"), unsafe_allow_html=True)
 
         with col2:
-            st.markdown(display_metric("Surfaces nettoyées", f"{surface_nettoyee:.2f}", "fa-expand", "m²"), unsafe_allow_html=True)
+            st.markdown(display_metric("Surfaces nettoyées", f"{surface_nettoyee:.2f}", "📏", "m²"), unsafe_allow_html=True)
 
         with col3:
-            st.markdown(display_metric("Productivité moyenne", f"{productivite_moyenne:.2f}", "fa-tachometer-alt", "m²/h"), unsafe_allow_html=True)
+            st.markdown(display_metric("Productivité moyenne", f"{productivite_moyenne:.2f}", "📈", "m²/h"), unsafe_allow_html=True)
 
         with col4:
-            st.markdown(display_metric("Vitesse moyenne", f"{vitesse_moyenne:.2f}", "fa-running", "km/h"), unsafe_allow_html=True)
+            st.markdown(display_metric("Vitesse moyenne", f"{vitesse_moyenne:.2f}", "🏃", "km/h"), unsafe_allow_html=True)
 
         with col5:
-            st.markdown(display_metric("Coût total", f"{total_cost:.2f}", "fa-euro-sign", "€"), unsafe_allow_html=True)
+            st.markdown(display_metric("Coût total", f"{total_cost:.2f}", "💰", "€"), unsafe_allow_html=True)
 
         with col6:
-            st.markdown(display_metric("Taux d'utilisation", f"{utilization_rate:.2f}", "fa-percentage", "%"), unsafe_allow_html=True)
-    
+            st.markdown(display_metric("Taux d'utilisation", f"{utilization_rate:.2f}", "📊", "%"), unsafe_allow_html=True)
 
         # Créer la jauge du taux de suivi
         fig_suivi = go.Figure(go.Indicator(
