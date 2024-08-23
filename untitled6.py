@@ -649,7 +649,11 @@ def main():
         # Moyennes mensuelles pour la productivité et la vitesse
         vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
         productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
-
+        # Calculer le taux d'utilisation et le coût total mensuel
+        jours_dans_le_mois = pd.Period(year=2024, month=selected_month, freq='M').days_in_month
+        heures_prevues_par_jour = 3  # Ajustez selon vos besoins
+        heures_prevues_mois = jours_dans_le_mois * heures_prevues_par_jour
+        taux_utilisation_mois = (heures_cumulees_mois / heures_prevues_mois) * 100
         # Assurez-vous que cette ligne est présente et correcte
         filtered_alarm_details_df = alarm_details_df[alarm_details_df['mois'] == selected_month]
 
@@ -703,7 +707,7 @@ def main():
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
 
-        col1, col2, col3, col4, col5, col6 = st.columns(6)
+        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
 
         with col1:
             st.markdown(
@@ -766,6 +770,17 @@ def main():
                 <div class="metric-container">
                     <div class="metric-label">Temps de réalisation moyen (Mois)</div>
                     <div class="metric-value">{avg_resolution_time_month:.2f} min</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col7:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Taux d'utilisation (Mois)</div>
+                    <div class="metric-value">{taux_utilisation_mois:.2f}%</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
