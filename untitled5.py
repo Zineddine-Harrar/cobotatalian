@@ -658,9 +658,6 @@ def main():
         heures_prevues_mois = jours_dans_le_mois * heures_prevues_par_jour
         taux_utilisation_mois = (heures_cumulees_mois / heures_prevues_mois) * 100
 
-        cout_mensuel = 1600  # Coût mensuel fixe, ajustez selon vos besoins
-        cout_horaire = cout_mensuel / heures_prevues_mois
-        cout_total_mois = cout_horaire * heures_cumulees_mois
         # Assurez-vous que cette ligne est présente et correcte
         filtered_alarm_details_df = alarm_details_df[alarm_details_df['mois'] == selected_month]
 
@@ -713,7 +710,7 @@ def main():
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
 
-        col1, col2, col3, col4, col5, col6, col7, col8 = st.columns(8)
+        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
 
         with col1:
             st.markdown(
@@ -792,16 +789,7 @@ def main():
                 unsafe_allow_html=True,
             )
 
-        with col8:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Coût total (Mois)</div>
-                    <div class="metric-value">{cout_total_mois:.2f} €</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+        
         # Créer la jauge du taux de suivi
         fig_suivi = go.Figure(go.Indicator(
             mode="gauge+number",
