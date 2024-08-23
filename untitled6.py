@@ -888,8 +888,8 @@ def main():
             st.session_state.actions_correctives = initial_row
 
     # Convertir les colonnes de date en datetime
-    st.session_state.actions_correctives['Date d\'ajout'] = pd.to_datetime(st.session_state.actions_correctives['Date d\'ajout'])
-    st.session_state.actions_correctives['Délai d\'intervention'] = pd.to_datetime(st.session_state.actions_correctives['Délai d\'intervention'])
+    st.session_state.actions_correctives['Date d\'ajout'] = pd.to_datetime(st.session_state.actions_correctives['Date d\'ajout']).fillna(pd.to_datetime(st.session_state.actions_correctives['Date d\'ajout']))
+    st.session_state.actions_correctives['Délai d\'intervention'] = pd.to_datetime(st.session_state.actions_correctives['Délai d\'intervention']).fillna(pd.to_datetime(st.session_state.actions_correctives['Délai d\'intervention']))
 
     # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
     edited_df = st.data_editor(
@@ -936,7 +936,8 @@ def main():
         hide_index=True,
         width=1200,
     )
-
+    edited_df['Date d\'ajout'] = edited_df['Date d\'ajout'].fillna(st.session_state.actions_correctives['Date d\'ajout'])
+    edited_df['Délai d\'intervention'] = edited_df['Délai d\'intervention'].fillna(st.session_state.actions_correctives['Délai d\'intervention'])
     # Mettre à jour le DataFrame dans le session state
     st.session_state.actions_correctives = edited_df
 
