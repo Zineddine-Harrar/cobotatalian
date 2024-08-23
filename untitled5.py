@@ -270,7 +270,8 @@ def main():
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/IMON/Alerte IMON  19-08.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
-   # Rename columns for easier access
+    description_evenements = pd.read_excel("Description des evenements.xlsx")
+    # Rename columns for easier access
     alarm_details_df.columns = ['Index', 'Code', 'Composant', 'Description', 'Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Modèle_machine', 'Machine_Description', 'N_de_série']
 
     # Convert 'Apparition_Date' and 'Retour_Date' columns to string format if not already
@@ -285,6 +286,8 @@ def main():
 
     # Calculate resolution time in minutes
     alarm_details_df['Resolution Time'] = (alarm_details_df['Retour'] - alarm_details_df['Apparition']).dt.total_seconds() / 60
+    alarm_details_df['mois'] = alarm_details_df['Apparition'].dt.month
+
 
     # Drop intermediate columns
     alarm_details_df.drop(columns=['Apparition_Date', 'Apparition_Time', 'Retour_Date', 'Retour_Time', 'Index'], inplace=True)
