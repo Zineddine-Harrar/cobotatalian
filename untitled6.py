@@ -857,41 +857,40 @@ def main():
     
         st.plotly_chart(fig_completion)
 
+   
+
+
     st.subheader("Actions correctives")
 
     # Initialiser le DataFrame des actions correctives dans le state de la session s'il n'existe pas déjà
     if 'actions_correctives' not in st.session_state:
-        st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
-    else:
-        # Migration : renommer la colonne 'Délai' en 'Délai d'intervention' si elle existe
-        if 'Délai' in st.session_state.actions_correctives.columns:
-            st.session_state.actions_correctives = st.session_state.actions_correctives.rename(columns={'Délai': 'Délai d\'intervention'})
-    
-        # Ajouter les nouvelles colonnes si elles n'existent pas
-        for col in ['Date d\'ajout', 'Responsable Action', 'Commentaires']:
-            if col not in st.session_state.actions_correctives.columns:
-                st.session_state.actions_correctives[col] = ''
-    
-        # Réorganiser les colonnes dans l'ordre souhaité
-        st.session_state.actions_correctives = st.session_state.actions_correctives[['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires']]
-
-    # Fonction pour ajouter une nouvelle action
-    def add_action():
-        new_action = pd.DataFrame({
-            'Action corrective': [action],
+        # Créer une ligne initiale avec des valeurs par défaut
+        initial_row = pd.DataFrame({
+            'Action corrective': ['Action 1'],
             'Date d\'ajout': [datetime.now().date()],
-            'Délai d\'intervention': [delai],
-            'Responsable Action': [responsable],
-            'Statut': [statut],
-            'Commentaires': ['']
+            'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],  # Date actuelle + 7 jours
+            'Responsable Action': ['Responsable 1'],
+            'Statut': ['En cours'],
+            'Commentaires': ['Commentaires à faire']
         })
-        st.session_state.actions_correctives = pd.concat([st.session_state.actions_correctives, new_action], ignore_index=True)
+        st.session_state.actions_correctives = initial_row
+    else:
+        # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
+        if len(st.session_state.actions_correctives) == 0:
+            initial_row = pd.DataFrame({
+                'Action corrective': ['Action 1'],
+                'Date d\'ajout': [datetime.now().date()],
+                'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
+                'Responsable Action': ['Responsable 1'],
+                'Statut': ['En cours'],
+                'Commentaires': ['Commentaires à faire']
+            })
+            st.session_state.actions_correctives = initial_row
 
     # Convertir les colonnes de date en datetime
     st.session_state.actions_correctives['Date d\'ajout'] = pd.to_datetime(st.session_state.actions_correctives['Date d\'ajout'])
     st.session_state.actions_correctives['Délai d\'intervention'] = pd.to_datetime(st.session_state.actions_correctives['Délai d\'intervention'])
-    mask_missing_dates = st.session_state.actions_correctives['Date d\'ajout'].isnull()
-    st.session_state.actions_correctives.loc[mask_missing_dates, 'Date d\'ajout'] = datetime.now().date()
+
     # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
     edited_df = st.data_editor(
         st.session_state.actions_correctives,
@@ -908,7 +907,6 @@ def main():
                 help="Date d'ajout de l'action",
                 format="DD/MM/YYYY",
                 width="medium",
-                disabled=True,
             ),
             "Délai d'intervention": st.column_config.DateColumn(
                 "Délai d'intervention",
@@ -936,16 +934,16 @@ def main():
             ),
         },
         hide_index=True,
-        width=1800,
+        width=1200,
     )
 
     # Mettre à jour le DataFrame dans le session state
     st.session_state.actions_correctives = edited_df
 
-    # Bouton pour supprimer toutes les actions
-    if st.button("Supprimer toutes les actions", key="delete_all"):
-        st.session_state.actions_correctives = pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
-        st.success("Toutes les actions ont été supprimées.")
+    # Bouton pour supprimer toutes les actions sauf la première
+    if st.button("Supprimer toutes les actions sauf la première", key="delete_all"):
+        st.session_state.actions_correctives = st.session_state.actions_correctives.iloc[:1]
+        st.success("Toutes les actions sauf la première ont été supprimées.")
 if __name__ == '__main__':
     main()
    
