@@ -811,8 +811,7 @@ def main():
             )
             st.plotly_chart(fig_pie)
 
-        st.subheader("Description des événements")
-        st.dataframe(description_evenements,width=2000)
+       
 
         # Create the monthly alerts comparison chart
         st.subheader("Comparaison du nombre d'événements signalés par mois")
@@ -828,7 +827,8 @@ def main():
         fig_monthly_alerts.update_layout(xaxis_title="Mois", yaxis_title="Nombre d'événements")
 
         st.plotly_chart(fig_monthly_alerts)
-
+        st.subheader("Description des événements")
+        st.dataframe(description_evenements,width=2000)
         # Récupérer les données de taux de suivi pour tous les mois
         all_months_taux_suivi = []
         for month in range(1, 13):
