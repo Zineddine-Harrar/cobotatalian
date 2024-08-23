@@ -85,7 +85,7 @@ def main():
             background-color: #000 !important;
             color: #fff !important;
         }
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         .metric-container {
             border-radius: 10px;
             background-color: #1e1e1e;
