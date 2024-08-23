@@ -624,6 +624,9 @@ def main():
             else:
                 return 'Nuit'
 
+        # Convertir la colonne 'Apparition' en datetime si ce n'est pas déjà fait
+        filtered_alarm_details_df['Apparition'] = pd.to_datetime(filtered_alarm_details_df['Apparition'])
+
         # Ajouter une colonne pour la catégorie (Journée/Nuit)
         filtered_alarm_details_df['Catégorie'] = filtered_alarm_details_df['Apparition'].dt.hour.map(categorize_hour)
 
@@ -638,8 +641,11 @@ def main():
             filtered_data = filtered_alarm_details_df[filtered_alarm_details_df['Catégorie'] == categorie_filter]
         else:
             filtered_data = filtered_alarm_details_df
-        # Calculer le nombre total d'alertes pour le mois
-        total_alerts_month = len(filtered_data)
+
+        # Afficher un échantillon des données filtrées pour vérification
+        st.write("Échantillon des données filtrées:")
+        st.write(filtered_data[['Apparition', 'Catégorie']].head())
+
         # Calculer le temps de réalisation moyen des événements sur le mois
         avg_resolution_time_month = filtered_data['Resolution Time'].mean()
         # Calculer les statistiques filtrées
