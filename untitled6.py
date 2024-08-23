@@ -706,7 +706,6 @@ def main():
                 """,
                 unsafe_allow_html=True,
             )
-
         # Créer la jauge du taux de suivi
         fig_suivi = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -714,10 +713,17 @@ def main():
             title={'text': "Taux de suivi des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
+                'bar': {'color': "white"},  # Couleur de l'indicateur
                 'steps': [
-                    {'range': [0, 50], 'color': "orange"},
-                    {'range': [50, 100], 'color': "green"}],
-                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi_moyen_mois}
+                    {'range': [0, 40], 'color': "red"},
+                    {'range': [40, 80], 'color': "orange"},
+                    {'range': [80, 100], 'color': "green"}
+                ],
+                'threshold': {
+                    'line': {'color': "white", 'width': 4},
+                    'thickness': 0.75,
+                    'value': taux_suivi_moyen_mois
+                }
             }
         ))
 
@@ -735,10 +741,17 @@ def main():
             title={'text': "Taux de réalisation des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
+                'bar': {'color': "white"},  # Couleur de l'indicateur
                 'steps': [
-                    {'range': [0, 50], 'color': "orange"},
-                    {'range': [50, 100], 'color': "green"}],
-                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_realisation_moyen_mois}
+                    {'range': [0, 40], 'color': "red"},
+                    {'range': [40, 80], 'color': "orange"},
+                    {'range': [80, 100], 'color': "green"}
+                ],
+                'threshold': {
+                    'line': {'color': "white", 'width': 4},
+                    'thickness': 0.75,
+                    'value': taux_realisation_moyen_mois
+                }
             }
         ))
 
