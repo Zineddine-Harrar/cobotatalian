@@ -85,6 +85,27 @@ def main():
             background-color: #000 !important;
             color: #fff !important;
         }
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+        .metric-container {
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+            position: relative;
+        }
+        .metric-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .metric-label {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -197,7 +218,14 @@ def main():
         comparison_table = pd.DataFrame(rows)
         
         return comparison_table
-
+    def display_metric(label, value, icon, unit=""):
+        return f"""
+        <div class="metric-container">
+            <i class="metric-icon fas {icon}"></i>
+            <div class="metric-label">{label}</div>
+            <div class="metric-value">{value} {unit}</div>
+        </div>
+        """
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
         total_parcours = 49  # Total des parcours prévus sur une semaine (7 jours * 6 parcours par jour)
@@ -393,71 +421,22 @@ def main():
         col1, col2, col3, col4, col5, col6 = st.columns(6)
 
         with col1:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Heures cumulées</div>
-                    <div class="metric-value">{heures_cumulees:.2f} heures</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            st.markdown(display_metric("Heures cumulées", f"{heures_cumulees:.2f}", "fa-clock", "heures"), unsafe_allow_html=True)
 
         with col2:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Surfaces nettoyées cumulées</div>
-                    <div class="metric-value">{surface_nettoyee:.2f} m²</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            st.markdown(display_metric("Surfaces nettoyées", f"{surface_nettoyee:.2f}", "fa-expand", "m²"), unsafe_allow_html=True)
 
         with col3:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Productivité moyenne</div>
-                    <div class="metric-value">{productivite_moyenne:.2f} m²/h</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            st.markdown(display_metric("Productivité moyenne", f"{productivite_moyenne:.2f}", "fa-tachometer-alt", "m²/h"), unsafe_allow_html=True)
 
         with col4:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Vitesse moyenne</div>
-                    <div class="metric-value">{vitesse_moyenne:.2f} km/h</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.markdown(display_metric("Vitesse moyenne", f"{vitesse_moyenne:.2f}", "fa-running", "km/h"), unsafe_allow_html=True)
 
         with col5:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Coût total</div>
-                    <div class="metric-value">{total_cost:.2f} €</div>
-                    <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.markdown(display_metric("Coût total", f"{total_cost:.2f}", "fa-euro-sign", "€"), unsafe_allow_html=True)
+
         with col6:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Taux d'utilisation</div>
-                    <div class="metric-value">{utilization_rate:.2f} %</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            
-            )
+            st.markdown(display_metric("Taux d'utilisation", f"{utilization_rate:.2f}", "fa-percentage", "%"), unsafe_allow_html=True)
     
 
         # Créer la jauge du taux de suivi
