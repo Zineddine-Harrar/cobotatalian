@@ -339,18 +339,55 @@ def main():
         # Calculer les coûts
         weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
      
-        # Filter alarm data by the selected week
+        # Sélection de la semaine
+        semaine = selected_week
+
+        # Filtrer les données pour la semaine sélectionnée
         filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
 
-        # Calculate the count of alerts by description
-        alert_count_by_description = filtered_alarm_details_df['Description'].value_counts().reset_index()
+        # Fonction pour catégoriser les heures
+        def categorize_hour(hour):
+            if 6 <= hour < 22:
+                return 'Journée'
+            else:
+                return 'Nuit'
+
+        # Convertir la colonne 'Apparition' en datetime si ce n'est pas déjà fait
+        filtered_alarm_details_df['Apparition'] = pd.to_datetime(filtered_alarm_details_df['Apparition'])
+
+        # Ajouter une colonne pour la catégorie (Journée/Nuit)
+        filtered_alarm_details_df['Catégorie'] = filtered_alarm_details_df['Apparition'].dt.hour.map(categorize_hour)
+
+        # Créer un sélecteur pour filtrer par catégorie
+        categorie_filter = st.selectbox(
+            "Filtrer par période",
+            options=['Tous', 'Journée', 'Nuit']
+        )
+
+        # Filtrer les données en fonction de la sélection
+        if categorie_filter != 'Tous':
+            filtered_data = filtered_alarm_details_df[filtered_alarm_details_df['Catégorie'] == categorie_filter]
+        else:
+            filtered_data = filtered_alarm_details_df
+    
+        # Afficher un échantillon des données filtrées pour vérification
+        st.write("Échantillon des données filtrées:")
+        st.write(filtered_data[['Apparition', 'Catégorie']].head())
+
+        # Calculer le nombre total d'alertes pour la semaine
+        total_alerts_week = len(filtered_data)
+
+        # Calculer le temps de réalisation moyen des événements sur la semaine
+        avg_resolution_time_week = filtered_data['Resolution Time'].mean()
+
+        # Calculer les statistiques filtrées
+        alert_count_by_description = filtered_data['Description'].value_counts().reset_index()
         alert_count_by_description.columns = ['Description', 'Alert Count']
 
-        # Calculate average resolution time by description
-        avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df)
+        avg_resolution_time = filtered_data.groupby('Description')['Resolution Time'].mean().reset_index()
+        avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
 
-        # Merge alert count and average resolution time
-        alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')    # Afficher les KPI côte à côte
+        alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
    
         # Afficher les KPI côte à côte
         st.markdown("## **Indicateurs Hebdomadaires**")
@@ -558,14 +595,14 @@ def main():
                 go.Bar(x=alert_summary['Description'], y=alert_summary['Alert Count'], name="Nombre d'évènements"),
                 secondary_y=False,
             )
-    
+
             fig.add_trace(
                 go.Scatter(x=alert_summary['Description'], y=alert_summary['Avg Resolution Time (min)'], name="Délai d'intervention moyen", mode='lines+markers'),
                 secondary_y=True,
             )
-
+    
             fig.update_layout(
-                title_text=" Nombre d'évènements par type et délai d'intervention moyen ",
+                title_text=f"Nombre d'évènements par type et délai d'intervention moyen (Semaine {semaine}, {categorie_filter})",
                 xaxis_title="Type d'évènements",
                 template='plotly_dark'
             )
@@ -578,7 +615,9 @@ def main():
         with col2:
             # Pie chart
             fig_pie = create_pie_chart(alert_summary)
+            fig_pie.update_layout(title_text=f"Répartition des évènements (Semaine {semaine}, {categorie_filter})")
             st.plotly_chart(fig_pie)
+            
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
     # Mois
