@@ -313,6 +313,14 @@ def main():
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
 
+    def filter_data_by_period(data, period):
+        if period == 'Tous':
+            return data
+        elif period == 'Journée':
+            return data[(data['Apparition'].dt.hour >= 6) & (data['Apparition'].dt.hour < 22)]
+        else:  # Nuit
+            return data[(data['Apparition'].dt.hour < 6) | (data['Apparition'].dt.hour >= 22)]
+            
     period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
     if period_selection == "Semaine":
         selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
@@ -322,19 +330,29 @@ def main():
 
         # Créer le tableau de suivi par parcours pour la semaine spécifiée
         weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-    
+
+        # Filtrer les données pour la semaine sélectionnée
+        weekly_details = details_df1[details_df1['semaine'] == semaine]
+
+        # Créer un sélecteur pour filtrer par catégorie
+        categorie_filter = st.selectbox(
+            "Filtrer par période",
+            options=['Tous', 'Journée', 'Nuit']
+        )
+        # Appliquer le filtre par période
+        
+        filtered_weekly_details = filter_data_by_period(weekly_details, categorie_filter)
 
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
 
-        weekly_details = details_df1[details_df1['semaine'] == semaine]
         completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
 
 
     
 
         # Calculer les indicateurs hebdomadaires
-        heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
+        heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(filtered_weekly_details, semaine)
 
         # Calculer les coûts
         weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
