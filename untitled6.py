@@ -883,7 +883,19 @@ def main():
         )
     
         st.plotly_chart(fig_completion)
-    
+        # Calculer les taux de complétion pour tous les parcours du mois
+        completion_rates = monthly_details.groupby('parcours')['terminerà_[%]'].mean()
+        completion_rates_df = completion_rates.reset_index()
+        completion_rates_df.columns = ['parcours', 'taux_completion']
+
+        # Créer l'histogramme des taux de complétion par parcours
+        fig_hist = px.bar(completion_rates_df, x='parcours', y='taux_completion',
+                          title=f'Taux de réalisation par parcours (Mois {mois_dict[selected_month]})',
+                          labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
+                          template='plotly_dark')
+
+        # Afficher l'histogramme dans Streamlit
+        st.plotly_chart(fig_hist)
 
 
     st.subheader("Actions correctives")
