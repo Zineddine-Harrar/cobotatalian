@@ -610,30 +610,49 @@ def main():
         vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
         productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
 
-        # Calcul du nombre d'événements signalés cumulés sur le mois
-        filtered_alarm_details_df_month = alarm_details_df[alarm_details_df['mois'] == selected_month]
-        print("filtered_alarm_details_df_month:")
-        print(filtered_alarm_details_df_month)
-        total_alerts_month = len(filtered_alarm_details_df_month)
-    
-        # Calcul du temps de réalisation moyen des événements sur le mois
-        avg_resolution_time_month = filtered_alarm_details_df_month['Resolution Time'].mean()
+        # Assurez-vous que cette ligne est présente et correcte
+        filtered_alarm_details_df = alarm_details_df[alarm_details_df['mois'] == selected_month]
 
-        # Calculate the count of alerts by description
-        alert_count_by_description = filtered_alarm_details_df_month['Description'].value_counts().reset_index()
+        # Fonction pour catégoriser les heures
+        def categorize_hour(hour):
+            if 6 <= hour < 22:
+                return 'Journée'
+            else:
+                return 'Nuit'
+
+        # Convertir la colonne 'Apparition' en datetime si ce n'est pas déjà fait
+        filtered_alarm_details_df['Apparition'] = pd.to_datetime(filtered_alarm_details_df['Apparition'])
+
+        # Ajouter une colonne pour la catégorie (Journée/Nuit)
+        filtered_alarm_details_df['Catégorie'] = filtered_alarm_details_df['Apparition'].dt.hour.map(categorize_hour)
+
+        # Créer un sélecteur pour filtrer par catégorie
+        categorie_filter = st.selectbox(
+            "Filtrer par période",
+            options=['Tous', 'Journée', 'Nuit']
+        )
+
+        # Filtrer les données en fonction de la sélection
+        if categorie_filter != 'Tous':
+            filtered_data = filtered_alarm_details_df[filtered_alarm_details_df['Catégorie'] == categorie_filter]
+        else:
+            filtered_data = filtered_alarm_details_df
+
+        # Afficher un échantillon des données filtrées pour vérification
+        st.write("Échantillon des données filtrées:")
+        st.write(filtered_data[['Apparition', 'Catégorie']].head())
+
+        # Calculer le temps de réalisation moyen des événements sur le mois
+        avg_resolution_time_month = filtered_data['Resolution Time'].mean()
+        # Calculer les statistiques filtrées
+        alert_count_by_description = filtered_data['Description'].value_counts().reset_index()
         alert_count_by_description.columns = ['Description', 'Alert Count']
-        print("alert_count_by_description:")
-        print(alert_count_by_description)
 
-        # Calculate average resolution time by description
-        avg_resolution_time = calculate_average_resolution_time(filtered_alarm_details_df_month)
-        print("avg_resolution_time:")
-        print(avg_resolution_time)
+        avg_resolution_time = filtered_data.groupby('Description')['Resolution Time'].mean().reset_index()
+        avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
 
-        # Merge alert count and average resolution time
         alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
-        print("alert_summary:")
-        print(alert_summary)
+
 
 
         # Affichage des KPI pour le mois
@@ -793,23 +812,20 @@ def main():
             )
 
             fig.update_layout(
-                title_text=f"Nombre d'évènements par type et délai d'intervention moyen (Mois {mois_dict[selected_month]})",
+                title_text=f"Nombre d'évènements par type et délai d'intervention moyen ({categorie_filter})",
                 xaxis_title="Type d'évènements",
                 template='plotly_dark'
             )
 
             fig.update_yaxes(title_text="Nombre d'évènements", secondary_y=False)
             fig.update_yaxes(title_text="Délai d'intervention (min)", secondary_y=True)
-    
+
             st.plotly_chart(fig)
 
         with col2:
             # Pie chart
             fig_pie = create_pie_chart(alert_summary)
-            fig_pie.update_layout(
-                title_text=f"Répartition des évènements (Mois {mois_dict[selected_month]})",
-                template='plotly_dark'
-            )
+            fig_pie.update_layout(title_text=f"Répartition des évènements ({categorie_filter})")
             st.plotly_chart(fig_pie)
 
 
