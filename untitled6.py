@@ -850,7 +850,7 @@ def main():
             margin=dict(b=150)  # Augmenter la marge en bas pour les noms de parcours
         )
         st.plotly_chart(fig_taux_suivi)
-
+        
     
 
         # Bar chart for route completion rates over several months
@@ -878,6 +878,39 @@ def main():
 
         # Afficher l'histogramme dans Streamlit
         st.plotly_chart(fig_hist, use_container_width=True)
+
+        # Calculer les taux de réalisation pour tous les mois
+        all_months_completion_rates = []
+        for month in range(1, 13):
+            monthly_data = details_df1[details_df1['mois'] == month]
+            _, taux_realisation = calculate_completion_rates(monthly_data)
+            all_months_completion_rates.append(taux_realisation)
+
+        # Créer un DataFrame pour l'histogramme comparatif
+        comparative_df = pd.DataFrame({
+            'Mois': list(mois_dict.values()),
+            'Taux de réalisation': all_months_completion_rates
+        })
+
+        # Créer l'histogramme comparatif
+        fig_comparative = px.bar(comparative_df, x='Mois', y='Taux de réalisation',
+                                 title='Comparatif des taux de réalisation des parcours par mois',
+                                 labels={'Taux de réalisation': 'Taux de réalisation (%)'},
+                                 template='plotly_dark')
+
+        # Ajouter une ligne horizontale à 90%
+        fig_comparative.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+
+        # Ajuster la mise en page
+        fig_comparative.update_layout(
+            xaxis_title="",
+            yaxis=dict(range=[0, 100]),  # Fixer l'échelle de l'axe y de 0 à 100%
+            margin=dict(b=50)
+        )
+
+        # Afficher l'histogramme comparatif dans Streamlit
+        st.subheader("Comparatif des taux de réalisation par mois")
+        st.plotly_chart(fig_comparative, use_container_width=True)
     st.subheader("Actions correctives")
 
     # Initialiser le DataFrame des actions correctives dans le state de la session s'il n'existe pas déjà
