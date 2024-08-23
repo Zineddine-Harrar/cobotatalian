@@ -638,6 +638,8 @@ def main():
             filtered_data = filtered_alarm_details_df[filtered_alarm_details_df['Catégorie'] == categorie_filter]
         else:
             filtered_data = filtered_alarm_details_df
+        # Calculer le nombre total d'alertes pour le mois
+        total_alerts_month = len(filtered_data)
 
         # Calculer les statistiques filtrées
         alert_count_by_description = filtered_data['Description'].value_counts().reset_index()
