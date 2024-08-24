@@ -317,9 +317,21 @@ def main():
         if period == 'Tous':
             return data
         elif period == 'Journée':
-            return data[(data['début'].dt.hour >= 6) & (data['début'].dt.hour < 22)]
+            if 'début' in data.columns:
+                return data[(data['début'].dt.hour >= 6) & (data['début'].dt.hour < 22)]
+            elif 'Apparition' in data.columns:
+                return data[(data['Apparition'].dt.hour >= 6) & (data['Apparition'].dt.hour < 22)]
+            else:
+                st.error("Colonne 'début' ou 'Apparition' non trouvée dans les données")
+                return data
         else:  # Nuit
-            return data[(data['début'].dt.hour < 6) | (data['début'].dt.hour >= 22)]
+            if 'début' in data.columns:
+                return data[(data['début'].dt.hour < 6) | (data['début'].dt.hour >= 22)]
+            elif 'Apparition' in data.columns:
+                return data[(data['Apparition'].dt.hour < 6) | (data['Apparition'].dt.hour >= 22)]
+            else:
+                st.error("Colonne 'début' ou 'Apparition' non trouvée dans les données")
+                return data
             
     period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
     if period_selection == "Semaine":
