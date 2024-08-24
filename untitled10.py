@@ -454,7 +454,7 @@ def main():
         taux_suivi_moyen_mois /= len(semaines_du_mois) if len(semaines_du_mois) > 0 else 1
 
         # Calculer le taux de réalisation pour le mois
-        completion_rates_month, taux_realisation_moyen_mois = calculate_weekly_completion_rate(monthly_details, selected_month)
+        completion_rates_month, taux_realisation_moyen_mois = calculate_completion_rates(monthly_details)
 
         # Calculer le taux d'utilisation et le coût total mensuel
         jours_dans_le_mois = pd.Period(year=2024, month=selected_month, freq='M').days_in_month
