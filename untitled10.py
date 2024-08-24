@@ -566,16 +566,6 @@ def main():
             st.subheader('Taux de Réalisation Mensuel')
             st.plotly_chart(fig_completion_mois)
 
-        # Créer et afficher l'histogramme des taux de complétion par parcours pour le mois
-        completion_rates_df_month = completion_rates_month.reset_index()
-        completion_rates_df_month.columns = ['cleaning_plan', 'task_completion_(%)']
-
-        fig_hist_month = px.bar(completion_rates_df_month, x='cleaning_plan', y='task_completion_(%)',
-                                title=f'Taux de Réalisation par Parcours (Mois de {mois_dict[selected_month]})',
-                                labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Réalisation (%)'},
-                                template='plotly_dark')
-
-        st.plotly_chart(fig_hist_month)
 
         # Graphique : Taux de suivi des parcours par mois
         all_months_taux_suivi = []
@@ -598,7 +588,9 @@ def main():
         st.plotly_chart(fig_taux_suivi)
 
         # Graphique : Taux de réalisation par parcours
-        completion_rates_df = completion_rates.reset_index()
+        monthly_data = details_df[details_df['mois'] == selected_month]
+        taux_realisation = calculate_completion_rates(monthly_data)
+        completion_rates_df = taux_realisation.reset_index()
         completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
 
         fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
