@@ -629,6 +629,7 @@ def main():
 
         # Filtrer les données pour le mois sélectionné
         details_df1['mois'] = details_df1['début'].dt.month
+        st.dataframe(details_df1)
         monthly_details = details_df1[details_df1['mois'] == selected_month]
         # Calculer le taux de suivi pour le mois
         taux_suivi_moyen_mois = 0
@@ -660,7 +661,6 @@ def main():
 
         # Assurez-vous que cette ligne est présente et correcte
         filtered_alarm_details_df = alarm_details_df[alarm_details_df['mois'] == selected_month]
-        st.dataframe(monthly_details)
         # Fonction pour catégoriser les heures
         def categorize_hour(hour):
             if 6 <= hour < 22:
