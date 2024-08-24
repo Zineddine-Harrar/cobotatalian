@@ -313,51 +313,38 @@ def main():
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
 
-    def filter_data_by_period(data, period):
-        if period == 'Tous':
-            return data
-        elif period == 'Journée':
-            if 'début' in data.columns:
-                return data[(data['début'].dt.hour >= 6) & (data['début'].dt.hour < 22)]
-            elif 'Apparition' in data.columns:
-                return data[(data['Apparition'].dt.hour >= 6) & (data['Apparition'].dt.hour < 22)]
-            else:
-                st.error("Colonne 'début' ou 'Apparition' non trouvée dans les données")
-                return data
-        else:  # Nuit
-            if 'début' in data.columns:
-                return data[(data['début'].dt.hour < 6) | (data['début'].dt.hour >= 22)]
-            elif 'Apparition' in data.columns:
-                return data[(data['Apparition'].dt.hour < 6) | (data['Apparition'].dt.hour >= 22)]
-            else:
-                st.error("Colonne 'début' ou 'Apparition' non trouvée dans les données")
-                return data
             
     period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
     if period_selection == "Semaine":
-        selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})", key="week_selector")
+        selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
+
+        # Sélection de la semaine
         semaine = selected_week
 
-        # Filtrer les données pour la semaine sélectionnée
-        weekly_details = details_df1[details_df1['semaine'] == semaine]
-        weekly_alarms = filter_data_by_week(alarm_details_df, semaine)
+        # Créer le tableau de suivi par parcours pour la semaine spécifiée
+        weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
     
-        # Créer un sélecteur pour filtrer par période
-        period_filter = st.selectbox("Filtrer par période", options=['Tous', 'Journée', 'Nuit'], key="week_period_filter")
-    
-        # Appliquer le filtre de période
-        filtered_weekly_details = filter_data_by_period(weekly_details, period_filter)
-        filtered_alarms = filter_data_by_period(weekly_alarms, period_filter)
 
-        # Calculer les indicateurs avec les données filtrées
-        heures_cumulees = filtered_weekly_details['durée[mn]'].sum() / 60
-        surface_nettoyee = filtered_weekly_details['surfacepropre_[mq]'].sum()
-        vitesse_moyenne = filtered_weekly_details['vitesse_moyenne[km/h]'].mean()
-        productivite_moyenne = filtered_weekly_details['productivitéhoraire_[mq/h]'].mean()
+        # Calculer le taux de suivi à partir du tableau de suivi
+        taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
+
+        weekly_details = details_df1[details_df1['semaine'] == semaine]
+        completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
+
+
+    
+
+        # Calculer les indicateurs hebdomadaires
+        heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
 
         # Calculer les coûts
         weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
+     
+        # Sélection de la semaine
+        semaine = selected_week
 
+        # Filtrer les données pour la semaine sélectionnée
+        filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
         # Calculer les statistiques des événements
         total_alerts_week = len(filtered_alarms)
         avg_resolution_time_week = filtered_alarms['Resolution Time'].mean()
