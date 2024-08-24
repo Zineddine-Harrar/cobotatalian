@@ -345,9 +345,7 @@ def main():
 
         # Filtrer les données pour la semaine sélectionnée
         filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
-        # Calculer les statistiques des événements
-        total_alerts_week = len(filtered_alarms)
-        avg_resolution_time_week = filtered_alarms['Resolution Time'].mean()
+
         # Fonction pour catégoriser les heures
         def categorize_hour(hour):
             if 6 <= hour < 22:
@@ -373,7 +371,7 @@ def main():
         else:
             filtered_data = filtered_alarm_details_df
     
-      
+       
 
         # Calculer le nombre total d'alertes pour la semaine
         total_alerts_week = len(filtered_data)
@@ -390,17 +388,12 @@ def main():
 
         alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
 
-        # Calculer le nombre d'événements signalés pour la semaine
-        total_alerts_week = len(filtered_data)
-
-        # Calculer le temps de réalisation moyen pour la semaine
-        avg_resolution_time_week = filtered_data['Resolution Time'].mean()
-
+   
         # Afficher les KPI côte à côte
         st.markdown("## **Indicateurs Hebdomadaires**")
 
-        col1, col2, col3, col4 = st.columns(4)
-        col5, col6, col7, col8 = st.columns(4)
+        col1, col2, col3, col4, col5, col6 = st.columns(6)
+
         with col1:
             st.markdown(
                 f"""
@@ -467,29 +460,7 @@ def main():
                 unsafe_allow_html=True
             
             )
-
-        with col7:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Nombre d'événements</div>
-                    <div class="metric-value">{total_alerts_week:.2f}</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            
-            )
-        with col8:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Temps moyen d'intervention</div>
-                    <div class="metric-value">{avg_resolution_time_week:.2f} %</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            
-            )            
+    
 
         # Créer la jauge du taux de suivi
         fig_suivi = go.Figure(go.Indicator(
@@ -646,7 +617,7 @@ def main():
             fig_pie = create_pie_chart(alert_summary)
             fig_pie.update_layout(title_text=f"Répartition des évènements (Semaine {semaine}, {categorie_filter})")
             st.plotly_chart(fig_pie)
-            
+
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
     # Mois
