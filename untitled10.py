@@ -242,165 +242,316 @@ def main():
 
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
+    period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
 
-    # Afficher le sélecteur de semaine avec les dates
-    selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
+    if period_selection == "Semaine":
+        # Afficher le sélecteur de semaine avec les dates
+        selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
 
-    # Sélection de la semaine
-    semaine = selected_week
+        # Sélection de la semaine
+        semaine = selected_week
 
-    weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-    taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-    completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df1, semaine)
-    heures_cumulees, surface_nettoyee, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
-    # Calculer les coûts
-    weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
-    st.markdown("## **Indicateurs Hebdomadaires**")
-    col1, col2, col3, col4, col5 = st.columns(5)
+        weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+        taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
+        completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df1, semaine)
+        heures_cumulees, surface_nettoyee, productivite_moyenne = calculate_weekly_indicators(details_df, semaine)
+        # Calculer les coûts
+        weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
+        st.markdown("## **Indicateurs Hebdomadaires**")
+        col1, col2, col3, col4, col5 = st.columns(5)
 
-    with col1:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Heures cumulées</div>
-                <div class="metric-value">{heures_cumulees:.2f} heures</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        with col1:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Heures cumulées</div>
+                    <div class="metric-value">{heures_cumulees:.2f} heures</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-    with col2:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Surface nettoyée</div>
-                <div class="metric-value">{surface_nettoyee:.2f} m²</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        with col2:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Surface nettoyée</div>
+                    <div class="metric-value">{surface_nettoyee:.2f} m²</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-    with col3:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Productivité moyenne</div>
-                <div class="metric-value">{productivite_moyenne:.2f} m²/h</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with col4:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Coût total</div>
-                <div class="metric-value">{total_cost:.2f} €</div>
-                <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    with col5:
-        st.markdown(
-            f"""
-            <div class="metric-container">
-                <div class="metric-label">Taux d'utilisation</div>
-                <div class="metric-value">{utilization_rate:.2f} %</div>
-            </div>
-            """,
-            unsafe_allow_html=True
+        with col3:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Productivité moyenne</div>
+                    <div class="metric-value">{productivite_moyenne:.2f} m²/h</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col4:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Coût total</div>
+                    <div class="metric-value">{total_cost:.2f} €</div>
+                    <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        with col5:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Taux d'utilisation</div>
+                    <div class="metric-value">{utilization_rate:.2f} %</div>
+                </div>
+                """,
+                unsafe_allow_html=True
             
+            )
+        # Créer la jauge du taux de suivi
+        fig_suivi = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=taux_suivi,
+            title={'text': "Taux de Suivi"},
+            gauge={
+                'axis': {'range': [None, 100]},
+                'steps': [
+                    {'range': [0, 50], 'color': "orange"},
+                    {'range': [50, 100], 'color': "green"}],
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}
+            }
+        ))
+
+        # Mettre à jour le fond en noir
+        fig_suivi.update_layout(
+            paper_bgcolor="black",
+            plot_bgcolor="black",
+            font={'color': "white"}
         )
-    # Créer la jauge du taux de suivi
-    fig_suivi = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=taux_suivi,
-        title={'text': "Taux de Suivi"},
-        gauge={
-            'axis': {'range': [None, 100]},
-            'steps': [
-                {'range': [0, 50], 'color': "orange"},
-                {'range': [50, 100], 'color': "green"}],
-            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}
-        }
-    ))
 
-    # Mettre à jour le fond en noir
-    fig_suivi.update_layout(
-        paper_bgcolor="black",
-        plot_bgcolor="black",
-        font={'color': "white"}
-    )
+        # Créer la jauge du taux de complétion
+        fig_completion = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=weekly_completion_rate,
+            title={'text': "Taux de Complétion Hebdomadaire"},
+            gauge={
+                'axis': {'range': [None, 100]},
+                'steps': [
+                    {'range': [0, 50], 'color': "orange"},
+                    {'range': [50, 100], 'color': "green"}],
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}
+            }
+        ))
 
-    # Créer la jauge du taux de complétion
-    fig_completion = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=weekly_completion_rate,
-        title={'text': "Taux de Complétion Hebdomadaire"},
-        gauge={
-            'axis': {'range': [None, 100]},
-            'steps': [
-                {'range': [0, 50], 'color': "orange"},
-                {'range': [50, 100], 'color': "green"}],
-            'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}
-        }
-    ))
+        # Mettre à jour le fond en noir
+        fig_completion.update_layout(
+            paper_bgcolor="black",
+            plot_bgcolor="black",
+            font={'color': "white"}
+        )
 
-    # Mettre à jour le fond en noir
-    fig_completion.update_layout(
-        paper_bgcolor="black",
-        plot_bgcolor="black",
-        font={'color': "white"}
-    )
+        # Afficher les jauges côte à côte
+        col1, col2 = st.columns(2)
 
-    # Afficher les jauges côte à côte
-    col1, col2 = st.columns(2)
+        with col1:
+            st.subheader('Taux de Suivi')
+            st.plotly_chart(fig_suivi)
 
-    with col1:
-        st.subheader('Taux de Suivi')
-        st.plotly_chart(fig_suivi)
+        with col2:
+            st.subheader('Taux de Complétion')
+            st.plotly_chart(fig_completion)
 
-    with col2:
-        st.subheader('Taux de Complétion')
-        st.plotly_chart(fig_completion)
+        # Appliquer le style conditionnel
+        def style_cell(val):
+            if val == 'Fait':
+                return 'background-color: #13FF1A; color: black;'
+            elif val == 'Pas fait':
+                return 'background-color: #FF1313; color: #CACFD2;'
+            else:
+                return ''
 
-    # Appliquer le style conditionnel
-    def style_cell(val):
-        if val == 'Fait':
-            return 'background-color: #13FF1A; color: black;'
-        elif val == 'Pas fait':
-            return 'background-color: #FF1313; color: #CACFD2;'
-        else:
-            return ''
+        def style_header(val):
+            return 'background-color: black; color: white;'
 
-    def style_header(val):
-        return 'background-color: black; color: white;'
+        # Appliquer le style sur tout le DataFrame
+        styled_table = weekly_comparison_table.style.applymap(style_cell)
 
-    # Appliquer le style sur tout le DataFrame
-    styled_table = weekly_comparison_table.style.applymap(style_cell)
+        # Appliquer le style sur la colonne "Parcours Prévu"
+        styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
+        # Appliquer le style sur les en-têtes de colonne
+        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
-    # Appliquer le style sur la colonne "Parcours Prévu"
-    styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
-    # Appliquer le style sur les en-têtes de colonne
-    styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
+        # Afficher le tableau de suivi par parcours
+        st.subheader('Tableau de Suivi des Parcours')
+        st.dataframe(styled_table, width=2000)
 
-    # Afficher le tableau de suivi par parcours
-    st.subheader('Tableau de Suivi des Parcours')
-    st.dataframe(styled_table, width=2000)
+        completion_rates_df = completion_rates.reset_index()
+        # Renommer les colonnes pour supprimer les caractères spéciaux
+        completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
 
-    completion_rates_df = completion_rates.reset_index()
-    # Renommer les colonnes pour supprimer les caractères spéciaux
-    completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
+        # Créer l'histogramme des taux de complétion par parcours
+        fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
+                          title='Taux de Complétion Hebdomadaire par Parcours',
+                          labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Complétion (%)'},
+                          template='plotly_dark')
 
-    # Créer l'histogramme des taux de complétion par parcours
-    fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
-                      title='Taux de Complétion Hebdomadaire par Parcours',
-                      labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Complétion (%)'},
-                      template='plotly_dark')
+        # Afficher l'histogramme dans Streamlit
+        st.plotly_chart(fig_hist)
+    elif period_selection == "Mois":
+        # Nouveau code pour la vue mensuelle
+        mois_dict = {1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin", 
+                     7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"}
+    
+        # Sélection du mois
+        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), 
+                                      format_func=lambda x: mois_dict[x])
 
-    # Afficher l'histogramme dans Streamlit
-    st.plotly_chart(fig_hist)
+        # Filtrer les données pour le mois sélectionné
+        details_df1['mois'] = details_df1['task_start_time'].dt.month
+        monthly_details = details_df1[details_df1['mois'] == selected_month]
 
+        # Calculer les indicateurs mensuels
+        heures_cumulees_mois = monthly_details['total_time_(h)'].sum()
+        surface_nettoyee_mois = monthly_details['actual_cleaning_area(?)'].sum()
+        productivite_moyenne_mois = monthly_details['work_efficiency_(?/h)'].mean()
+
+        # Calculer le taux de suivi pour le mois
+        taux_suivi_moyen_mois = 0
+        semaines_du_mois = monthly_details['semaine'].unique()
+        for semaine in semaines_du_mois:
+            weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+            taux_suivi_semaine = calculate_taux_suivi_from_table(weekly_comparison_table)
+            taux_suivi_moyen_mois += taux_suivi_semaine
+        taux_suivi_moyen_mois /= len(semaines_du_mois) if len(semaines_du_mois) > 0 else 1
+
+        # Calculer le taux de réalisation pour le mois
+        completion_rates_month, taux_realisation_moyen_mois = calculate_weekly_completion_rate(monthly_details, selected_month)
+
+        # Calculer le taux d'utilisation et le coût total mensuel
+        jours_dans_le_mois = pd.Period(year=2024, month=selected_month, freq='M').days_in_month
+        heures_prevues_par_jour = 3  # Ajustez selon vos besoins
+        heures_prevues_mois = jours_dans_le_mois * heures_prevues_par_jour
+        taux_utilisation_mois = (heures_cumulees_mois / heures_prevues_mois) * 100
+
+        # Calculer le coût mensuel
+        monthly_cost = 840  # Coût mensuel fixe
+        hourly_cost_month = monthly_cost / heures_cumulees_mois if heures_cumulees_mois > 0 else 0
+
+        # Afficher les indicateurs mensuels
+        st.markdown("## **Indicateurs Mensuels**")
+        col1, col2, col3, col4, col5 = st.columns(5)
+
+        with col1:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Heures cumulées (Mois)</div>
+                    <div class="metric-value">{heures_cumulees_mois:.2f} heures</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col2:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Surface nettoyée (Mois)</div>
+                    <div class="metric-value">{surface_nettoyee_mois:.2f} m²</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col3:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Productivité moyenne (Mois)</div>
+                    <div class="metric-value">{productivite_moyenne_mois:.2f} m²/h</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col4:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Coût total (Mois)</div>
+                    <div class="metric-value">{monthly_cost:.2f} €</div>
+                    <div class="metric-delta">Coût/h: {hourly_cost_month:.2f} €</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        with col5:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Taux d'utilisation (Mois)</div>
+                    <div class="metric-value">{taux_utilisation_mois:.2f} %</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        # Créer les jauges pour le taux de suivi et le taux de réalisation mensuel
+        fig_suivi_mois = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=taux_suivi_moyen_mois,
+            title={'text': "Taux de Suivi Mensuel"},
+            gauge={
+                'axis': {'range': [None, 100]},
+                'steps': [
+                    {'range': [0, 50], 'color': "orange"},
+                    {'range': [50, 100], 'color': "green"}],
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi_moyen_mois}
+            }
+        ))
+    
+        fig_completion_mois = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=taux_realisation_moyen_mois,
+            title={'text': "Taux de Réalisation Mensuel"},
+            gauge={
+                'axis': {'range': [None, 100]},
+                'steps': [
+                    {'range': [0, 50], 'color': "orange"},
+                    {'range': [50, 100], 'color': "green"}],
+                'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_realisation_moyen_mois}
+            }
+        ))
+
+        # Mettre à jour le fond en noir pour les jauges mensuelles
+        fig_suivi_mois.update_layout(paper_bgcolor="black", plot_bgcolor="black", font={'color': "white"})
+        fig_completion_mois.update_layout(paper_bgcolor="black", plot_bgcolor="black", font={'color': "white"})
+
+        # Afficher les jauges mensuelles côte à côte
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader('Taux de Suivi Mensuel')
+            st.plotly_chart(fig_suivi_mois)
+        with col2:
+            st.subheader('Taux de Réalisation Mensuel')
+            st.plotly_chart(fig_completion_mois)
+
+        # Créer et afficher l'histogramme des taux de complétion par parcours pour le mois
+        completion_rates_df_month = completion_rates_month.reset_index()
+        completion_rates_df_month.columns = ['cleaning_plan', 'task_completion_(%)']
+
+        fig_hist_month = px.bar(completion_rates_df_month, x='cleaning_plan', y='task_completion_(%)',
+                                title=f'Taux de Réalisation par Parcours (Mois de {mois_dict[selected_month]})',
+                                labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Réalisation (%)'},
+                                template='plotly_dark')
+
+        st.plotly_chart(fig_hist_month)
 if __name__ == '__main__':
     main()
