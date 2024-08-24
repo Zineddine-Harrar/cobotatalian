@@ -588,7 +588,7 @@ def main():
         st.plotly_chart(fig_taux_suivi)
 
         # Graphique : Taux de réalisation par parcours
-        monthly_data = details_df[details_df['mois'] == selected_month]
+        monthly_data = details_df1[details_df1['mois'] == selected_month]
         completion_rates, _ = calculate_completion_rates(monthly_data)  # Déballage du tuple
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
