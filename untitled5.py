@@ -327,7 +327,7 @@ def main():
 
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-
+        st.dataframe(details_df1)
         weekly_details = details_df1[details_df1['semaine'] == semaine]
         completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
 
