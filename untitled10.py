@@ -394,15 +394,23 @@ def main():
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
-
+        # Ajouter une ligne horizontale à 90%
+        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
         # Créer l'histogramme des taux de complétion par parcours
         fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
                           title='Taux de Complétion Hebdomadaire par Parcours',
                           labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Complétion (%)'},
                           template='plotly_dark')
-
+         # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
+        fig_hist.update_layout(
+            xaxis_tickangle=-45,
+            xaxis_title="",
+            yaxis=dict(range=[0, 100]),
+            margin=dict(b=150)  # Augmenter la marge en bas pour les noms de parcours
+        )
         # Afficher l'histogramme dans Streamlit
-        st.plotly_chart(fig_hist)
+        st.plotly_chart(fig_hist, use_container_width=True)
+    
     elif period_selection == "Mois":
         # Nouveau code pour la vue mensuelle
         mois_dict = {1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin", 
