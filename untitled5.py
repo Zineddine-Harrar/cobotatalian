@@ -233,7 +233,20 @@ def main():
         productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
         
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
+    # Fonction pour calculer les indicateurs hebdomadaires
+    def calculate_monthly_indicators(details_df, mois):
+        # Filtrer les données pour la semaine spécifiée
+        monthly_details = details_df[details_df['mois'] == mois]
+        
+        # Calculer les indicateurs
+        heures_cumulees_mois = monthly_details['durée[mn]'].sum() / 60  # Convertir les minutes en heures
+        surface_nettoyee_mois = monthly_details['surfacepropre_[mq]'].sum()
 
+        # Moyennes mensuelles pour la productivité et la vitesse
+        vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
+        productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
+        
+        return heures_cumulees_mois, surface_nettoyee_mois, vitesse_moyenne_mois, productivite_moyenne_mois
     def calculate_average_resolution_time(df):
         df['Resolution Time'] = (df['Retour'] - df['Apparition']).dt.total_seconds() / 60
         avg_resolution_time = df.groupby('Description')['Resolution Time'].mean().reset_index()
@@ -626,10 +639,11 @@ def main():
         mois_dict = {1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin", 7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"}
         # Sélection du mois
         selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: datetime(2024, x, 1).strftime("%B"),key="month_selector")
-
+        mois = selected_month
+        details_df['mois'] = details_df['début'].dt.month
         # Filtrer les données pour le mois sélectionné
         details_df1['mois'] = details_df1['début'].dt.month
-        st.dataframe(details_df1)
+        
         monthly_details = details_df1[details_df1['mois'] == selected_month]
         # Calculer le taux de suivi pour le mois
         taux_suivi_moyen_mois = 0
@@ -645,14 +659,8 @@ def main():
         
 
         # Calcul des KPI mensuels
-
-        # Heures cumulées et surfaces nettoyées sur le mois
-        heures_cumulees_mois = monthly_details['durée[mn]'].sum() / 60  # Convertir les minutes en heures
-        surface_nettoyee_mois = monthly_details['surfacepropre_[mq]'].sum()
-
-        # Moyennes mensuelles pour la productivité et la vitesse
-        vitesse_moyenne_mois = monthly_details['vitesse_moyenne[km/h]'].mean()
-        productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
+        heures_cumulees_mois, surface_nettoyee_mois, vitesse_moyenne_mois, productivite_moyenne_mois = calculate_monthly_indicators(details_df, mois)
+        
         # Calculer le taux d'utilisation et le coût total mensuel
         jours_dans_le_mois = pd.Period(year=2024, month=selected_month, freq='M').days_in_month
         heures_prevues_par_jour = 3  # Ajustez selon vos besoins
