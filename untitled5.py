@@ -323,7 +323,7 @@ def main():
             
     period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
     if period_selection == "Semaine":
-        selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
+        selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})",key="week_selector")
         semaine = selected_week
          # Créer le tableau de suivi par parcours pour la semaine spécifiée
         weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
@@ -339,7 +339,8 @@ def main():
         # Créer un sélecteur pour filtrer par catégorie
         categorie_filter = st.selectbox(
             "Filtrer par période",
-            options=['Tous', 'Journée', 'Nuit']
+            options=['Tous', 'Journée', 'Nuit'],
+            key="week_period_filter"
         )
 
         # Appliquer le filtre par période
@@ -664,7 +665,7 @@ def main():
     elif period_selection == "Mois":
         mois_dict = {1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin", 7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"}
         # Sélection du mois
-        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: datetime(2024, x, 1).strftime("%B"))
+        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: datetime(2024, x, 1).strftime("%B"),key="month_selector")
 
         # Filtrer les données pour le mois sélectionné
         details_df1['mois'] = details_df1['début'].dt.month
@@ -716,7 +717,8 @@ def main():
         # Créer un sélecteur pour filtrer par catégorie
         categorie_filter = st.selectbox(
             "Filtrer par période",
-            options=['Tous', 'Journée', 'Nuit']
+            options=['Tous', 'Journée', 'Nuit'],
+            key="month_period_filter"
         )
 
         # Filtrer les données en fonction de la sélection
