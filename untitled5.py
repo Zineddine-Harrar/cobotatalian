@@ -660,7 +660,7 @@ def main():
 
         # Assurez-vous que cette ligne est présente et correcte
         filtered_alarm_details_df = alarm_details_df[alarm_details_df['mois'] == selected_month]
-
+        st.dataframe(monthly_details)
         # Fonction pour catégoriser les heures
         def categorize_hour(hour):
             if 6 <= hour < 22:
