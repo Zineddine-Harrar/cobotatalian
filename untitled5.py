@@ -323,35 +323,31 @@ def main():
             
     period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
     if period_selection == "Semaine":
-        selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})",key="week_selector")
+        selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})", key="week_selector")
         semaine = selected_week
-         # Créer le tableau de suivi par parcours pour la semaine spécifiée
-        weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-        # Calculer le taux de suivi à partir du tableau de suivi
-        taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-        
 
         # Filtrer les données pour la semaine sélectionnée
         weekly_details = details_df1[details_df1['semaine'] == semaine]
-        filtered_alarm_details_df = filter_data_by_week(alarm_details_df, semaine)
-        completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
-
-        # Créer un sélecteur pour filtrer par catégorie
-        categorie_filter = st.selectbox(
-            "Filtrer par période",
-            options=['Tous', 'Journée', 'Nuit'],
-            key="week_period_filter"
-        )
-
-        # Appliquer le filtre par période
-        filtered_data = filter_data_by_period(filtered_alarm_details_df, categorie_filter)
-        filtered_weekly_details = filter_data_by_period(weekly_details, categorie_filter)
+    
+        # Créer un sélecteur pour filtrer par période
+        period_filter = st.selectbox("Filtrer par période", options=['Tous', 'Journée', 'Nuit'], key="week_period_filter")
+    
+        # Appliquer le filtre de période
+        filtered_weekly_details = filter_data_by_period(weekly_details, period_filter)
 
         # Calculer les indicateurs avec les données filtrées
         heures_cumulees = filtered_weekly_details['durée[mn]'].sum() / 60
         surface_nettoyee = filtered_weekly_details['surfacepropre_[mq]'].sum()
         vitesse_moyenne = filtered_weekly_details['vitesse_moyenne[km/h]'].mean()
         productivite_moyenne = filtered_weekly_details['productivitéhoraire_[mq/h]'].mean()
+
+        # Calculer les coûts
+        weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
+
+        # Calculer le taux de suivi et le taux de réalisation
+        weekly_comparison_table = create_parcours_comparison_table(semaine, filtered_weekly_details, planning_df)
+        taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
+        completion_rates, weekly_completion_rate = calculate_completion_rates(filtered_weekly_details)
     
         # Calculer les coûts
         weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
