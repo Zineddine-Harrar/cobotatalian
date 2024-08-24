@@ -317,9 +317,9 @@ def main():
         if period == 'Tous':
             return data
         elif period == 'Journée':
-            return data[(data['début'].dt.hour >= 6) & (data['Apparition'].dt.hour < 22)]
+            return data[(data['début'].dt.hour >= 6) & (data['début'].dt.hour < 22)]
         else:  # Nuit
-            return data[(data['début'].dt.hour < 6) | (data['Apparition'].dt.hour >= 22)]
+            return data[(data['début'].dt.hour < 6) | (data['début'].dt.hour >= 22)]
             
     period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
     if period_selection == "Semaine":
