@@ -323,17 +323,19 @@ def main():
             
     period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
     if period_selection == "Semaine":
-        selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})", key="week_selector")
+       selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})", key="week_selector")
         semaine = selected_week
 
         # Filtrer les données pour la semaine sélectionnée
         weekly_details = details_df1[details_df1['semaine'] == semaine]
+        weekly_alarms = filter_data_by_week(alarm_details_df, semaine)
     
         # Créer un sélecteur pour filtrer par période
         period_filter = st.selectbox("Filtrer par période", options=['Tous', 'Journée', 'Nuit'], key="week_period_filter")
     
         # Appliquer le filtre de période
         filtered_weekly_details = filter_data_by_period(weekly_details, period_filter)
+        filtered_alarms = filter_data_by_period(weekly_alarms, period_filter)
 
         # Calculer les indicateurs avec les données filtrées
         heures_cumulees = filtered_weekly_details['durée[mn]'].sum() / 60
@@ -344,17 +346,9 @@ def main():
         # Calculer les coûts
         weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
 
-        # Calculer le taux de suivi et le taux de réalisation
-        weekly_comparison_table = create_parcours_comparison_table(semaine, filtered_weekly_details, planning_df)
-        taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
-        completion_rates, weekly_completion_rate = calculate_completion_rates(filtered_weekly_details)
-    
-        # Calculer les coûts
-        weekly_cost, hourly_cost, total_cost, utilization_rate = calculate_weekly_hourly_cost(heures_cumulees)
-
         # Calculer les statistiques des événements
-        total_alerts_week = len(filtered_data)
-        avg_resolution_time_week = filtered_data['Resolution Time'].mean()
+        total_alerts_week = len(filtered_alarms)
+        avg_resolution_time_week = filtered_alarms['Resolution Time'].mean()
         # Fonction pour catégoriser les heures
         def categorize_hour(hour):
             if 6 <= hour < 22:
