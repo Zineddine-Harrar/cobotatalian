@@ -102,7 +102,8 @@ def main():
     details_df['jour'] = details_df['task_start_time'].dt.day_name()
     # Ajouter la colonne semaine
     details_df['semaine'] = details_df['task_start_time'].dt.isocalendar().week
-
+    details_df['date'] = details_df['task_start_time'].dt.date
+    details_df['mois'] = details_df['task_start_time'].dt.month
     # Dictionnaire pour traduire les noms des jours de l'anglais au français
     day_translation = {
         'Monday': 'Lundi',
@@ -199,7 +200,22 @@ def main():
 
     completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df, 28)
     print(weekly_completion_rate)
+    # Fonction pour calculer le taux de complétion
+    def calculate_completion_rates(details_df, threshold=90):
+        completion_rates = details_df.groupby('cleaning_plan')['task_completion_(%)'].mean()
+        parcours_realises = (completion_rates >= threshold).sum()
+        total_parcours = len(completion_rates)
+        taux_realisation = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
+        return completion_rates, taux_realisation
 
+    # Fonction pour calculer les indicateurs mensuels
+    def calculate_monthly_indicators(details_df, mois):
+        monthly_details = details_df[details_df['mois'] == mois]
+        heures_cumulees_mois = monthly_details['total_time_(h)'].sum()
+        surface_nettoyee_mois = monthly_details['actual_cleaning_area(?)'].sum()
+        productivite_moyenne_mois = monthly_details['work_efficiency_(?/h)'].mean()
+        return heures_cumulees_mois, surface_nettoyee_mois, productivite_moyenne_mois
+        
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
         weekly_details = details_df[details_df['semaine'] == semaine]
@@ -424,11 +440,9 @@ def main():
         # Filtrer les données pour le mois sélectionné
         details_df1['mois'] = details_df1['task_start_time'].dt.month
         monthly_details = details_df1[details_df1['mois'] == selected_month]
-
+        details_df['mois'] = details_df['task_start_time'].dt.month
         # Calculer les indicateurs mensuels
-        heures_cumulees_mois = monthly_details['total_time_(h)'].sum()
-        surface_nettoyee_mois = monthly_details['actual_cleaning_area(?)'].sum()
-        productivite_moyenne_mois = monthly_details['work_efficiency_(?/h)'].mean()
+        heures_cumulees_mois, surface_nettoyee_mois, productivite_moyenne_mois = calculate_monthly_indicators(details_df, selected_month)  
 
         # Calculer le taux de suivi pour le mois
         taux_suivi_moyen_mois = 0
@@ -562,5 +576,58 @@ def main():
                                 template='plotly_dark')
 
         st.plotly_chart(fig_hist_month)
+
+        # Graphique : Taux de suivi des parcours par mois
+        all_months_taux_suivi = []
+        for month in range(1, 13):
+            monthly_data = details_df[details_df['mois'] == month]
+            semaines_du_mois = monthly_data['semaine'].unique()
+            weekly_taux_suivi = []
+            for semaine in semaines_du_mois:
+                weekly_comparison_table = create_parcours_comparison_table(semaine, details_df, planning_df)
+                taux_suivi_semaine = calculate_taux_suivi_from_table(weekly_comparison_table)
+                weekly_taux_suivi.append(taux_suivi_semaine)
+            taux_suivi_moyen_mois = sum(weekly_taux_suivi) / len(weekly_taux_suivi) if weekly_taux_suivi else 0
+            all_months_taux_suivi.append(taux_suivi_moyen_mois)
+
+        fig_taux_suivi = px.bar(x=list(mois_dict.values()), y=all_months_taux_suivi,
+                                title='Taux de suivi des parcours par mois',
+                                labels={'x': 'Mois', 'y': 'Taux de suivi (%)'},
+                                template='plotly_dark')
+        fig_taux_suivi.update_layout(xaxis_tickangle=-45, xaxis_title="", yaxis=dict(range=[0, 100]))
+        st.plotly_chart(fig_taux_suivi)
+
+        # Graphique : Taux de réalisation par parcours
+        completion_rates_df = completion_rates.reset_index()
+        completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
+
+        fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
+                          title=f'Taux de réalisation par parcours (Mois de {mois_dict[selected_month]})',
+                          labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de réalisation (%)'},
+                          template='plotly_dark')
+        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+        fig_hist.update_layout(xaxis_tickangle=-45, xaxis_title="", yaxis=dict(range=[0, 100]))
+        st.plotly_chart(fig_hist)
+
+        # Graphique : Comparatif des taux de réalisation par mois
+        all_months_completion_rates = []
+        for month in range(1, 13):
+            monthly_data = details_df[details_df['mois'] == month]
+            _, taux_realisation = calculate_completion_rates(monthly_data)
+            all_months_completion_rates.append(taux_realisation)
+
+        comparative_df = pd.DataFrame({
+            'Mois': list(mois_dict.values()),
+            'Taux de réalisation': all_months_completion_rates
+        })
+
+        fig_comparative = px.bar(comparative_df, x='Mois', y='Taux de réalisation',
+                                 title='Comparatif des taux de réalisation des parcours par mois',
+                                 labels={'Taux de réalisation': 'Taux de réalisation (%)'},
+                                 template='plotly_dark')
+        fig_comparative.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+        fig_comparative.update_layout(xaxis_title="", yaxis=dict(range=[0, 100]))
+        st.plotly_chart(fig_comparative)
+    
 if __name__ == '__main__':
     main()
