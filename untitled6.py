@@ -634,7 +634,7 @@ def main():
     elif period_selection == "Mois":
         mois_dict = {1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin", 7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"}
         # Sélection du mois
-        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: datetime(2024, x, 1).strftime("%B"))
+        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: mois_dict[x])
         mois = selected_month
         details_df['mois'] = details_df['début'].dt.month
         # Filtrer les données pour le mois sélectionné
