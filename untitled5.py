@@ -1057,7 +1057,6 @@ def main():
             return df
         except FileNotFoundError:
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
-
     # Fonction pour sauvegarder les actions correctives dans un fichier Excel
     def save_actions_correctives(df):
         # Convertir les colonnes de date en datetime avant la sauvegarde
