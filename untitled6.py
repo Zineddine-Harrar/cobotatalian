@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.io as pio
 from plotly.subplots import make_subplots
+import openpyxl
+import io
+
 def main():
 
     st.markdown(
@@ -84,11 +87,13 @@ def main():
             background-color: #000 !important;
             color: #fff !important;
         }
+        .stDownloadButton button {
+        color: white !important;
+        }
         </style>
         """,
         unsafe_allow_html=True
     )
-
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
