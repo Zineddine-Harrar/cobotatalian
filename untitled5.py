@@ -1053,10 +1053,13 @@ def main():
     # Fonction pour sauvegarder les actions correctives dans un fichier Excel
     def save_actions_correctives(df):
         df.to_excel('actions_correctives.xlsx', index=False)
-    
-    # Charger les actions correctives existantes ou créer un nouveau DataFrame
+
+    # Initialiser le state si nécessaire
     if 'actions_correctives' not in st.session_state:
         st.session_state.actions_correctives = load_actions_correctives()
+
+    if 'editing' not in st.session_state:
+        st.session_state.editing = False
 
     # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
     if len(st.session_state.actions_correctives) == 0:
@@ -1069,64 +1072,71 @@ def main():
             'Commentaires': ['Commentaires à faire']
         })
 
-    # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
-    edited_df = st.data_editor(
-        st.session_state.actions_correctives,
-        num_rows="dynamic",
-        column_config={
-            "Action corrective": st.column_config.TextColumn(
-                "Action corrective",
-                help="Décrivez l'action corrective",
-                max_chars=100,
-                width="large",
-            ),
-            "Date d'ajout": st.column_config.DateColumn(
-                "Date d'ajout",
-                help="Date d'ajout de l'action",
-                format="DD/MM/YYYY",
-                width="medium",
-            ),
-            "Délai d'intervention": st.column_config.DateColumn(
-                "Délai d'intervention",
-                help="Date limite pour l'action",
-                format="DD/MM/YYYY",
-                width="medium",
-            ),
-            "Responsable Action": st.column_config.TextColumn(
-                "Responsable Action",
-                help="Personne responsable de l'action",
-                max_chars=50,
-                width="medium",
-            ),
-            "Statut": st.column_config.SelectboxColumn(
-                "Statut",
-                help="Statut actuel de l'action",
-                options=['En cours', 'Terminé', 'En retard'],
-                width="small",
-            ),
-            "Commentaires": st.column_config.TextColumn(
-                "Commentaires",
-                help="Commentaires additionnels",
-                max_chars=200,
-                width="large",
-            ),
-        },
-        hide_index=True,
-        width=2000,
-    )
+    # Bouton pour basculer entre le mode d'édition et de visualisation
+    if st.button("Modifier les actions correctives" if not st.session_state.editing else "Terminer l'édition"):
+        st.session_state.editing = not st.session_state.editing
 
-    # Mettre à jour le DataFrame dans le session state et sauvegarder dans Excel
-    if not edited_df.equals(st.session_state.actions_correctives):
-        st.session_state.actions_correctives = edited_df
-        save_actions_correctives(edited_df)
-        st.success("Les actions correctives ont été mises à jour et sauvegardées.")
+    if st.session_state.editing:
+        # Mode d'édition
+        edited_df = st.data_editor(
+            st.session_state.actions_correctives,
+            num_rows="dynamic",
+            column_config={
+                "Action corrective": st.column_config.TextColumn(
+                    "Action corrective",
+                    help="Décrivez l'action corrective",
+                    max_chars=100,
+                    width="large",
+                ),
+                "Date d'ajout": st.column_config.DateColumn(
+                    "Date d'ajout",
+                    help="Date d'ajout de l'action",
+                    format="DD/MM/YYYY",
+                    width="medium",
+                ),
+                "Délai d'intervention": st.column_config.DateColumn(
+                    "Délai d'intervention",
+                    help="Date limite pour l'action",
+                    format="DD/MM/YYYY",
+                    width="medium",
+                ),
+                "Responsable Action": st.column_config.TextColumn(
+                    "Responsable Action",
+                    help="Personne responsable de l'action",
+                    max_chars=50,
+                    width="medium",
+                ),
+                "Statut": st.column_config.SelectboxColumn(
+                    "Statut",
+                    help="Statut actuel de l'action",
+                    options=['En cours', 'Terminé', 'En retard'],
+                    width="small",
+                ),
+                "Commentaires": st.column_config.TextColumn(
+                    "Commentaires",
+                    help="Commentaires additionnels",
+                    max_chars=200,
+                    width="large",
+                ),
+            },
+            hide_index=True,
+            width=2000,
+        )
+    
+        if st.button("Sauvegarder les modifications"):
+            st.session_state.actions_correctives = edited_df
+            save_actions_correctives(edited_df)
+            st.success("Les actions correctives ont été mises à jour et sauvegardées.")
+            st.session_state.editing = False
+    else:
+        # Mode de visualisation
+        st.dataframe(st.session_state.actions_correctives, width=2000)
 
     # Bouton pour supprimer toutes les actions sauf la première
     if st.button("Supprimer toutes les actions sauf la première", key="delete_all"):
         st.session_state.actions_correctives = st.session_state.actions_correctives.iloc[:1]
         save_actions_correctives(st.session_state.actions_correctives)
         st.success("Toutes les actions sauf la première ont été supprimées et sauvegardées.")
-    
 
     
 if __name__ == '__main__':
