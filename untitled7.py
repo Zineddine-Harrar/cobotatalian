@@ -106,7 +106,13 @@ def app_selection_page():
     if st.button("Déconnexion"):
         st.query_params.update({"logout": "true"})
         st.rerun()
+if 'previous_app' not in st.session_state:
+    st.session_state['previous_app'] = None
 
+def reset_filter_if_app_changed():
+    if st.session_state['selected_app'] != st.session_state['previous_app']:
+        st.session_state['period_selection'] = "Semaine"
+        st.session_state['previous_app'] = st.session_state['selected_app']
 # Exécution de l'application sélectionnée
 def run_selected_app():
     if st.session_state['selected_app'] == "RQUARTZ - IMON":
