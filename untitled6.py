@@ -1041,15 +1041,10 @@ def main():
 
     st.subheader("Actions correctives")
 
-    # Utilisez la variable de session pour déterminer l'application en cours
-    current_app = st.session_state.current_app
-
     # Fonction pour charger les actions correctives depuis un fichier Excel
-    def load_actions_correctives(app_name):
-        file_name = f'actions_correctives_{app_name.replace(" ", "_")}.xlsx'
+    def load_actions_correctives():
         try:
-            df = pd.read_excel(file_name, parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
-            # Convertir les colonnes de date en date seulement (sans heure)
+            df = pd.read_excel('actions_correctives_RQUARTZ_T2F.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
             df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
             return df
@@ -1057,16 +1052,14 @@ def main():
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
     # Fonction pour sauvegarder les actions correctives dans un fichier Excel
-    def save_actions_correctives(df, app_name):
-        file_name = f'actions_correctives_{app_name.replace(" ", "_")}.xlsx'
-        # Convertir les colonnes de date en datetime avant la sauvegarde
+    def save_actions_correctives(df):
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
         df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
-        df.to_excel(file_name, index=False)
+        df.to_excel('actions_correctives_RQUARTZ_T2F.xlsx', index=False)
 
     # Initialiser le state si nécessaire
     if 'actions_correctives' not in st.session_state:
-        st.session_state.actions_correctives = load_actions_correctives(current_app)
+        st.session_state.actions_correctives = load_actions_correctives()
 
     if 'editing' not in st.session_state:
         st.session_state.editing = False
@@ -1074,7 +1067,7 @@ def main():
     # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
     if len(st.session_state.actions_correctives) == 0:
         st.session_state.actions_correctives = pd.DataFrame({
-            'Action corrective': [f'Action 1 pour {current_app}'],
+            'Action corrective': ['Action 1 pour RQUARTZ T2F'],
             'Date d\'ajout': [datetime.now().date()],
             'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
             'Responsable Action': ['Responsable 1'],
@@ -1135,15 +1128,15 @@ def main():
 
         if st.button("Sauvegarder les modifications"):
             st.session_state.actions_correctives = edited_df
-            save_actions_correctives(edited_df, current_app)
-            st.success(f"Les actions correctives pour {current_app} ont été mises à jour et sauvegardées.")
+            save_actions_correctives(edited_df)
+            st.success("Les actions correctives pour RQUARTZ T2F ont été mises à jour et sauvegardées.")
             st.session_state.editing = False
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives, width=2000)
 
     # Bouton pour télécharger le fichier Excel
-    if st.button("Télécharger le fichier en format Excel"):
+    if st.button("Télécharger le fichier Excel"):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             st.session_state.actions_correctives.to_excel(writer, index=False)
@@ -1151,7 +1144,7 @@ def main():
         st.download_button(
             label="Cliquez ici pour télécharger",
             data=output,
-            file_name=f"actions_correctives_{current_app.replace(' ', '_')}.xlsx",
+            file_name="actions_correctives_RQUARTZ_T2F.xlsx",
             key="download_button",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
