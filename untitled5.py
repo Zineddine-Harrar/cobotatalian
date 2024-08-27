@@ -1041,42 +1041,32 @@ def main():
         st.plotly_chart(fig_comparative, use_container_width=True)
     st.subheader("Actions correctives")
 
-    # Initialiser le DataFrame des actions correctives dans le state de la session s'il n'existe pas déjà
+    # Fonction pour charger les actions correctives depuis un fichier Excel
+    def load_actions_correctives():
+        try:
+            df = pd.read_excel('actions_correctives.xlsx')
+            return df
+        except FileNotFoundError:
+            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+
+    # Fonction pour sauvegarder les actions correctives dans un fichier Excel
+    def save_actions_correctives(df):
+        df.to_excel('actions_correctives.xlsx', index=False)
+    
+    # Charger les actions correctives existantes ou créer un nouveau DataFrame
     if 'actions_correctives' not in st.session_state:
-        # Créer une ligne initiale avec des valeurs par défaut
-        initial_row = pd.DataFrame({
+        st.session_state.actions_correctives = load_actions_correctives()
+
+    # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
+    if len(st.session_state.actions_correctives) == 0:
+        st.session_state.actions_correctives = pd.DataFrame({
             'Action corrective': ['Action 1'],
             'Date d\'ajout': [datetime.now().date()],
-            'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],  # Date actuelle + 7 jours
+            'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
             'Responsable Action': ['Responsable 1'],
             'Statut': ['En cours'],
             'Commentaires': ['Commentaires à faire']
         })
-        st.session_state.actions_correctives = initial_row
-    else:
-        # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
-        if len(st.session_state.actions_correctives) == 0:
-            initial_row = pd.DataFrame({
-                'Action corrective': ['Action 1'],
-                'Date d\'ajout': [datetime.now().date()],
-                'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
-                'Responsable Action': ['Responsable 1'],
-                'Statut': ['En cours'],
-                'Commentaires': ['Commentaires à faire']
-            })
-            st.session_state.actions_correctives = initial_row
-
-    # Fonction pour préserver les valeurs non nulles
-    def preserve_values(new_df, old_df):
-        for col in new_df.columns:
-            if col in ['Date d\'ajout', 'Délai d\'intervention']:
-                new_df[col] = pd.to_datetime(new_df[col]).fillna(pd.to_datetime(old_df[col]))
-            else:
-                new_df[col] = new_df[col].fillna(old_df[col])
-        return new_df
-
-    # Préserver les valeurs avant l'édition
-    st.session_state.actions_correctives = preserve_values(st.session_state.actions_correctives, st.session_state.actions_correctives)
 
     # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
     edited_df = st.data_editor(
@@ -1124,17 +1114,17 @@ def main():
         width=2000,
     )
 
-    # Préserver les valeurs après l'édition
-    edited_df = preserve_values(edited_df, st.session_state.actions_correctives)
-    
-    # Mettre à jour le DataFrame dans le session state
-    st.session_state.actions_correctives = edited_df
+    # Mettre à jour le DataFrame dans le session state et sauvegarder dans Excel
+    if not edited_df.equals(st.session_state.actions_correctives):
+        st.session_state.actions_correctives = edited_df
+        save_actions_correctives(edited_df)
+        st.success("Les actions correctives ont été mises à jour et sauvegardées.")
 
     # Bouton pour supprimer toutes les actions sauf la première
     if st.button("Supprimer toutes les actions sauf la première", key="delete_all"):
         st.session_state.actions_correctives = st.session_state.actions_correctives.iloc[:1]
-        st.success("Toutes les actions sauf la première ont été supprimées.")    
-
+        save_actions_correctives(st.session_state.actions_correctives)
+        st.success("Toutes les actions sauf la première ont été supprimées et sauvegardées.")
     
 
     
