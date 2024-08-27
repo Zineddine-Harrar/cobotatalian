@@ -8,15 +8,17 @@ import plotly.io as pio
 from plotly.subplots import make_subplots
 import openpyxl
 import io
-# Au début de chaque application (RQUARTZ IMON, RQUARTZ T2F, ECOBOT 40)
 def initialize_app_state(app_name):
     if 'current_app' not in st.session_state:
         st.session_state.current_app = app_name
-
-    if 'last_app' not in st.session_state or st.session_state.last_app != app_name:
-        st.session_state.last_app = app_name
-        # Réinitialiser le filtre de sélection à "Semaine"
+    
+    if 'last_app' not in st.session_state:
+        st.session_state.last_app = ""
+    
+    # Réinitialiser le filtre seulement si on change d'application
+    if st.session_state.last_app != app_name:
         st.session_state[f'period_selection_{app_name}'] = "Semaine"
+        st.session_state.last_app = app_name
 def main():
 
     st.markdown(
@@ -340,18 +342,15 @@ def main():
     week_options = {week: date for week, date in week_start_dates.items()}
 
             
-    # Pour RQUARTZ IMON
-    initialize_app_state("RQUARTZ_T2F")
+    initialize_app_state("RQUARTZ_IMON")
     
-    # Utiliser la valeur stockée dans session_state pour définir la valeur par défaut
     period_selection = st.radio(
         "Sélectionnez la période à analyser",
         ["Semaine", "Mois"],
-        key=f"period_selection_RQUARTZ_IMON",
+        key="period_selection_RQUARTZ_IMON",
         index=0 if st.session_state.period_selection_RQUARTZ_IMON == "Semaine" else 1
     )
-
-    # Mettre à jour la valeur dans session_state
+    
     st.session_state.period_selection_RQUARTZ_IMON = period_selection
     
     if period_selection == "Semaine":
