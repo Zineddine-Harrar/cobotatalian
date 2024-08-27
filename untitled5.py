@@ -1139,13 +1139,13 @@ def main():
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives, width=2000)
     # Bouton pour télécharger le fichier Excel
-    if st.button("Télécharger le fichier Excel"):
+    if st.button("Télécharger le fichier en format Excel"):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             st.session_state.actions_correctives.to_excel(writer, index=False)
         output.seek(0)
         st.download_button(
-            label="Cliquez ici pour télécharger le fichier Excel",
+            label="Cliquez ici pour télécharger",
             data=output,
             file_name="actions_correctives.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
