@@ -622,7 +622,7 @@ def main():
         st.plotly_chart(fig_comparative)
 
     if 'current_app' not in st.session_state:
-        st.session_state.current_app = "RQUARTZ IMON"
+        st.session_state.current_app = "ECOBOT 40"
     st.subheader("Actions correctives")
 
     # Fonction pour charger les actions correctives depuis un fichier Excel
