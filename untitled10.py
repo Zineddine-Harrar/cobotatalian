@@ -620,6 +620,9 @@ def main():
         fig_comparative.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
         fig_comparative.update_layout(xaxis_title="", yaxis=dict(range=[0, 100]))
         st.plotly_chart(fig_comparative)
+
+    if 'current_app' not in st.session_state:
+        st.session_state.current_app = "RQUARTZ IMON"
     st.subheader("Actions correctives")
 
     # Fonction pour charger les actions correctives depuis un fichier Excel
