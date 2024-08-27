@@ -777,7 +777,7 @@ def main():
             st.markdown(
                 f"""
                 <div class="metric-container">
-                    <div class="metric-label">Temps de réalisation moyen (Mois)</div>
+                    <div class="metric-label">Délai d’intervention moyen suite aux évènements (Mois)</div>
                     <div class="metric-value">{avg_resolution_time_month:.2f} min</div>
                 </div>
                 """,
