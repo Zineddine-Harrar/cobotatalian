@@ -761,7 +761,7 @@ def main():
             st.markdown(
                 f"""
                 <div class="metric-container">
-                    <div class="metric-label">Nombre d'événements signalés (Mois)</div>
+                    <div class="metric-label">Délai d’intervention moyen suite aux évènements (Mois)</div>
                     <div class="metric-value">{total_alerts_month}</div>
                 </div>
                 """,
