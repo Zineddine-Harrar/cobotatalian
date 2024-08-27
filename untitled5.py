@@ -1044,13 +1044,20 @@ def main():
         # Afficher l'histogramme comparatif dans Streamlit
         st.subheader("Comparatif des taux de réalisation par mois")
         st.plotly_chart(fig_comparative, use_container_width=True)
+
+    if 'current_app' not in st.session_state:
+        st.session_state.current_app = "RQUARTZ IMON"
     st.subheader("Actions correctives")
     # Déterminer quelle application est en cours d'utilisation
-    current_app = "RQUARTZ IMON" if "IMON" in st.title else "RQUARTZ T2F"
+    
+
+    # Utilisez la variable de session pour déterminer l'application en cours
+    current_app = st.session_state.current_app
     # Fonction pour charger les actions correctives depuis un fichier Excel
-    def load_actions_correctives():
+    def load_actions_correctives(app_name):
+        file_name = f'actions_correctives_{app_name.replace(" ", "_")}.xlsx'
         try:
-            df = pd.read_excel('actions_correctives.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
+            df = pd.read_excel(file_name, parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
             # Convertir les colonnes de date en date seulement (sans heure)
             df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
@@ -1067,7 +1074,8 @@ def main():
 
     # Initialiser le state si nécessaire
     if 'actions_correctives' not in st.session_state:
-        st.session_state.actions_correctives = load_actions_correctives()
+        st.session_state.actions_correctives = load_actions_correctives(current_app)
+
 
     if 'editing' not in st.session_state:
         st.session_state.editing = False
