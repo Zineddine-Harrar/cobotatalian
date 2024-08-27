@@ -1075,9 +1075,12 @@ def main():
             'Commentaires': ['Commentaires à faire']
         })
 
-    # Bouton pour basculer entre le mode d'édition et de visualisation
-    if st.button("Modifier les actions correctives" if not st.session_state.editing else "Terminer l'édition"):
+    # Fonction pour basculer le mode d'édition
+    def toggle_edit_mode():
         st.session_state.editing = not st.session_state.editing
+
+    # Bouton pour basculer entre le mode d'édition et de visualisation
+    st.button("Modifier les actions correctives" if not st.session_state.editing else "Terminer l'édition", on_click=toggle_edit_mode)
 
     if st.session_state.editing:
         # Mode d'édition
