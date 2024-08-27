@@ -332,20 +332,18 @@ def main():
     week_options = {week: date for week, date in week_start_dates.items()}
 
             
-    # Initialisation et gestion du state
-    if 'current_app' not in st.session_state:
-        st.session_state.current_app = "RQUARTZ IMON"
-
-    if 'last_app' not in st.session_state or st.session_state.last_app != "RQUARTZ IMON":
-        st.session_state.last_app = "RQUARTZ IMON"
-        if 'period_selection_IMON' not in st.session_state:
-            st.session_state.period_selection_IMON = "Semaine"
+    # Initialisation de la variable d'état de session
+    if 'period_selection_IMON' not in st.session_state:
+        st.session_state.period_selection_IMON = "Semaine"
 
     # Utiliser une clé unique pour le radio button
     period_selection = st.radio("Sélectionnez la période à analyser", 
                                 ["Semaine", "Mois"], 
                                 key="period_selection_IMON",
                                 index=0 if st.session_state.period_selection_IMON == "Semaine" else 1)
+    
+    # Mettre à jour la variable d'état de session
+    st.session_state.period_selection_IMON = period_selection
     
     if period_selection == "Semaine":
         selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
