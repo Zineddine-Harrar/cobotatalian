@@ -328,7 +328,18 @@ def main():
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
 
-    period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
+    if 'current_app' not in st.session_state:
+        st.session_state.current_app = "RQUARTZ T2F"
+
+    if 'last_app' not in st.session_state or st.session_state.last_app != "RQUARTZ T2F":
+        st.session_state.last_app = "RQUARTZ T2F"
+        if 'period_selection_T2F' not in st.session_state:
+            st.session_state.period_selection_T2F = "Semaine"
+
+    period_selection = st.radio("Sélectionnez la période à analyser", 
+                                ["Semaine", "Mois"], 
+                                key="period_selection_T2F",
+                                index=0 if st.session_state.period_selection_T2F == "Semaine" else 1)
     if period_selection == "Semaine":
         selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
 
@@ -1058,15 +1069,15 @@ def main():
         df.to_excel('actions_correctives_RQUARTZ_T2F.xlsx', index=False)
 
     # Initialiser le state si nécessaire
-    if 'actions_correctives' not in st.session_state:
-        st.session_state.actions_correctives = load_actions_correctives()
+    if 'actions_correctives_T2F' not in st.session_state:
+        st.session_state.actions_correctives_T2F = load_actions_correctives()
 
-    if 'editing' not in st.session_state:
-        st.session_state.editing = False
+    if 'editing_T2F' not in st.session_state:
+        st.session_state.editing_T2F = False
 
     # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
-    if len(st.session_state.actions_correctives) == 0:
-        st.session_state.actions_correctives = pd.DataFrame({
+    if len(st.session_state.actions_correctives_T2F) == 0:
+        st.session_state.actions_correctives_T2F = pd.DataFrame({
             'Action corrective': ['Action 1 pour RQUARTZ T2F'],
             'Date d\'ajout': [datetime.now().date()],
             'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
@@ -1076,16 +1087,17 @@ def main():
         })
 
     # Fonction pour basculer le mode d'édition
-    def toggle_edit_mode():
-        st.session_state.editing = not st.session_state.editing
+    def toggle_edit_mode_T2F():
+        st.session_state.editing_T2F = not st.session_state.editing_T2F
 
     # Bouton pour basculer entre le mode d'édition et de visualisation
-    st.button("Modifier les actions correctives" if not st.session_state.editing else "Terminer l'édition", on_click=toggle_edit_mode)
+    st.button("Modifier les actions correctives" if not st.session_state.editing_T2F else "Terminer l'édition", 
+              on_click=toggle_edit_mode_T2F, key='toggle_edit_T2F')
 
-    if st.session_state.editing:
+    if st.session_state.editing_T2F:
         # Mode d'édition
         edited_df = st.data_editor(
-            st.session_state.actions_correctives,
+            st.session_state.actions_correctives_T2F,
             num_rows="dynamic",
             column_config={
                 "Action corrective": st.column_config.TextColumn(
@@ -1127,28 +1139,29 @@ def main():
             },
             hide_index=True,
             width=2000,
+            key='data_editor_T2F'
         )
 
-        if st.button("Sauvegarder les modifications"):
-            st.session_state.actions_correctives = edited_df
+        if st.button("Sauvegarder les modifications", key='save_T2F'):
+            st.session_state.actions_correctives_T2F = edited_df
             save_actions_correctives(edited_df)
             st.success("Les actions correctives pour RQUARTZ T2F ont été mises à jour et sauvegardées.")
-            st.session_state.editing = False
+            st.session_state.editing_T2F = False
     else:
         # Mode de visualisation
-        st.dataframe(st.session_state.actions_correctives, width=2000)
+        st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
 
     # Bouton pour télécharger le fichier Excel
-    if st.button("Télécharger le fichier Excel"):
+    if st.button("Télécharger le fichier Excel", key='download_T2F'):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            st.session_state.actions_correctives.to_excel(writer, index=False)
+            st.session_state.actions_correctives_T2F.to_excel(writer, index=False)
         output.seek(0)
         st.download_button(
             label="Cliquez ici pour télécharger",
             data=output,
             file_name="actions_correctives_RQUARTZ_T2F.xlsx",
-            key="download_button",
+            key="download_button_T2F",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
