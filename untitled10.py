@@ -2,9 +2,21 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 import plotly.graph_objects as go
-import plotly.express as px  # Assurez-vous d'importer plotly.express pour px.bar
 import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.io as pio
+from plotly.subplots import make_subplots
+import openpyxl
+import io
+# Au début de chaque application (RQUARTZ IMON, RQUARTZ T2F, ECOBOT 40)
+def initialize_app_state(app_name):
+    if 'current_app' not in st.session_state:
+        st.session_state.current_app = app_name
 
+    if 'last_app' not in st.session_state or st.session_state.last_app != app_name:
+        st.session_state.last_app = app_name
+        # Réinitialiser le filtre de sélection à "Semaine"
+        st.session_state[f'period_selection_{app_name}'] = "Semaine"
 def main():
     st.markdown(
         """
@@ -258,18 +270,17 @@ def main():
 
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
-    if 'current_app' not in st.session_state:
-        st.session_state.current_app = "ECOBOT 40"
-
-    if 'last_app' not in st.session_state or st.session_state.last_app != "ECOBOT 40":
-        st.session_state.last_app = "ECOBOT 40"
-        if 'period_selection_ECOBOT40' not in st.session_state:
-            st.session_state.period_selection_ECOBOT40 = "Semaine"
-
-    period_selection = st.radio("Sélectionnez la période à analyser", 
-                                ["Semaine", "Mois"], 
-                                key="period_selection_ECOBOT40",
-                                index=0 if st.session_state.period_selection_ECOBOT40 == "Semaine" else 1)
+    initialize_app_state("ECOBOT_40")
+        
+    period_selection = st.radio(
+         "Sélectionnez la période à analyser", 
+         ["Semaine", "Mois"], 
+         key="period_selection_ECOBOT_40",
+         index=0 if st.session_state.period_selection_ECOBOT_40 == "Semaine" else 1
+        )
+        
+    # Mettre à jour la valeur dans session_state
+    st.session_state.period_selection_ECOBOT_40 = period_selection
 
     if period_selection == "Semaine":
         # Afficher le sélecteur de semaine avec les dates
