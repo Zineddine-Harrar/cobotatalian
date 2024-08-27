@@ -1046,7 +1046,7 @@ def main():
         st.plotly_chart(fig_comparative, use_container_width=True)
 
     if 'current_app' not in st.session_state:
-    st.session_state.current_app = "RQUARTZ IMON"
+        st.session_state.current_app = "RQUARTZ IMON"
 
     st.subheader("Actions correctives")
 
