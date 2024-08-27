@@ -8,17 +8,7 @@ import plotly.io as pio
 from plotly.subplots import make_subplots
 import openpyxl
 import io
-def initialize_app_state(app_name):
-    if 'current_app' not in st.session_state:
-        st.session_state.current_app = app_name
-    
-    if 'last_app' not in st.session_state:
-        st.session_state.last_app = ""
-    
-    # Réinitialiser le filtre seulement si on change d'application
-    if st.session_state.last_app != app_name:
-        st.session_state[f'period_selection_{app_name}'] = "Semaine"
-        st.session_state.last_app = app_name
+
 def main():
 
     st.markdown(
@@ -342,16 +332,16 @@ def main():
     week_options = {week: date for week, date in week_start_dates.items()}
 
             
-    initialize_app_state("RQUARTZ_IMON")
-    
+    if 'period_selection' not in st.session_state:
+        st.session_state['period_selection'] = "Semaine"
+
     period_selection = st.radio(
         "Sélectionnez la période à analyser",
         ["Semaine", "Mois"],
-        key="period_selection_RQUARTZ_IMON",
-        index=0 if st.session_state.period_selection_RQUARTZ_IMON == "Semaine" else 1
+        index=["Semaine", "Mois"].index(st.session_state['period_selection'])
     )
-    
-    st.session_state.period_selection_RQUARTZ_IMON = period_selection
+
+    st.session_state['period_selection'] = period_selection
     
     if period_selection == "Semaine":
         selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
