@@ -87,6 +87,9 @@ def main():
             background-color: #000 !important;
             color: #fff !important;
         }
+        .stDownloadButton button {
+        color: white !important;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -1148,6 +1151,7 @@ def main():
             label="Cliquez ici pour télécharger",
             data=output,
             file_name="actions_correctives.xlsx",
+            key = "download_button",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
     
