@@ -622,98 +622,117 @@ def main():
         st.plotly_chart(fig_comparative)
     st.subheader("Actions correctives")
 
-    # Initialiser le DataFrame des actions correctives dans le state de la session s'il n'existe pas déjà
-    if 'actions_correctives' not in st.session_state:
-        # Créer une ligne initiale avec des valeurs par défaut
-        initial_row = pd.DataFrame({
-            'Action corrective': ['Action 1'],
+    # Fonction pour charger les actions correctives depuis un fichier Excel
+    def load_actions_correctives():
+        try:
+            df = pd.read_excel('actions_correctives_ECOBOT40.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
+            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
+            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
+            return df
+        except FileNotFoundError:
+            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+
+    # Fonction pour sauvegarder les actions correctives dans un fichier Excel
+    def save_actions_correctives(df):
+        df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
+        df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
+        df.to_excel('actions_correctives_ECOBOT40.xlsx', index=False)
+
+    # Initialiser le state si nécessaire
+    if 'actions_correctives_ECOBOT40' not in st.session_state:
+        st.session_state.actions_correctives_ECOBOT40 = load_actions_correctives()
+
+    if 'editing_ECOBOT40' not in st.session_state:
+        st.session_state.editing_ECOBOT40 = False
+
+    # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
+    if len(st.session_state.actions_correctives_ECOBOT40) == 0:
+        st.session_state.actions_correctives_ECOBOT40 = pd.DataFrame({
+            'Action corrective': ['Action 1 pour ECOBOT 40'],
             'Date d\'ajout': [datetime.now().date()],
-            'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],  # Date actuelle + 7 jours
+            'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
             'Responsable Action': ['Responsable 1'],
             'Statut': ['En cours'],
             'Commentaires': ['Commentaires à faire']
         })
-        st.session_state.actions_correctives = initial_row
+
+    # Fonction pour basculer le mode d'édition
+    def toggle_edit_mode_ECOBOT40():
+        st.session_state.editing_ECOBOT40 = not st.session_state.editing_ECOBOT40
+
+    # Bouton pour basculer entre le mode d'édition et de visualisation
+    st.button("Modifier les actions correctives" if not st.session_state.editing_ECOBOT40 else "Terminer l'édition", 
+              on_click=toggle_edit_mode_ECOBOT40, key='toggle_edit_ECOBOT40')
+
+    if st.session_state.editing_ECOBOT40:
+        # Mode d'édition
+        edited_df = st.data_editor(
+            st.session_state.actions_correctives_ECOBOT40,
+            num_rows="dynamic",
+            column_config={
+                "Action corrective": st.column_config.TextColumn(
+                    "Action corrective",
+                    help="Décrivez l'action corrective",
+                    max_chars=100,
+                    width="large",
+                ),
+                "Date d'ajout": st.column_config.DateColumn(
+                    "Date d'ajout",
+                    help="Date d'ajout de l'action",
+                    format="DD/MM/YYYY",
+                    width="medium",
+                ),
+                "Délai d'intervention": st.column_config.DateColumn(
+                    "Délai d'intervention",
+                    help="Date limite pour l'action",
+                    format="DD/MM/YYYY",
+                    width="medium",
+                ),
+                "Responsable Action": st.column_config.TextColumn(
+                    "Responsable Action",
+                    help="Personne responsable de l'action",
+                    max_chars=50,
+                    width="medium",
+                ),
+                "Statut": st.column_config.SelectboxColumn(
+                    "Statut",
+                    help="Statut actuel de l'action",
+                    options=['En cours', 'Terminé', 'En retard'],
+                    width="small",
+                ),
+                "Commentaires": st.column_config.TextColumn(
+                    "Commentaires",
+                    help="Commentaires additionnels",
+                    max_chars=200,
+                    width="large",
+                ),
+            },
+            hide_index=True,
+            width=2000,
+            key='data_editor_ECOBOT40'
+        )
+
+        if st.button("Sauvegarder les modifications", key='save_ECOBOT40'):
+            st.session_state.actions_correctives_ECOBOT40 = edited_df
+            save_actions_correctives(edited_df)
+            st.success("Les actions correctives pour ECOBOT 40 ont été mises à jour et sauvegardées.")
+            st.session_state.editing_ECOBOT40 = False
     else:
-        # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
-        if len(st.session_state.actions_correctives) == 0:
-            initial_row = pd.DataFrame({
-                'Action corrective': ['Action 1'],
-                'Date d\'ajout': [datetime.now().date()],
-                'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
-                'Responsable Action': ['Responsable 1'],
-                'Statut': ['En cours'],
-                'Commentaires': ['Commentaires à faire']
-            })
-            st.session_state.actions_correctives = initial_row
+        # Mode de visualisation
+        st.dataframe(st.session_state.actions_correctives_ECOBOT40, width=2000)
 
-    # Fonction pour préserver les valeurs non nulles
-    def preserve_values(new_df, old_df):
-        for col in new_df.columns:
-            if col in ['Date d\'ajout', 'Délai d\'intervention']:
-                new_df[col] = pd.to_datetime(new_df[col]).fillna(pd.to_datetime(old_df[col]))
-            else:
-                new_df[col] = new_df[col].fillna(old_df[col])
-        return new_df
-
-    # Préserver les valeurs avant l'édition
-    st.session_state.actions_correctives = preserve_values(st.session_state.actions_correctives, st.session_state.actions_correctives)
-
-    # Utiliser st.data_editor pour afficher et modifier le tableau des actions correctives
-    edited_df = st.data_editor(
-        st.session_state.actions_correctives,
-        num_rows="dynamic",
-        column_config={
-            "Action corrective": st.column_config.TextColumn(
-                "Action corrective",
-                help="Décrivez l'action corrective",
-                max_chars=100,
-                width="large",
-            ),
-            "Date d'ajout": st.column_config.DateColumn(
-                "Date d'ajout",
-                help="Date d'ajout de l'action",
-                format="DD/MM/YYYY",
-                width="medium",
-            ),
-            "Délai d'intervention": st.column_config.DateColumn(
-                "Délai d'intervention",
-                help="Date limite pour l'action",
-                format="DD/MM/YYYY",
-                width="medium",
-            ),
-            "Responsable Action": st.column_config.TextColumn(
-                "Responsable Action",
-                help="Personne responsable de l'action",
-                max_chars=50,
-                width="medium",
-            ),
-            "Statut": st.column_config.SelectboxColumn(
-                "Statut",
-                help="Statut actuel de l'action",
-                options=['En cours', 'Terminé', 'En retard'],
-                width="small",
-            ),
-            "Commentaires": st.column_config.TextColumn(
-                "Commentaires",
-                help="Commentaires additionnels",
-                max_chars=200,
-                width="large",
-            ),
-        },
-        hide_index=True,
-        width=2000,
-    )
-
-    # Préserver les valeurs après l'édition
-    edited_df = preserve_values(edited_df, st.session_state.actions_correctives)
-    
-    # Mettre à jour le DataFrame dans le session state
-    st.session_state.actions_correctives = edited_df
-
-    # Bouton pour supprimer toutes les actions sauf la première
-    if st.button("Supprimer toutes les actions sauf la première", key="delete_all"):
-        st.session_state.actions_correctives = st.session_state.actions_correctives.iloc[:1]
-        st.success("Toutes les actions sauf la première ont été supprimées.")  
+    # Bouton pour télécharger le fichier Excel
+    if st.button("Télécharger le fichier Excel", key='download_ECOBOT40'):
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            st.session_state.actions_correctives_ECOBOT40.to_excel(writer, index=False)
+        output.seek(0)
+        st.download_button(
+            label="Cliquez ici pour télécharger",
+            data=output,
+            file_name="actions_correctives_ECOBOT40.xlsx",
+            key="download_button_ECOBOT40",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 if __name__ == '__main__':
     main()
