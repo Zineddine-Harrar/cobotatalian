@@ -1045,13 +1045,19 @@ def main():
     # Fonction pour charger les actions correctives depuis un fichier Excel
     def load_actions_correctives():
         try:
-            df = pd.read_excel('actions_correctives.xlsx')
+            df = pd.read_excel('actions_correctives.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
+            # Convertir les colonnes de date en date seulement (sans heure)
+            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
+            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
             return df
         except FileNotFoundError:
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
     # Fonction pour sauvegarder les actions correctives dans un fichier Excel
     def save_actions_correctives(df):
+        # Convertir les colonnes de date en datetime avant la sauvegarde
+        df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
+        df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
         df.to_excel('actions_correctives.xlsx', index=False)
 
     # Initialiser le state si nécessaire
@@ -1131,8 +1137,19 @@ def main():
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives, width=2000)
-
-
+    # Bouton pour télécharger le fichier Excel
+    if st.button("Télécharger le fichier Excel"):
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            st.session_state.actions_correctives.to_excel(writer, index=False)
+        output.seek(0)
+        st.download_button(
+            label="Cliquez ici pour télécharger le fichier Excel",
+            data=output,
+            file_name="actions_correctives.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    
     
 if __name__ == '__main__':
     main()
