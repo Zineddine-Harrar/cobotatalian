@@ -1045,7 +1045,8 @@ def main():
         st.subheader("Comparatif des taux de réalisation par mois")
         st.plotly_chart(fig_comparative, use_container_width=True)
     st.subheader("Actions correctives")
-
+    # Déterminer quelle application est en cours d'utilisation
+    current_app = "RQUARTZ IMON" if "IMON" in st.title else "RQUARTZ T2F"
     # Fonction pour charger les actions correctives depuis un fichier Excel
     def load_actions_correctives():
         try:
@@ -1060,9 +1061,10 @@ def main():
     # Fonction pour sauvegarder les actions correctives dans un fichier Excel
     def save_actions_correctives(df):
         # Convertir les colonnes de date en datetime avant la sauvegarde
+        file_name = f'actions_correctives_{app_name.replace(" ", "_")}.xlsx'
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
         df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
-        df.to_excel('actions_correctives.xlsx', index=False)
+        df.to_excel(file_name, index=False)
 
     # Initialiser le state si nécessaire
     if 'actions_correctives' not in st.session_state:
