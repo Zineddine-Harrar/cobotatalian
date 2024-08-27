@@ -1067,6 +1067,8 @@ def main():
             df = pd.read_excel('actions_correctives_RQUARTZ_IMON.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
             df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
+            # Convertir la colonne 'Commentaires' en type str
+            df['Commentaires'] = df['Commentaires'].astype(str)
             return df
         except FileNotFoundError:
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
@@ -1076,7 +1078,7 @@ def main():
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
         df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
         df.to_excel('actions_correctives_RQUARTZ_IMON.xlsx', index=False)
-
+        
     # Initialiser le state si nécessaire
     if 'actions_correctives_IMON' not in st.session_state:
         st.session_state.actions_correctives_IMON = load_actions_correctives()
