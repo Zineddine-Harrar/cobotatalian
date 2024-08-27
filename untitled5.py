@@ -665,6 +665,9 @@ def main():
         heures_prevues_par_jour = 3  # Ajustez selon vos besoins
         heures_prevues_mois = jours_dans_le_mois * heures_prevues_par_jour
         taux_utilisation_mois = (heures_cumulees_mois / heures_prevues_mois) * 100
+         # Calculer le coût mensuel
+        monthly_cost = 1600  # Coût mensuel fixe
+        hourly_cost_month = monthly_cost / heures_cumulees_mois if heures_cumulees_mois > 0 else 0
 
         # Assurez-vous que cette ligne est présente et correcte
         filtered_alarm_details_df = alarm_details_df[alarm_details_df['mois'] == selected_month]
@@ -716,7 +719,8 @@ def main():
         # Affichage des KPI pour le mois
         st.markdown("### Indicateurs Mensuels")
 
-        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
+        col1, col2, col3, col4 = st.columns(4)
+        col5, col6, col7, col8 = st.columns(4)
         with col1:
             st.markdown(
                 f"""
@@ -792,6 +796,18 @@ def main():
                 </div>
                 """,
                 unsafe_allow_html=True,
+            )
+
+        with col8:
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Coût total (Mois)</div>
+                    <div class="metric-value">{monthly_cost:.2f} €</div>
+                    <div class="metric-delta">Coût/h: {hourly_cost_month:.2f} €</div>
+                </div>
+                """,
+                unsafe_allow_html=True
             )
 
         
