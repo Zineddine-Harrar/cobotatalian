@@ -258,7 +258,18 @@ def main():
 
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
-    period_selection = st.radio("Sélectionnez la période à analyser", ["Semaine", "Mois"])
+    if 'current_app' not in st.session_state:
+        st.session_state.current_app = "ECOBOT 40"
+
+    if 'last_app' not in st.session_state or st.session_state.last_app != "ECOBOT 40":
+        st.session_state.last_app = "ECOBOT 40"
+        if 'period_selection_ECOBOT40' not in st.session_state:
+            st.session_state.period_selection_ECOBOT40 = "Semaine"
+
+    period_selection = st.radio("Sélectionnez la période à analyser", 
+                                ["Semaine", "Mois"], 
+                                key="period_selection_ECOBOT40",
+                                index=0 if st.session_state.period_selection_ECOBOT40 == "Semaine" else 1)
 
     if period_selection == "Semaine":
         # Afficher le sélecteur de semaine avec les dates
