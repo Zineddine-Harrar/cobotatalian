@@ -1132,11 +1132,6 @@ def main():
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives, width=2000)
 
-    # Bouton pour supprimer toutes les actions sauf la première
-    if st.button("Supprimer toutes les actions sauf la première", key="delete_all"):
-        st.session_state.actions_correctives = st.session_state.actions_correctives.iloc[:1]
-        save_actions_correctives(st.session_state.actions_correctives)
-        st.success("Toutes les actions sauf la première ont été supprimées et sauvegardées.")
 
     
 if __name__ == '__main__':
