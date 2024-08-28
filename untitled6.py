@@ -88,7 +88,7 @@ def main():
             color: #fff !important;
         }
         .stDownloadButton button {
-        color: white !important;
+        color: black !important;
         }
         </style>
         """,
