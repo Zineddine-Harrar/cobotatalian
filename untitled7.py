@@ -77,7 +77,7 @@ def login_section():
 
 # Page de sélection de l'application
 def app_selection_page():
-    st.title("Applications RQUARTZ")
+    st.title("Tableau de bord COBOT ATALIAN")
 
     st.markdown("### Sélectionnez une application")
     col1, col2, col3 = st.columns(3)
