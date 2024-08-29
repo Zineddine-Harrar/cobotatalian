@@ -46,23 +46,29 @@ def main():
             color: white;
         }
         .metric-container {
-            border-radius: 10px;
+            border-radius: 5px;
             background-color: #1e1e1e;
-            padding: 20px;
+            padding: 15px;
+            margin: 10px 0;
             text-align: center;
             color: #fff;
         }
+
         .metric-label {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .metric-value {
-            font-size: 2.5em;
-            font-weight: bold;
-        }
-        .metric-delta {
             font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .metric-delta {
+            font-size: 1em;
             color: #28a745;
+            margin-top: 5px;
         }
         .dataframe {
             background-color: #000 !important;
