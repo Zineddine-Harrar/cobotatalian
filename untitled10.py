@@ -265,7 +265,7 @@ def main():
     if 'period_selection' not in st.session_state:
         st.session_state['period_selection'] = "Semaine"
 
-    period_selection = st.radio(
+    period_selection = st.selectbox(
         "Sélectionnez la période à analyser",
         ["Semaine", "Mois"],
         index=["Semaine", "Mois"].index(st.session_state['period_selection'])
