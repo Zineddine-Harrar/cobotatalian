@@ -1100,7 +1100,7 @@ def main():
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
         df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
         df.to_excel('actions_correctives_RQUARTZ_IMON.xlsx', index=False)
-
+    st.write("Secrets disponibles :", list(st.secrets.keys()))
     # Section des actions correctives
     st.subheader("Actions correctives")
 
