@@ -10,7 +10,7 @@ import openpyxl
 import io
 import os
 def main():
-
+    st.set_page_config(layout="wide")
     st.markdown(
         """
         <style>
@@ -90,6 +90,13 @@ def main():
         .stDownloadButton button {
         color: black !important;
         }
+        .logo-img {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 150px;  # Ajustez la taille selon vos besoins
+        }
+        <img src="atalian-logo (1).png" class="logo-img">
         </style>
         """,
         unsafe_allow_html=True
