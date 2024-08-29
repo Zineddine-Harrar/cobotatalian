@@ -59,7 +59,7 @@ def main():
         }
 
         .metric-label {
-            font-size: 1.7em;  /* Augmenté pour s'adapter à la plus grande boîte */
+            font-size: 1.6em;  /* Augmenté pour s'adapter à la plus grande boîte */
             font-weight: bold;
             margin-bottom: 15px;  /* Augmenté pour plus d'espace */
         }
