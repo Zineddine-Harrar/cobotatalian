@@ -10,11 +10,7 @@ import openpyxl
 import io
 import os
 def main():
-    # Ajouter le logo
-    logo = Image.open("atalian-logo (1).png")
-    col1, col2, col3 = st.columns([1,2,1])
-    with col3:
-        st.image(logo, width=100)  # Ajustez la largeur selon vos besoins
+    
     st.markdown(
         """
         <style>
