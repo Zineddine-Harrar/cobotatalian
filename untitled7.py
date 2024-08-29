@@ -77,10 +77,7 @@ def login_section():
 
 # Page de sélection de l'application
 def app_selection_page():
-    st.set_page_config(
-        page_icon="atalian-logo (1).png",  # Remplacez par le chemin de votre icône
-        layout="wide"
-    )
+    st.image("atalian-logo (1).png", width=300)
     st.title("Tableau de bord COBOT ATALIAN")
 
     st.markdown("### Sélectionnez une application")
