@@ -55,6 +55,7 @@ def main():
             display: flex;
             flex-direction: column;
             justify-content: center;
+            overflow: hidden;  /* Cache le débordement */
         }
 
         .metric-label {
@@ -98,6 +99,33 @@ def main():
             color: #fff !important;
         }
         </style>
+        <script>
+        function adjustFontSize() {
+            document.querySelectorAll('.metric-container').forEach(container => {
+                const label = container.querySelector('.metric-label');
+                const value = container.querySelector('.metric-value');
+                const delta = container.querySelector('.metric-delta');
+        
+                let fontSize = 2.6;
+                value.style.fontSize = `${fontSize}em`;
+        
+                while (container.scrollHeight > container.clientHeight && fontSize > 1) {
+                    fontSize -= 0.1;
+                    value.style.fontSize = `${fontSize}em`;
+                }
+        
+                // Ajuster la taille du label et du delta proportionnellement
+                label.style.fontSize = `${fontSize * 0.615}em`;  // 1.6 / 2.6 ≈ 0.615
+                if (delta) {
+                    delta.style.fontSize = `${fontSize * 0.5}em`;  // 1.3 / 2.6 ≈ 0.5
+                }
+            });
+        }
+
+        // Exécuter l'ajustement au chargement et au redimensionnement de la fenêtre
+        window.addEventListener('load', adjustFontSize);
+        window.addEventListener('resize', adjustFontSize);
+        </script>
         """,
         unsafe_allow_html=True
     )
