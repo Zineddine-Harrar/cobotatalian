@@ -1061,7 +1061,13 @@ def main():
     if 'current_app' not in st.session_state:
         st.session_state.current_app = "RQUARTZ IMON"
 
-    GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
+    if "GITHUB_TOKEN" in st.secrets:
+        GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
+    elif "DB_TOKEN" in st.secrets:
+        GITHUB_TOKEN = st.secrets["DB_TOKEN"]
+    else:
+        st.error("Token GitHub non trouvé dans les secrets. Veuillez configurer GITHUB_TOKEN ou DB_TOKEN dans les paramètres de l'application.")
+        st.stop()
     REPO_NAME = "Zineddine-Harrar/cobotatalian"
     BRANCH_NAME = "main"  # ou le nom de votre branche principale
 
