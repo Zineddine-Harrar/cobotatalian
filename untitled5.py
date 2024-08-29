@@ -419,74 +419,37 @@ def main():
         # Afficher les KPI côte à côte
         st.markdown("## **Indicateurs Hebdomadaires**")
 
-        col1, col2, col3, col4, col5, col6 = st.columns(6)
+        # Créer une disposition en grille de 3x2
+        col1, col2, col3 = st.columns(3)
+        col4, col5, col6 = st.columns(3)
+
+        # Fonction helper pour créer un conteneur métrique
+        def metric_container(label, value, delta=None):
+            return f"""
+            <div class="metric-container">
+                <div class="metric-label">{label}</div>
+                <div class="metric-value">{value}</div>
+                {f'<div class="metric-delta">{delta}</div>' if delta else ''}
+            </div>
+            """
 
         with col1:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Heures cumulées</div>
-                    <div class="metric-value">{heures_cumulees:.2f} heures</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            st.markdown(metric_container("Heures cumulées", f"{heures_cumulees:.2f} heures"), unsafe_allow_html=True)
 
         with col2:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Surfaces nettoyées cumulées</div>
-                    <div class="metric-value">{surface_nettoyee:.2f} m²</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            st.markdown(metric_container("Surfaces nettoyées cumulées", f"{surface_nettoyee:.2f} m²"), unsafe_allow_html=True)
 
         with col3:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Productivité moyenne</div>
-                    <div class="metric-value">{productivite_moyenne:.2f} m²/h</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            st.markdown(metric_container("Productivité moyenne", f"{productivite_moyenne:.2f} m²/h"), unsafe_allow_html=True)
 
         with col4:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Vitesse moyenne</div>
-                    <div class="metric-value">{vitesse_moyenne:.2f} km/h</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.markdown(metric_container("Vitesse moyenne", f"{vitesse_moyenne:.2f} km/h"), unsafe_allow_html=True)
 
         with col5:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Coût total</div>
-                    <div class="metric-value">{total_cost:.2f} €</div>
-                    <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.markdown(metric_container("Coût total", f"{total_cost:.2f} €", f"Coût/h: {hourly_cost:.2f} €"), unsafe_allow_html=True)
+
         with col6:
-            st.markdown(
-                f"""
-                <div class="metric-container">
-                    <div class="metric-label">Taux d'utilisation</div>
-                    <div class="metric-value">{utilization_rate:.2f} %</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            
-            )
+            st.markdown(metric_container("Taux d'utilisation", f"{utilization_rate:.2f} %"), unsafe_allow_html=True)
     
 
         # Créer la jauge du taux de suivi
