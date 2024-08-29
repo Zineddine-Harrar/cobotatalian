@@ -46,34 +46,34 @@ def main():
             color: white;
         }
         .metric-container {
-            border-radius: 5px;
+            border-radius: 10px;  /* Augmenté pour un look plus doux avec la taille accrue */
             background-color: #1e1e1e;
-            padding: 20px;  /* Augmenté pour plus d'espace */
-            margin: 10px 0;
+            padding: 30px;  /* Augmenté significativement pour plus d'espace */
+            margin: 15px 0;  /* Augmenté pour plus d'espace entre les boîtes */
             text-align: center;
             color: #fff;
-            min-height: 170px;  /* Augmenté pour accommoder le texte plus grand */
+            min-height: 220px;  /* Augmenté significativement */
             display: flex;
             flex-direction: column;
             justify-content: center;
-        }        
+        }
 
         .metric-label {
-            font-size: 1.4em;  /* Augmenté de 1.2em à 1.4em */
+            font-size: 1.6em;  /* Augmenté pour s'adapter à la plus grande boîte */
             font-weight: bold;
-            margin-bottom: 12px;  /* Augmenté pour plus d'espace */
+            margin-bottom: 15px;  /* Augmenté pour plus d'espace */
         }
 
         .metric-value {
-            font-size: 2.2em;  /* Augmenté de 1.8em à 2.2em */
+            font-size: 2.6em;  /* Augmenté pour une meilleure visibilité dans la grande boîte */
             font-weight: bold;
-            line-height: 1.3;  /* Ajusté pour un meilleur espacement */
+            line-height: 1.4;  /* Ajusté pour un meilleur espacement */
         }
 
         .metric-delta {
-            font-size: 1.1em;  /* Augmenté de 0.9em à 1.1em */
+            font-size: 1.3em;  /* Augmenté proportionnellement */
             color: #28a745;
-            margin-top: 8px;  /* Ajusté pour l'équilibre */
+            margin-top: 12px;  /* Ajusté pour l'équilibre dans la grande boîte */
         }
         .dataframe {
             background-color: #000 !important;
