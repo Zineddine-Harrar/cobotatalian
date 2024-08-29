@@ -46,23 +46,34 @@ def main():
             color: white;
         }
         .metric-container {
-            border-radius: 10px;
+            border-radius: 10px;  /* Augmenté pour un look plus doux avec la taille accrue */
             background-color: #1e1e1e;
-            padding: 20px;
+            padding: 30px;  /* Augmenté significativement pour plus d'espace */
+            margin: 15px 0;  /* Augmenté pour plus d'espace entre les boîtes */
             text-align: center;
             color: #fff;
+            min-height: 220px;  /* Augmenté significativement */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
+
         .metric-label {
-            font-size: 1.5em;
+            font-size: 1.4em;  /* Augmenté pour s'adapter à la plus grande boîte */
             font-weight: bold;
+            margin-bottom: 15px;  /* Augmenté pour plus d'espace */
         }
+
         .metric-value {
-            font-size: 2.5em;
+            font-size: 2.6em;  /* Augmenté pour une meilleure visibilité dans la grande boîte */
             font-weight: bold;
+            line-height: 1.4;  /* Ajusté pour un meilleur espacement */
         }
+
         .metric-delta {
-            font-size: 1.2em;
+            font-size: 1.3em;  /* Augmenté proportionnellement */
             color: #28a745;
+            margin-top: 12px;  /* Ajusté pour l'équilibre dans la grande boîte */
         }
         .dataframe {
             background-color: #000 !important;
@@ -417,8 +428,8 @@ def main():
         # Afficher les KPI côte à côte
         st.markdown("## **Indicateurs Hebdomadaires**")
 
-        col1, col2, col3, col4, col5, col6 = st.columns(6)
-
+        col1, col2, col3 = st.columns(3)
+        col4, col5, col6 = st.columns(3)
         with col1:
             st.markdown(
                 f"""
