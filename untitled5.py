@@ -8,7 +8,7 @@ import plotly.io as pio
 from plotly.subplots import make_subplots
 import openpyxl
 import io
-
+import os
 def main():
 
     st.markdown(
@@ -1058,35 +1058,43 @@ def main():
     if 'current_app' not in st.session_state:
         st.session_state.current_app = "RQUARTZ IMON"
 
-    # Section des actions correctives
-    st.subheader("Actions correctives")
-
-    # Fonction pour charger les actions correctives depuis un fichier Excel
+    # Fonction pour charger les actions correctives
     def load_actions_correctives():
         try:
             df = pd.read_excel('actions_correctives_RQUARTZ_IMON.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
             df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
-            # Convertir la colonne 'Commentaires' en type str
             df['Commentaires'] = df['Commentaires'].astype(str)
+            if 'Fichier joint' not in df.columns:
+                df['Fichier joint'] = ''
             return df
         except FileNotFoundError:
-            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires', 'Fichier joint'])
 
-    # Fonction pour sauvegarder les actions correctives dans un fichier Excel
+    # Fonction pour sauvegarder les actions correctives
     def save_actions_correctives(df):
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
         df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
         df.to_excel('actions_correctives_RQUARTZ_IMON.xlsx', index=False)
-        
-    # Initialiser le state si nécessaire
+
+    # Fonction pour télécharger un fichier
+    def save_uploaded_file(uploaded_file):
+        if uploaded_file is not None:
+            file_path = os.path.join("uploaded_files", uploaded_file.name)
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            return file_path
+        return None
+
+    # Section des actions correctives
+    st.subheader("Actions correctives")
+
     if 'actions_correctives_IMON' not in st.session_state:
         st.session_state.actions_correctives_IMON = load_actions_correctives()
 
     if 'editing_IMON' not in st.session_state:
         st.session_state.editing_IMON = False
 
-    # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
     if len(st.session_state.actions_correctives_IMON) == 0:
         st.session_state.actions_correctives_IMON = pd.DataFrame({
             'Action corrective': ['Action 1 pour RQUARTZ IMON'],
@@ -1094,19 +1102,17 @@ def main():
             'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
             'Responsable Action': ['Responsable 1'],
             'Statut': ['En cours'],
-            'Commentaires': ['Commentaires à faire']
+            'Commentaires': ['Commentaires à faire'],
+            'Fichier joint': ['']
         })
 
-    # Fonction pour basculer le mode d'édition
     def toggle_edit_mode_IMON():
         st.session_state.editing_IMON = not st.session_state.editing_IMON
 
-    # Bouton pour basculer entre le mode d'édition et de visualisation
     st.button("Modifier les actions correctives" if not st.session_state.editing_IMON else "Terminer l'édition", 
               on_click=toggle_edit_mode_IMON, key='toggle_edit_IMON')
 
     if st.session_state.editing_IMON:
-        # Mode d'édition
         edited_df = st.data_editor(
             st.session_state.actions_correctives_IMON,
             num_rows="dynamic",
@@ -1147,11 +1153,26 @@ def main():
                     max_chars=200,
                     width="large",
                 ),
+                "Fichier joint": st.column_config.TextColumn(
+                    "Fichier joint",
+                    help="Nom du fichier joint",
+                    max_chars=200,
+                    width="large",
+                ),
             },
             hide_index=True,
             width=2000,
             key='data_editor_IMON'
         )
+
+        # Widget pour télécharger des fichiers
+        uploaded_file = st.file_uploader("Choisir un fichier à joindre", key="file_uploader_IMON")
+        if uploaded_file is not None:
+            file_path = save_uploaded_file(uploaded_file)
+            if file_path:
+                st.success(f"Fichier téléchargé avec succès: {file_path}")
+                # Ajouter le nom du fichier à la dernière ligne du DataFrame
+                edited_df.iloc[-1, edited_df.columns.get_loc('Fichier joint')] = uploaded_file.name
 
         if st.button("Sauvegarder les modifications", key='save_IMON'):
             st.session_state.actions_correctives_IMON = edited_df
@@ -1159,8 +1180,21 @@ def main():
             st.success("Les actions correctives pour RQUARTZ IMON ont été mises à jour et sauvegardées.")
             st.session_state.editing_IMON = False
     else:
-        # Mode de visualisation
-        st.dataframe(st.session_state.actions_correctives_IMON, width=2000)
+        # Mode de visualisation avec liens pour télécharger les fichiers
+        df_display = st.session_state.actions_correctives_IMON.copy()
+        for index, row in df_display.iterrows():
+            if row['Fichier joint']:
+                file_path = os.path.join("uploaded_files", row['Fichier joint'])
+                if os.path.exists(file_path):
+                    with open(file_path, "rb") as file:
+                        btn = st.download_button(
+                            label=f"Télécharger {row['Fichier joint']}",
+                            data=file,
+                            file_name=row['Fichier joint'],
+                            mime="application/octet-stream",
+                            key=f"download_{index}"
+                        )
+        st.dataframe(df_display, width=2000)
 
     # Bouton pour télécharger le fichier Excel
     if st.button("Télécharger le fichier Excel", key='download_IMON'):
