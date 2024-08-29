@@ -9,6 +9,8 @@ from plotly.subplots import make_subplots
 import openpyxl
 import io
 import os
+from github import Github
+
 def main():
 
     st.markdown(
@@ -1058,7 +1060,25 @@ def main():
     if 'current_app' not in st.session_state:
         st.session_state.current_app = "RQUARTZ IMON"
 
-    # Fonction pour charger les actions correctives
+    GITHUB_TOKEN = "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"
+    REPO_NAME = "Zineddine-Harrar/cobotatalian"
+    BRANCH_NAME = "main"  # ou le nom de votre branche principale
+
+    # Initialisation du client GitHub
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_repo(REPO_NAME)
+
+    def upload_file_to_github(file_content, file_name):
+        try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            unique_file_name = f"uploads/{timestamp}_{file_name}"
+            content = base64.b64encode(file_content).decode()
+            repo.create_file(unique_file_name, f"Upload {file_name}", content, branch=BRANCH_NAME)
+            return f"https://raw.githubusercontent.com/{REPO_NAME}/{BRANCH_NAME}/{unique_file_name}"
+        except Exception as e:
+            st.error(f"Erreur lors du téléchargement du fichier: {e}")
+            return None
+
     def load_actions_correctives():
         try:
             df = pd.read_excel('actions_correctives_RQUARTZ_IMON.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
@@ -1069,22 +1089,20 @@ def main():
                 df['Fichier joint'] = ''
             return df
         except FileNotFoundError:
-            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires', 'Fichier joint'])
+            return pd.DataFrame({
+                'Action corrective': [''],
+                'Date d\'ajout': [datetime.now().date()],
+                'Délai d\'intervention': [datetime.now().date() + timedelta(days=7)],
+                'Responsable Action': [''],
+                'Statut': ['En cours'],
+                'Commentaires': [''],
+                'Fichier joint': ['']
+            })
 
-    # Fonction pour sauvegarder les actions correctives
     def save_actions_correctives(df):
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
         df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
         df.to_excel('actions_correctives_RQUARTZ_IMON.xlsx', index=False)
-
-    # Fonction pour télécharger un fichier
-    def save_uploaded_file(uploaded_file):
-        if uploaded_file is not None:
-            file_path = os.path.join("uploaded_files", uploaded_file.name)
-            with open(file_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-            return file_path
-        return None
 
     # Section des actions correctives
     st.subheader("Actions correctives")
@@ -1155,7 +1173,7 @@ def main():
                 ),
                 "Fichier joint": st.column_config.TextColumn(
                     "Fichier joint",
-                    help="Nom du fichier joint",
+                    help="Lien vers le fichier joint",
                     max_chars=200,
                     width="large",
                 ),
@@ -1168,11 +1186,12 @@ def main():
         # Widget pour télécharger des fichiers
         uploaded_file = st.file_uploader("Choisir un fichier à joindre", key="file_uploader_IMON")
         if uploaded_file is not None:
-            file_path = save_uploaded_file(uploaded_file)
-            if file_path:
-                st.success(f"Fichier téléchargé avec succès: {file_path}")
-                # Ajouter le nom du fichier à la dernière ligne du DataFrame
-                edited_df.iloc[-1, edited_df.columns.get_loc('Fichier joint')] = uploaded_file.name
+            file_content = uploaded_file.read()
+            file_url = upload_file_to_github(file_content, uploaded_file.name)
+            if file_url:
+                st.success(f"Fichier téléchargé avec succès: {file_url}")
+                # Ajouter le lien du fichier à la dernière ligne du DataFrame
+                edited_df.iloc[-1, edited_df.columns.get_loc('Fichier joint')] = file_url
 
         if st.button("Sauvegarder les modifications", key='save_IMON'):
             st.session_state.actions_correctives_IMON = edited_df
@@ -1180,21 +1199,10 @@ def main():
             st.success("Les actions correctives pour RQUARTZ IMON ont été mises à jour et sauvegardées.")
             st.session_state.editing_IMON = False
     else:
-        # Mode de visualisation avec liens pour télécharger les fichiers
+        # Mode de visualisation avec liens cliquables pour les fichiers joints
         df_display = st.session_state.actions_correctives_IMON.copy()
-        for index, row in df_display.iterrows():
-            if row['Fichier joint']:
-                file_path = os.path.join("uploaded_files", row['Fichier joint'])
-                if os.path.exists(file_path):
-                    with open(file_path, "rb") as file:
-                        btn = st.download_button(
-                            label=f"Télécharger {row['Fichier joint']}",
-                            data=file,
-                            file_name=row['Fichier joint'],
-                            mime="application/octet-stream",
-                            key=f"download_{index}"
-                        )
-        st.dataframe(df_display, width=2000)
+        df_display['Fichier joint'] = df_display['Fichier joint'].apply(lambda x: f'<a href="{x}" target="_blank">Voir le fichier</a>' if x else '')
+        st.write(df_display.to_html(escape=False, index=False), unsafe_allow_html=True)
 
     # Bouton pour télécharger le fichier Excel
     if st.button("Télécharger le fichier Excel", key='download_IMON'):
