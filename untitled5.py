@@ -9,9 +9,6 @@ from plotly.subplots import make_subplots
 import openpyxl
 import io
 import os
-from github import Github
-import base64
-
 def main():
 
     st.markdown(
@@ -1061,55 +1058,35 @@ def main():
     if 'current_app' not in st.session_state:
         st.session_state.current_app = "RQUARTZ IMON"
 
-    try:
-        GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
-    except KeyError:
-        st.error("Le token GitHub n'a pas été trouvé dans les secrets. Veuillez vérifier la configuration de vos secrets.")
-        GITHUB_TOKEN = None
+    # Section des actions correctives
+    st.subheader("Actions correctives")
 
-    REPO_NAME = "Zineddine-Harrar/cobotatalian"  # Remplacez par le nom de votre dépôt
-    BRANCH_NAME = "main"  # ou le nom de votre branche principale
-
-    # Initialisation du client GitHub seulement si le token est disponible
-    if GITHUB_TOKEN:
+    # Fonction pour charger les actions correctives depuis un fichier Excel
+    def load_actions_correctives():
         try:
-            g = Github(GITHUB_TOKEN)
-            repo = g.get_repo(REPO_NAME)
-        except Exception as e:
-            st.error(f"Erreur lors de l'initialisation du client GitHub : {e}")
-            repo = None
-    else:
-        repo = None
+            df = pd.read_excel('actions_correctives_RQUARTZ_IMON.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
+            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
+            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
+            # Convertir la colonne 'Commentaires' en type str
+            df['Commentaires'] = df['Commentaires'].astype(str)
+            return df
+        except FileNotFoundError:
+            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
-    def upload_file_to_github(file_content, file_name):
-        if not repo:
-            st.error("Impossible de télécharger le fichier. La connexion à GitHub n'est pas établie.")
-            return None
-    
-        try:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            unique_file_name = f"uploads/{timestamp}_{file_name}"
-            content = base64.b64encode(file_content).decode()
-            repo.create_file(unique_file_name, f"Upload {file_name}", content, branch=BRANCH_NAME)
-            return f"https://raw.githubusercontent.com/{REPO_NAME}/{BRANCH_NAME}/{unique_file_name}"
-        except Exception as e:
-            st.error(f"Erreur lors du téléchargement du fichier: {e}")
-            return None
-
+    # Fonction pour sauvegarder les actions correctives dans un fichier Excel
     def save_actions_correctives(df):
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
         df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
         df.to_excel('actions_correctives_RQUARTZ_IMON.xlsx', index=False)
-    st.write("Secrets disponibles :", list(st.secrets.keys()))
-    # Section des actions correctives
-    st.subheader("Actions correctives")
-
+        
+    # Initialiser le state si nécessaire
     if 'actions_correctives_IMON' not in st.session_state:
         st.session_state.actions_correctives_IMON = load_actions_correctives()
 
     if 'editing_IMON' not in st.session_state:
         st.session_state.editing_IMON = False
 
+    # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
     if len(st.session_state.actions_correctives_IMON) == 0:
         st.session_state.actions_correctives_IMON = pd.DataFrame({
             'Action corrective': ['Action 1 pour RQUARTZ IMON'],
@@ -1117,17 +1094,19 @@ def main():
             'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
             'Responsable Action': ['Responsable 1'],
             'Statut': ['En cours'],
-            'Commentaires': ['Commentaires à faire'],
-            'Fichier joint': ['']
+            'Commentaires': ['Commentaires à faire']
         })
 
+    # Fonction pour basculer le mode d'édition
     def toggle_edit_mode_IMON():
         st.session_state.editing_IMON = not st.session_state.editing_IMON
 
+    # Bouton pour basculer entre le mode d'édition et de visualisation
     st.button("Modifier les actions correctives" if not st.session_state.editing_IMON else "Terminer l'édition", 
               on_click=toggle_edit_mode_IMON, key='toggle_edit_IMON')
 
     if st.session_state.editing_IMON:
+        # Mode d'édition
         edited_df = st.data_editor(
             st.session_state.actions_correctives_IMON,
             num_rows="dynamic",
@@ -1168,27 +1147,11 @@ def main():
                     max_chars=200,
                     width="large",
                 ),
-                "Fichier joint": st.column_config.TextColumn(
-                    "Fichier joint",
-                    help="Lien vers le fichier joint",
-                    max_chars=200,
-                    width="large",
-                ),
             },
             hide_index=True,
             width=2000,
             key='data_editor_IMON'
         )
-
-        # Widget pour télécharger des fichiers
-        uploaded_file = st.file_uploader("Choisir un fichier à joindre", key="file_uploader_IMON")
-        if uploaded_file is not None:
-            file_content = uploaded_file.read()
-            file_url = upload_file_to_github(file_content, uploaded_file.name)
-            if file_url:
-                st.success(f"Fichier téléchargé avec succès: {file_url}")
-                # Ajouter le lien du fichier à la dernière ligne du DataFrame
-                edited_df.iloc[-1, edited_df.columns.get_loc('Fichier joint')] = file_url
 
         if st.button("Sauvegarder les modifications", key='save_IMON'):
             st.session_state.actions_correctives_IMON = edited_df
@@ -1196,10 +1159,8 @@ def main():
             st.success("Les actions correctives pour RQUARTZ IMON ont été mises à jour et sauvegardées.")
             st.session_state.editing_IMON = False
     else:
-        # Mode de visualisation avec liens cliquables pour les fichiers joints
-        df_display = st.session_state.actions_correctives_IMON.copy()
-        df_display['Fichier joint'] = df_display['Fichier joint'].apply(lambda x: f'<a href="{x}" target="_blank">Voir le fichier</a>' if x else '')
-        st.write(df_display.to_html(escape=False, index=False), unsafe_allow_html=True)
+        # Mode de visualisation
+        st.dataframe(st.session_state.actions_correctives_IMON, width=2000)
 
     # Bouton pour télécharger le fichier Excel
     if st.button("Télécharger le fichier Excel", key='download_IMON'):
