@@ -1060,7 +1060,7 @@ def main():
     if 'current_app' not in st.session_state:
         st.session_state.current_app = "RQUARTZ IMON"
 
-    GITHUB_TOKEN = "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"
+    GITHUB_TOKEN = "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"
     REPO_NAME = "Zineddine-Harrar/cobotatalian"
     BRANCH_NAME = "main"  # ou le nom de votre branche principale
 
