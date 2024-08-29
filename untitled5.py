@@ -52,21 +52,26 @@ def main():
             margin: 10px 0;
             text-align: center;
             color: #fff;
+            min-height: 150px;  /* Hauteur minimale pour tous les conteneurs */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .metric-label {
             font-size: 1.2em;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         .metric-value {
-            font-size: 2em;
+            font-size: 1.8em;  /* Légèrement réduit pour s'adapter */
             font-weight: bold;
+            line-height: 1.2;  /* Ajusté pour un meilleur espacement */
         }
 
         .metric-delta {
-            font-size: 1em;
+            font-size: 0.9em;
             color: #28a745;
             margin-top: 5px;
         }
