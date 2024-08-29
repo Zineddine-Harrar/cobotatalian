@@ -10,8 +10,6 @@ import openpyxl
 import io
 import os
 def main():
-    st.set_page_config(layout="wide")
-
     # Ajouter le logo
     logo = Image.open("atalian-logo (1).png")
     col1, col2, col3 = st.columns([1,2,1])
