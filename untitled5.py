@@ -1061,21 +1061,31 @@ def main():
     if 'current_app' not in st.session_state:
         st.session_state.current_app = "RQUARTZ IMON"
 
-    if "GITHUB_TOKEN" in st.secrets:
+    try:
         GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
-    elif "DB_TOKEN" in st.secrets:
-        GITHUB_TOKEN = st.secrets["DB_TOKEN"]
-    else:
-        st.error("Token GitHub non trouvé dans les secrets. Veuillez configurer GITHUB_TOKEN ou DB_TOKEN dans les paramètres de l'application.")
-        st.stop()
-    REPO_NAME = "Zineddine-Harrar/cobotatalian"
+    except KeyError:
+        st.error("Le token GitHub n'a pas été trouvé dans les secrets. Veuillez vérifier la configuration de vos secrets.")
+        GITHUB_TOKEN = None
+
+    REPO_NAME = "Zineddine-Harrar/cobotatalian"  # Remplacez par le nom de votre dépôt
     BRANCH_NAME = "main"  # ou le nom de votre branche principale
 
-    # Initialisation du client GitHub
-    g = Github(GITHUB_TOKEN)
-    repo = g.get_repo(REPO_NAME)
+    # Initialisation du client GitHub seulement si le token est disponible
+    if GITHUB_TOKEN:
+        try:
+            g = Github(GITHUB_TOKEN)
+            repo = g.get_repo(REPO_NAME)
+        except Exception as e:
+            st.error(f"Erreur lors de l'initialisation du client GitHub : {e}")
+            repo = None
+    else:
+        repo = None
 
     def upload_file_to_github(file_content, file_name):
+        if not repo:
+            st.error("Impossible de télécharger le fichier. La connexion à GitHub n'est pas établie.")
+            return None
+    
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             unique_file_name = f"uploads/{timestamp}_{file_name}"
@@ -1085,26 +1095,6 @@ def main():
         except Exception as e:
             st.error(f"Erreur lors du téléchargement du fichier: {e}")
             return None
-
-    def load_actions_correctives():
-        try:
-            df = pd.read_excel('actions_correctives_RQUARTZ_IMON.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
-            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
-            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
-            df['Commentaires'] = df['Commentaires'].astype(str)
-            if 'Fichier joint' not in df.columns:
-                df['Fichier joint'] = ''
-            return df
-        except FileNotFoundError:
-            return pd.DataFrame({
-                'Action corrective': [''],
-                'Date d\'ajout': [datetime.now().date()],
-                'Délai d\'intervention': [datetime.now().date() + timedelta(days=7)],
-                'Responsable Action': [''],
-                'Statut': ['En cours'],
-                'Commentaires': [''],
-                'Fichier joint': ['']
-            })
 
     def save_actions_correctives(df):
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
