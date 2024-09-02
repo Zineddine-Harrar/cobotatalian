@@ -910,15 +910,31 @@ def main():
         # Create the monthly alerts comparison chart
         st.subheader("Comparaison du nombre d'événements signalés par mois")
 
+        # Create a DataFrame with all months
+        all_months = pd.DataFrame({
+            'mois': range(1, 13),
+            'Mois': [mois_dict[i] for i in range(1, 13)]
+        })
+
         # Get the count of alerts for each month
         monthly_alerts = alarm_details_df.groupby('mois')['Description'].count().reset_index()
-        monthly_alerts['Mois'] = monthly_alerts['mois'].map(mois_dict)
+
+        # Merge all months with the actual data
+        monthly_alerts = all_months.merge(monthly_alerts, on='mois', how='left')
+
+        # Fill NaN values with 0 for months without data
+        monthly_alerts['Description'] = monthly_alerts['Description'].fillna(0)
 
         # Create the bar chart
         fig_monthly_alerts = px.bar(monthly_alerts, x='Mois', y='Description', 
-                               title='Nombre de événements signalés par mois',
-                               template='plotly_dark')
-        fig_monthly_alerts.update_layout(xaxis_title="Mois", yaxis_title="Nombre d'événements")
+                            title='Nombre d\'événements signalés par mois',
+                            template='plotly_dark')
+
+        fig_monthly_alerts.update_layout(
+            xaxis_title="Mois", 
+            yaxis_title="Nombre d'événements",
+            xaxis={'categoryorder':'array', 'categoryarray': [mois_dict[i] for i in range(1, 13)]}
+        )
 
         st.plotly_chart(fig_monthly_alerts)
         st.subheader("Description des événements")
