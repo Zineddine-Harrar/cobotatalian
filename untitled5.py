@@ -554,7 +554,7 @@ def main():
         st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(styled_table, width=2000)
 
-    
+        st.subheader('Taux de réalisation par parcours')
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['parcours', 'taux_completion']
