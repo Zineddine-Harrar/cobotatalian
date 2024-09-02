@@ -594,7 +594,7 @@ def main():
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['parcours', 'taux_completion']
 
-        
+        st.subheader('Taux de réalisation par parcours')
         # Créer l'histogramme des taux de complétion par parcours
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
