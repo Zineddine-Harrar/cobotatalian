@@ -617,7 +617,7 @@ def main():
             st.subheader('Taux de Réalisation Mensuel')
             st.plotly_chart(fig_completion_mois)
 
-
+        st.subheader("Comparatif des taux de suivi par mois")
         # Graphique : Taux de suivi des parcours par mois
         all_months_taux_suivi = []
         for month in range(1, 13):
@@ -637,7 +637,7 @@ def main():
                                 template='plotly_dark')
         fig_taux_suivi.update_layout(xaxis_tickangle=-45, xaxis_title="", yaxis=dict(range=[0, 100]))
         st.plotly_chart(fig_taux_suivi)
-
+        st.subheader("Taux de réalisation par parcours")
         # Graphique : Taux de réalisation par parcours
         monthly_data = details_df1[details_df1['mois'] == selected_month]
         completion_rates, _ = calculate_completion_rates(monthly_data)  # Déballage du tuple
@@ -652,18 +652,19 @@ def main():
         fig_hist.update_layout(xaxis_tickangle=-45, xaxis_title="", yaxis=dict(range=[0, 100]))
         st.plotly_chart(fig_hist)
 
+        st.subheader("Comparatif des taux de réalisation par mois")
         # Graphique : Comparatif des taux de réalisation par mois
         all_months_completion_rates = []
         for month in range(1, 13):
             monthly_data = details_df[details_df['mois'] == month]
             _, taux_realisation = calculate_completion_rates(monthly_data)
             all_months_completion_rates.append(taux_realisation)
-
+        
         comparative_df = pd.DataFrame({
             'Mois': list(mois_dict.values()),
             'Taux de réalisation': all_months_completion_rates
         })
-
+        
         fig_comparative = px.bar(comparative_df, x='Mois', y='Taux de réalisation',
                                  title='Comparatif des taux de réalisation des parcours par mois',
                                  labels={'Taux de réalisation': 'Taux de réalisation (%)'},
