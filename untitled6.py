@@ -953,6 +953,7 @@ def main():
         st.plotly_chart(fig_monthly_alerts)
         st.subheader("Description des événements")
         st.dataframe(description_evenements,width=2000)
+        st.subheader("Comparatif des taux de suivi par mois")
         # Récupérer les données de taux de suivi pour tous les mois
         all_months_taux_suivi = []
         for month in range(1, 13):
