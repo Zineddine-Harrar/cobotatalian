@@ -927,8 +927,8 @@ def main():
 
         # Create the bar chart
         fig_monthly_alerts = px.bar(monthly_alerts, x='Mois', y='Description', 
-                            title='Nombre d\'événements signalés par mois',
-                            template='plotly_dark')
+                                    title='Nombre d\'événements signalés par mois',
+                                    template='plotly_dark')
 
         fig_monthly_alerts.update_layout(
             xaxis_title="Mois", 
