@@ -406,7 +406,7 @@ def main():
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
             value=weekly_completion_rate,
-            title={'text': "Taux de Complétion Hebdomadaire"},
+            title={'text': "Taux de réalisation Hebdomadaire"},
             gauge={
                 'axis': {'range': [None, 100]},
                 'steps': [
@@ -431,7 +431,7 @@ def main():
             st.plotly_chart(fig_suivi)
 
         with col2:
-            st.subheader('Taux de Complétion')
+            st.subheader('Taux de réalisation')
             st.plotly_chart(fig_completion)
 
         # Appliquer le style conditionnel
@@ -461,7 +461,7 @@ def main():
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
-        st.subheader('Taux de Complétion Hebdomadaire par Parcours')
+        st.subheader('Taux de réalisation Hebdomadaire par Parcours')
         # Créer l'histogramme des taux de complétion par parcours
         fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
                           title='Taux de Complétion Hebdomadaire par Parcours',
