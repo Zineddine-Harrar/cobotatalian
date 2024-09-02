@@ -461,10 +461,10 @@ def main():
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
-        st.subheader('Taux de réalisation Hebdomadaire par Parcours')
+        st.subheader('Taux de réalisation  par Parcours')
         # Créer l'histogramme des taux de complétion par parcours
         fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
-                          title='Taux de Complétion Hebdomadaire par Parcours',
+                          title='Taux de réalisation par Parcours',
                           labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Complétion (%)'},
                           template='plotly_dark')
         # Ajouter une ligne horizontale à 90%
