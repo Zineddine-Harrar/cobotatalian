@@ -385,7 +385,7 @@ def main():
         fig_suivi = go.Figure(go.Indicator(
             mode="gauge+number",
             value=taux_suivi,
-            title={'text': "Taux de Suivi"},
+            title={'text': "Taux de Suivi des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
                 'steps': [
@@ -406,7 +406,7 @@ def main():
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
             value=weekly_completion_rate,
-            title={'text': "Taux de réalisation Hebdomadaire"},
+            title={'text': "Taux de réalisation des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
                 'steps': [
@@ -427,11 +427,11 @@ def main():
         col1, col2 = st.columns(2)
 
         with col1:
-            st.subheader('Taux de Suivi')
+            st.subheader('Taux de Suivi des parcours')
             st.plotly_chart(fig_suivi)
 
         with col2:
-            st.subheader('Taux de réalisation')
+            st.subheader('Taux de réalisation des parcours')
             st.plotly_chart(fig_completion)
 
         # Appliquer le style conditionnel
