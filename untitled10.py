@@ -461,7 +461,7 @@ def main():
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['cleaning_plan', 'task_completion_(%)']
-        
+        st.subheader('Taux de Complétion Hebdomadaire par Parcours')
         # Créer l'histogramme des taux de complétion par parcours
         fig_hist = px.bar(completion_rates_df, x='cleaning_plan', y='task_completion_(%)',
                           title='Taux de Complétion Hebdomadaire par Parcours',
