@@ -682,26 +682,23 @@ def main():
         st.session_state.current_app = "ECOBOT 40"
     st.subheader("Actions correctives")
 
-    EXCEL_FILE_PATH = Path(os.getcwd()) / 'actions_correctives_ECOBOT40 (1).xlsx'
+    # Chemin du fichier CSV (on utilise CSV au lieu d'Excel pour plus de simplicité)
+    CSV_FILE_PATH = Path(os.getcwd()) / 'actions_correctives_ECOBOT40.csv'
 
     def log_debug(message):
-        st.write(f"DEBUG: {message}")
+        st.sidebar.text(f"DEBUG: {message}")
 
-    # Fonction pour charger les actions correctives depuis le fichier Excel existant
     def load_actions_correctives():
-        log_debug(f"Tentative de chargement du fichier: {EXCEL_FILE_PATH}")
+        log_debug(f"Tentative de chargement du fichier: {CSV_FILE_PATH}")
         try:
-            if not os.path.exists(EXCEL_FILE_PATH):
-                log_debug(f"Le fichier n'existe pas: {EXCEL_FILE_PATH}")
+            if not CSV_FILE_PATH.exists():
+                log_debug(f"Le fichier n'existe pas: {CSV_FILE_PATH}")
                 return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
-            df = pd.read_excel(EXCEL_FILE_PATH, engine='openpyxl')
+            df = pd.read_csv(CSV_FILE_PATH)
+            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
+            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
             log_debug(f"Fichier chargé avec succès. Nombre de lignes: {len(df)}")
-        
-            date_columns = ['Date d\'ajout', 'Délai d\'intervention']
-            for col in date_columns:
-                df[col] = pd.to_datetime(df[col], errors='coerce').dt.date
-
             return df
         except Exception as e:
             log_debug(f"Erreur lors du chargement du fichier: {str(e)}")
@@ -709,139 +706,112 @@ def main():
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
     def save_actions_correctives(df):
-        log_debug(f"Tentative de sauvegarde dans le fichier: {EXCEL_FILE_PATH}")
+        log_debug(f"Tentative de sauvegarde dans le fichier CSV: {CSV_FILE_PATH}")
         try:
-            # Vérifier les permissions
-            if EXCEL_FILE_PATH.exists():
-                if not os.access(EXCEL_FILE_PATH, os.W_OK):
-                    log_debug(f"Pas de permission d'écriture pour {EXCEL_FILE_PATH}")
-                    return False
-            else:
-                if not os.access(EXCEL_FILE_PATH.parent, os.W_OK):
-                    log_debug(f"Pas de permission d'écriture pour le dossier {EXCEL_FILE_PATH.parent}")
-                    return False
-
-            # Convertir les colonnes de date
-            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
-            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
-        
-            # Tentative de sauvegarde
-            df.to_excel(EXCEL_FILE_PATH, index=False, engine='openpyxl')
-        
-            # Vérification post-sauvegarde
-            if EXCEL_FILE_PATH.exists():
-                log_debug(f"Fichier sauvegardé. Taille: {EXCEL_FILE_PATH.stat().st_size} bytes")
-                # Lecture de vérification
-                verification_df = pd.read_excel(EXCEL_FILE_PATH)
-                if len(verification_df) == len(df):
-                    log_debug("Vérification réussie: le nombre de lignes correspond.")
-                else:
-                    log_debug(f"Incohérence: {len(df)} lignes sauvegardées, {len(verification_df)} lues.")
-                return True
-            else:
-                log_debug("Le fichier n'existe pas après la tentative de sauvegarde!")
-                return False
-
+            df['Date d\'ajout'] = df['Date d\'ajout'].astype(str)
+            df['Délai d\'intervention'] = df['Délai d\'intervention'].astype(str)
+            df.to_csv(CSV_FILE_PATH, index=False)
+            log_debug(f"Données sauvegardées avec succès. Taille du fichier: {CSV_FILE_PATH.stat().st_size} bytes")
+            return True
         except Exception as e:
             log_debug(f"Erreur lors de la sauvegarde: {str(e)}")
             log_debug(f"Traceback: {traceback.format_exc()}")
             return False
 
+    def actions_correctives_section():
+      st.subheader("Actions correctives")
 
-    # Initialiser ou mettre à jour le state
-    if 'actions_correctives_ECOBOT40' not in st.session_state or st.button("Recharger les données"):
-        st.session_state.actions_correctives_ECOBOT40 = load_actions_correctives()
+        # Initialiser ou mettre à jour le state
+        if 'actions_correctives_ECOBOT40' not in st.session_state or st.button("Recharger les données"):
+            st.session_state.actions_correctives_ECOBOT40 = load_actions_correctives()
 
-    if 'editing_ECOBOT40' not in st.session_state:
-        st.session_state.editing_ECOBOT40 = False
+        if 'editing_ECOBOT40' not in st.session_state:
+            st.session_state.editing_ECOBOT40 = False
 
-    # Fonction pour basculer le mode d'édition
-    def toggle_edit_mode_ECOBOT40():
-        st.session_state.editing_ECOBOT40 = not st.session_state.editing_ECOBOT40
+        # Fonction pour basculer le mode d'édition
+        def toggle_edit_mode_ECOBOT40():
+            st.session_state.editing_ECOBOT40 = not st.session_state.editing_ECOBOT40
 
-    # Bouton pour basculer entre le mode d'édition et de visualisation
-    st.button("Modifier les actions correctives" if not st.session_state.editing_ECOBOT40 else "Terminer l'édition", 
-              on_click=toggle_edit_mode_ECOBOT40, key='toggle_edit_ECOBOT40')
+        # Bouton pour basculer entre le mode d'édition et de visualisation
+        st.button("Modifier les actions correctives" if not st.session_state.editing_ECOBOT40 else "Terminer l'édition", 
+                  on_click=toggle_edit_mode_ECOBOT40, key='toggle_edit_ECOBOT40')
 
-    if st.session_state.editing_ECOBOT40:
-        # Mode d'édition
-        edited_df = st.data_editor(
-            st.session_state.actions_correctives_ECOBOT40,
-            num_rows="dynamic",
-            column_config={
-                "Action corrective": st.column_config.TextColumn(
-                    "Action corrective",
-                    help="Décrivez l'action corrective",
-                    max_chars=100,
-                    width="large",
-                ),
-                "Date d'ajout": st.column_config.DateColumn(
-                    "Date d'ajout",
-                    help="Date d'ajout de l'action",
-                    format="DD/MM/YYYY",
-                    width="medium",
-                ),
-                "Délai d'intervention": st.column_config.DateColumn(
-                    "Délai d'intervention",
-                    help="Date limite pour l'action",
-                    format="DD/MM/YYYY",
-                    width="medium",
-                ),
-                "Responsable Action": st.column_config.TextColumn(
-                    "Responsable Action",
-                    help="Personne responsable de l'action",
-                    max_chars=50,
-                    width="medium",
-                ),
-                "Statut": st.column_config.SelectboxColumn(
-                    "Statut",
-                    help="Statut actuel de l'action",
-                    options=['En cours', 'Terminé', 'En retard'],
-                    width="small",
-                ),
-                "Commentaires": st.column_config.TextColumn(
-                    "Commentaires",
-                    help="Commentaires additionnels",
-                    max_chars=200,
-                    width="large",
-                ),
-            },
-            hide_index=True,
-            width=2000,
-            key='data_editor_ECOBOT40'
-        )
+        if st.session_state.editing_ECOBOT40:
+            # Mode d'édition
+            edited_df = st.data_editor(
+                st.session_state.actions_correctives_ECOBOT40,
+                num_rows="dynamic",
+                column_config={
+                    "Action corrective": st.column_config.TextColumn(
+                        "Action corrective",
+                        help="Décrivez l'action corrective",
+                        max_chars=100,
+                        width="large",
+                    ),
+                    "Date d'ajout": st.column_config.DateColumn(
+                        "Date d'ajout",
+                        help="Date d'ajout de l'action",
+                        format="DD/MM/YYYY",
+                        width="medium",
+                    ),
+                    "Délai d'intervention": st.column_config.DateColumn(
+                        "Délai d'intervention",
+                        help="Date limite pour l'action",
+                        format="DD/MM/YYYY",
+                        width="medium",
+                    ),
+                    "Responsable Action": st.column_config.TextColumn(
+                        "Responsable Action",
+                        help="Personne responsable de l'action",
+                        max_chars=50,
+                        width="medium",
+                    ),
+                    "Statut": st.column_config.SelectboxColumn(
+                        "Statut",
+                        help="Statut actuel de l'action",
+                        options=['En cours', 'Terminé', 'En retard'],
+                        width="small",
+                    ),
+                    "Commentaires": st.column_config.TextColumn(
+                        "Commentaires",
+                        help="Commentaires additionnels",
+                        max_chars=200,
+                        width="large",
+                    ),
+                },
+                hide_index=True,
+                width=2000,
+                key='data_editor_ECOBOT40'
+            )
 
-        if st.button("Sauvegarder les modifications", key='save_ECOBOT40'):
             if st.button("Sauvegarder les modifications", key='save_ECOBOT40'):
-                if save_actions_correctives(st.session_state.actions_correctives_ECOBOT40):
+                if save_actions_correctives(edited_df):
+                    st.session_state.actions_correctives_ECOBOT40 = edited_df
                     st.success("Modifications sauvegardées avec succès!")
+                    st.session_state.editing_ECOBOT40 = False
                 else:
                     st.error("Erreur lors de la sauvegarde. Veuillez vérifier les logs de débogage.")
+        else:
+            # Mode de visualisation
+            st.dataframe(st.session_state.actions_correctives_ECOBOT40, width=2000)
 
-    else:
-        # Mode de visualisation
-        st.dataframe(st.session_state.actions_correctives_ECOBOT40, width=2000)
-
-    # Bouton pour télécharger le fichier Excel
-    if st.button("Télécharger le fichier Excel", key='download_ECOBOT40'):
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            st.session_state.actions_correctives_ECOBOT40.to_excel(writer, index=False)
-            output.seek(0)
+        # Bouton pour télécharger le fichier CSV
+        if st.button("Télécharger le fichier CSV", key='download_ECOBOT40'):
+            csv = st.session_state.actions_correctives_ECOBOT40.to_csv(index=False)
             st.download_button(
-            label="Cliquez ici pour télécharger",
-            data=output,
-            file_name="actions_correctives_ECOBOT40.xlsx",
-            key="download_button_ECOBOT40",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+                label="Cliquez ici pour télécharger",
+                data=csv,
+                file_name="actions_correctives_ECOBOT40.csv",
+                mime="text/csv"
+            )
 
-    st.write("Chemin absolu du fichier Excel:", EXCEL_FILE_PATH)
-    st.write("Le fichier existe:", EXCEL_FILE_PATH.exists())
-    if EXCEL_FILE_PATH.exists():
-        st.write("Taille du fichier:", EXCEL_FILE_PATH.stat().st_size, "bytes")
-        st.write("Dernière modification:", EXCEL_FILE_PATH.stat().st_mtime)
-    st.write("Répertoire de travail actuel:", os.getcwd())
-    st.write("Permissions du répertoire parent:", oct(os.stat(EXCEL_FILE_PATH.parent).st_mode))
+        # Informations de débogage
+        st.sidebar.subheader("Informations de débogage")
+        st.sidebar.text(f"Chemin du fichier: {CSV_FILE_PATH}")
+        st.sidebar.text(f"Le fichier existe: {CSV_FILE_PATH.exists()}")
+        if CSV_FILE_PATH.exists():
+            st.sidebar.text(f"Taille du fichier: {CSV_FILE_PATH.stat().st_size} bytes")
+            st.sidebar.text(f"Dernière modification: {datetime.fromtimestamp(CSV_FILE_PATH.stat().st_mtime)}")
+        st.sidebar.text(f"Répertoire actuel: {os.getcwd()}")
 if __name__ == '__main__':
     main()
