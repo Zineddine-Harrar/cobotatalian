@@ -719,7 +719,7 @@ def main():
             return False
 
     def actions_correctives_section():
-      st.subheader("Actions correctives")
+        st.subheader("Actions correctives")
 
         # Initialiser ou mettre à jour le state
         if 'actions_correctives_ECOBOT40' not in st.session_state or st.button("Recharger les données"):
