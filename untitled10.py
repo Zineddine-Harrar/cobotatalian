@@ -813,5 +813,7 @@ def main():
             st.sidebar.text(f"Taille du fichier: {CSV_FILE_PATH.stat().st_size} bytes")
             st.sidebar.text(f"Dernière modification: {datetime.fromtimestamp(CSV_FILE_PATH.stat().st_mtime)}")
         st.sidebar.text(f"Répertoire actuel: {os.getcwd()}")
+    actions_correctives_section()
+
 if __name__ == '__main__':
     main()
