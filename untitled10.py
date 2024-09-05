@@ -696,8 +696,8 @@ def main():
                 return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
             df = pd.read_csv(CSV_FILE_PATH)
-            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
-            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
+            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'], errors='coerce')
+            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'], errors='coerce')
             log_debug(f"Fichier chargé avec succès. Nombre de lignes: {len(df)}")
             return df
         except Exception as e:
@@ -708,8 +708,8 @@ def main():
     def save_actions_correctives(df):
         log_debug(f"Tentative de sauvegarde dans le fichier CSV: {CSV_FILE_PATH}")
         try:
-            df['Date d\'ajout'] = df['Date d\'ajout'].astype(str)
-            df['Délai d\'intervention'] = df['Délai d\'intervention'].astype(str)
+            df['Date d\'ajout'] = df['Date d\'ajout'].dt.strftime('%Y-%m-%d')
+            df['Délai d\'intervention'] = df['Délai d\'intervention'].dt.strftime('%Y-%m-%d')
             df.to_csv(CSV_FILE_PATH, index=False)
             log_debug(f"Données sauvegardées avec succès. Taille du fichier: {CSV_FILE_PATH.stat().st_size} bytes")
             return True
@@ -751,13 +751,13 @@ def main():
                     "Date d'ajout": st.column_config.DateColumn(
                         "Date d'ajout",
                         help="Date d'ajout de l'action",
-                        format="DD/MM/YYYY",
+                        format="YYYY-MM-DD",
                         width="medium",
                     ),
                     "Délai d'intervention": st.column_config.DateColumn(
                         "Délai d'intervention",
                         help="Date limite pour l'action",
-                        format="DD/MM/YYYY",
+                        format="YYYY-MM-DD",
                         width="medium",
                     ),
                     "Responsable Action": st.column_config.TextColumn(
