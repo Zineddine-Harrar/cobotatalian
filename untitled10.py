@@ -812,13 +812,12 @@ def main():
         )
 
         if st.button("Sauvegarder les modifications", key='save_ECOBOT40'):
-            if save_actions_correctives(edited_df):
-                st.session_state.actions_correctives_ECOBOT40 = edited_df
-                st.session_state.editing_ECOBOT40 = False
-                st.success("Modifications sauvegardées avec succès!")
-                st.rerun()
-            else:
-                st.error("Erreur lors de la sauvegarde. Veuillez vérifier les logs de débogage.")
+            if st.button("Sauvegarder les modifications", key='save_ECOBOT40'):
+                if save_actions_correctives(st.session_state.actions_correctives_ECOBOT40):
+                    st.success("Modifications sauvegardées avec succès!")
+                else:
+                    st.error("Erreur lors de la sauvegarde. Veuillez vérifier les logs de débogage.")
+
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_ECOBOT40, width=2000)
