@@ -673,6 +673,58 @@ def main():
         fig_comparative.update_layout(xaxis_title="", yaxis=dict(range=[0, 100]))
         st.plotly_chart(fig_comparative)
 
+    def create_initial_excel_file():
+        # Créer un DataFrame avec des données d'exemple
+        data = {
+            'Action corrective': [
+                'Vérifier les capteurs du robot',
+                'Mettre à jour le logiciel de navigation',
+                'Nettoyer les roues du robot',
+                'Calibrer les systèmes de détection d\'obstacles'
+            ],
+            'Date d\'ajout': [
+                datetime.now().date(),
+                (datetime.now() - timedelta(days=5)).date(),
+                (datetime.now() - timedelta(days=10)).date(),
+                (datetime.now() - timedelta(days=15)).date()
+            ],
+            'Délai d\'intervention': [
+                (datetime.now() + timedelta(days=7)).date(),
+                (datetime.now() + timedelta(days=3)).date(),
+                (datetime.now() + timedelta(days=1)).date(),
+                (datetime.now() - timedelta(days=5)).date()
+            ],
+            'Responsable Action': [
+                'Technicien A',
+                'Ingénieur Logiciel',
+                'Équipe de maintenance',
+                'Technicien B'
+            ],
+            'Statut': [
+                'En cours',
+                'En cours',
+                'Terminé',
+                'En retard'
+            ],
+            'Commentaires': [
+                'Problèmes de détection intermittents',
+                'Nouvelles fonctionnalités de cartographie à implémenter',
+                'Nettoyage mensuel de routine effectué',
+                'Retard dû à l\'attente de pièces de rechange'
+            ]
+        }
+
+        df = pd.DataFrame(data)
+
+        # Sauvegarder le DataFrame dans un fichier Excel
+        file_name = 'actions_correctives_ECOBOT40.xlsx'
+        df.to_excel(file_name, index=False)
+        print(f"Fichier '{file_name}' créé avec succès avec des données d'exemple.")
+
+    # Appeler la fonction pour créer le fichier
+    create_initial_excel_file()
+
+    
     if 'current_app' not in st.session_state:
         st.session_state.current_app = "ECOBOT 40"
     st.subheader("Actions correctives")
