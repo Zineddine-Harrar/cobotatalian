@@ -685,20 +685,35 @@ def main():
     # Fonction pour charger les actions correctives depuis le fichier Excel existant
     def load_actions_correctives():
         try:
-            df = pd.read_excel(EXCEL_FILE_PATH, parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
-            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
-            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
+            # Vérifier si le fichier existe
+            if not os.path.exists(EXCEL_FILE_PATH):
+                st.error(f"Le fichier {EXCEL_FILE_PATH} n'existe pas.")
+                return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+
+            # Lire le fichier Excel
+            df = pd.read_excel(EXCEL_FILE_PATH, engine='openpyxl')
+            
+            # Convertir les colonnes de date
+            date_columns = ['Date d\'ajout', 'Délai d\'intervention']
+            for col in date_columns:
+                df[col] = pd.to_datetime(df[col], errors='coerce').dt.date
+
+            st.success(f"Fichier {EXCEL_FILE_PATH} chargé avec succès.")
+            st.write("Aperçu des données chargées:", df.head())
             return df
-        except FileNotFoundError:
-            st.error(f"Le fichier {EXCEL_FILE_PATH} n'a pas été trouvé. Veuillez vérifier le chemin du fichier.")
+        except Exception as e:
+            st.error(f"Erreur lors du chargement du fichier: {str(e)}")
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
     # Fonction pour sauvegarder les actions correctives dans le fichier Excel existant
     def save_actions_correctives(df):
-        df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
-        df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
-        df.to_excel(EXCEL_FILE_PATH, index=False)
-        st.success(f"Les modifications ont été sauvegardées dans {EXCEL_FILE_PATH}")
+        try:
+            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
+            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
+            df.to_excel(EXCEL_FILE_PATH, index=False, engine='openpyxl')
+            st.success(f"Les modifications ont été sauvegardées dans {EXCEL_FILE_PATH}")
+        except Exception as e:
+            st.error(f"Erreur lors de la sauvegarde du fichier: {str(e)}")
 
     # Initialiser le state si nécessaire
     if 'actions_correctives_ECOBOT40' not in st.session_state:
@@ -767,6 +782,7 @@ def main():
             st.session_state.actions_correctives_ECOBOT40 = edited_df
             save_actions_correctives(edited_df)
             st.session_state.editing_ECOBOT40 = False
+            st.experimental_rerun()  # Recharger la page pour refléter les changements
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_ECOBOT40, width=2000)
@@ -784,5 +800,8 @@ def main():
             key="download_button_ECOBOT40",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
+    # Afficher le chemin absolu du fichier pour le débogage
+    st.write("Chemin absolu du fichier Excel:", os.path.abspath(EXCEL_FILE_PATH))
 if __name__ == '__main__':
     main()
