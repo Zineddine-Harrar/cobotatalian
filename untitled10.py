@@ -680,8 +680,7 @@ def main():
         st.session_state.current_app = "ECOBOT 40"
     st.subheader("Actions correctives")
 
-    # Modifiez la définition du chemin du fichier Excel
-    EXCEL_FILE_PATH = os.path.join(os.getcwd(), 'actions_correctives_ECOBOT40 (1).xlsx')
+    EXCEL_FILE_PATH = Path(os.getcwd()) / 'actions_correctives_ECOBOT40 (1).xlsx'
 
     def log_debug(message):
         st.write(f"DEBUG: {message}")
@@ -707,30 +706,42 @@ def main():
             log_debug(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
-    # Mettez à jour la fonction de sauvegarde
     def save_actions_correctives(df):
         log_debug(f"Tentative de sauvegarde dans le fichier: {EXCEL_FILE_PATH}")
         try:
+            # Vérifier les permissions
+            if EXCEL_FILE_PATH.exists():
+                if not os.access(EXCEL_FILE_PATH, os.W_OK):
+                    log_debug(f"Pas de permission d'écriture pour {EXCEL_FILE_PATH}")
+                    return False
+            else:
+                if not os.access(EXCEL_FILE_PATH.parent, os.W_OK):
+                    log_debug(f"Pas de permission d'écriture pour le dossier {EXCEL_FILE_PATH.parent}")
+                    return False
+
+            # Convertir les colonnes de date
             df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
         
-            # Vérifier si le répertoire existe, sinon le créer
-            directory = os.path.dirname(EXCEL_FILE_PATH)
-            if directory and not os.path.exists(directory):
-                os.makedirs(directory)
-            
+            # Tentative de sauvegarde
             df.to_excel(EXCEL_FILE_PATH, index=False, engine='openpyxl')
-            log_debug(f"Sauvegarde réussie. Nombre de lignes sauvegardées: {len(df)}")
         
-            # Vérifications post-sauvegarde
-            if os.path.exists(EXCEL_FILE_PATH):
-                log_debug(f"Le fichier existe après la sauvegarde. Taille: {os.path.getsize(EXCEL_FILE_PATH)} bytes")
+            # Vérification post-sauvegarde
+            if EXCEL_FILE_PATH.exists():
+                log_debug(f"Fichier sauvegardé. Taille: {EXCEL_FILE_PATH.stat().st_size} bytes")
+                # Lecture de vérification
+                verification_df = pd.read_excel(EXCEL_FILE_PATH)
+                if len(verification_df) == len(df):
+                    log_debug("Vérification réussie: le nombre de lignes correspond.")
+                else:
+                    log_debug(f"Incohérence: {len(df)} lignes sauvegardées, {len(verification_df)} lues.")
+                return True
             else:
                 log_debug("Le fichier n'existe pas après la tentative de sauvegarde!")
-        
-            return True
+                return False
+
         except Exception as e:
-            log_debug(f"Erreur lors de la sauvegarde du fichier: {str(e)}")
+            log_debug(f"Erreur lors de la sauvegarde: {str(e)}")
             log_debug(f"Traceback: {traceback.format_exc()}")
             return False
 
