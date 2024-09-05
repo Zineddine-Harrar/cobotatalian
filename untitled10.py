@@ -824,7 +824,7 @@ def main():
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-   st.write("Chemin absolu du fichier Excel:", EXCEL_FILE_PATH)
+    st.write("Chemin absolu du fichier Excel:", EXCEL_FILE_PATH)
     st.write("Le fichier existe:", os.path.exists(EXCEL_FILE_PATH))
     if os.path.exists(EXCEL_FILE_PATH):
         st.write("Taille du fichier:", os.path.getsize(EXCEL_FILE_PATH), "bytes")
