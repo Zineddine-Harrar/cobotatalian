@@ -679,21 +679,26 @@ def main():
         st.session_state.current_app = "ECOBOT 40"
     st.subheader("Actions correctives")
 
-    # Fonction pour charger les actions correctives depuis un fichier Excel
+    # Chemin vers le fichier Excel dans votre dépôt Git
+    EXCEL_FILE_PATH = 'data/actions_correctives_ECOBOT40.xlsx'
+
+    # Fonction pour charger les actions correctives depuis le fichier Excel existant
     def load_actions_correctives():
         try:
-            df = pd.read_excel('actions_correctives_ECOBOT40 (1).xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
+            df = pd.read_excel(EXCEL_FILE_PATH, parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
             df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
             return df
         except FileNotFoundError:
+            st.error(f"Le fichier {EXCEL_FILE_PATH} n'a pas été trouvé. Veuillez vérifier le chemin du fichier.")
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
-    # Fonction pour sauvegarder les actions correctives dans un fichier Excel
+    # Fonction pour sauvegarder les actions correctives dans le fichier Excel existant
     def save_actions_correctives(df):
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
         df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
-        df.to_excel('actions_correctives_ECOBOT40 (1).xlsx', index=False)
+        df.to_excel(EXCEL_FILE_PATH, index=False)
+        st.success(f"Les modifications ont été sauvegardées dans {EXCEL_FILE_PATH}")
 
     # Initialiser le state si nécessaire
     if 'actions_correctives_ECOBOT40' not in st.session_state:
@@ -701,17 +706,6 @@ def main():
 
     if 'editing_ECOBOT40' not in st.session_state:
         st.session_state.editing_ECOBOT40 = False
-
-    # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
-    if len(st.session_state.actions_correctives_ECOBOT40) == 0:
-        st.session_state.actions_correctives_ECOBOT40 = pd.DataFrame({
-            'Action corrective': ['Action 1 pour ECOBOT 40'],
-            'Date d\'ajout': [datetime.now().date()],
-            'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
-            'Responsable Action': ['Responsable 1'],
-            'Statut': ['En cours'],
-            'Commentaires': ['Commentaires à faire']
-        })
 
     # Fonction pour basculer le mode d'édition
     def toggle_edit_mode_ECOBOT40():
@@ -772,7 +766,6 @@ def main():
         if st.button("Sauvegarder les modifications", key='save_ECOBOT40'):
             st.session_state.actions_correctives_ECOBOT40 = edited_df
             save_actions_correctives(edited_df)
-            st.success("Les actions correctives pour ECOBOT 40 ont été mises à jour et sauvegardées.")
             st.session_state.editing_ECOBOT40 = False
     else:
         # Mode de visualisation
