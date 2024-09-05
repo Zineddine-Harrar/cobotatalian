@@ -819,7 +819,7 @@ def main():
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             st.session_state.actions_correctives_ECOBOT40.to_excel(writer, index=False)
-        output.seek(0)
+            output.seek(0)
             st.download_button(
             label="Cliquez ici pour télécharger",
             data=output,
