@@ -712,6 +712,8 @@ def main():
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
             df.to_excel(EXCEL_FILE_PATH, index=False, engine='openpyxl')
             st.success(f"Les modifications ont été sauvegardées dans {EXCEL_FILE_PATH}")
+            # Recharger les données pour s'assurer que les changements sont reflétés
+            st.session_state.actions_correctives_ECOBOT40 = load_actions_correctives()
         except Exception as e:
             st.error(f"Erreur lors de la sauvegarde du fichier: {str(e)}")
 
