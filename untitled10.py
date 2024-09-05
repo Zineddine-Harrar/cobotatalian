@@ -9,6 +9,7 @@ from plotly.subplots import make_subplots
 import openpyxl
 import io
 import os
+import traceback
 def main():
     st.markdown(
         """
@@ -679,8 +680,8 @@ def main():
         st.session_state.current_app = "ECOBOT 40"
     st.subheader("Actions correctives")
 
-    # Chemin vers le fichier Excel dans votre dépôt Git
-    EXCEL_FILE_PATH = 'actions_correctives_ECOBOT40 (1).xlsx'
+    # Modifiez la définition du chemin du fichier Excel
+    EXCEL_FILE_PATH = os.path.join(os.getcwd(), 'actions_correctives_ECOBOT40 (1).xlsx')
 
     def log_debug(message):
         st.write(f"DEBUG: {message}")
@@ -706,7 +707,7 @@ def main():
             log_debug(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
-    # Fonction pour sauvegarder les actions correctives dans le fichier Excel existant
+    # Mettez à jour la fonction de sauvegarde
     def save_actions_correctives(df):
         log_debug(f"Tentative de sauvegarde dans le fichier: {EXCEL_FILE_PATH}")
         try:
@@ -714,23 +715,18 @@ def main():
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
         
             # Vérifier si le répertoire existe, sinon le créer
-            os.makedirs(os.path.dirname(EXCEL_FILE_PATH), exist_ok=True)
-        
+            directory = os.path.dirname(EXCEL_FILE_PATH)
+            if directory and not os.path.exists(directory):
+                os.makedirs(directory)
+            
             df.to_excel(EXCEL_FILE_PATH, index=False, engine='openpyxl')
             log_debug(f"Sauvegarde réussie. Nombre de lignes sauvegardées: {len(df)}")
-            
-            # Vérifier si le fichier a été créé/modifié
+        
+            # Vérifications post-sauvegarde
             if os.path.exists(EXCEL_FILE_PATH):
                 log_debug(f"Le fichier existe après la sauvegarde. Taille: {os.path.getsize(EXCEL_FILE_PATH)} bytes")
             else:
                 log_debug("Le fichier n'existe pas après la tentative de sauvegarde!")
-        
-            # Recharger pour vérifier
-            reloaded_df = load_actions_correctives()
-            if len(reloaded_df) == len(df):
-                log_debug("Les données rechargées correspondent aux données sauvegardées.")
-            else:
-                log_debug(f"Incohérence: {len(df)} lignes sauvegardées, {len(reloaded_df)} lignes rechargées.")
         
             return True
         except Exception as e:
@@ -828,11 +824,11 @@ def main():
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-    # Afficher des informations de débogage
-    st.write("Chemin absolu du fichier Excel:", EXCEL_FILE_PATH)
+   st.write("Chemin absolu du fichier Excel:", EXCEL_FILE_PATH)
     st.write("Le fichier existe:", os.path.exists(EXCEL_FILE_PATH))
     if os.path.exists(EXCEL_FILE_PATH):
         st.write("Taille du fichier:", os.path.getsize(EXCEL_FILE_PATH), "bytes")
         st.write("Dernière modification:", datetime.fromtimestamp(os.path.getmtime(EXCEL_FILE_PATH)))
+    st.write("Répertoire de travail actuel:", os.getcwd())
 if __name__ == '__main__':
     main()
