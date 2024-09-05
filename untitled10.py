@@ -682,7 +682,7 @@ def main():
     # Fonction pour charger les actions correctives depuis un fichier Excel
     def load_actions_correctives():
         try:
-            df = pd.read_excel('actions_correctives_ECOBOT40.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
+            df = pd.read_excel('actions_correctives_ECOBOT40 (1).xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
             df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
             return df
@@ -693,7 +693,7 @@ def main():
     def save_actions_correctives(df):
         df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
         df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
-        df.to_excel('actions_correctives_ECOBOT40.xlsx', index=False)
+        df.to_excel('actions_correctives_ECOBOT40 (1).xlsx', index=False)
 
     # Initialiser le state si nécessaire
     if 'actions_correctives_ECOBOT40' not in st.session_state:
