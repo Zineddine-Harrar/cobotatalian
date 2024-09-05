@@ -682,43 +682,65 @@ def main():
     # Chemin vers le fichier Excel dans votre dépôt Git
     EXCEL_FILE_PATH = 'actions_correctives_ECOBOT40 (1).xlsx'
 
+    def log_debug(message):
+        st.write(f"DEBUG: {message}")
+
     # Fonction pour charger les actions correctives depuis le fichier Excel existant
     def load_actions_correctives():
+        log_debug(f"Tentative de chargement du fichier: {EXCEL_FILE_PATH}")
         try:
-            # Vérifier si le fichier existe
             if not os.path.exists(EXCEL_FILE_PATH):
-                st.error(f"Le fichier {EXCEL_FILE_PATH} n'existe pas.")
+                log_debug(f"Le fichier n'existe pas: {EXCEL_FILE_PATH}")
                 return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
-            # Lire le fichier Excel
             df = pd.read_excel(EXCEL_FILE_PATH, engine='openpyxl')
-            
-            # Convertir les colonnes de date
+            log_debug(f"Fichier chargé avec succès. Nombre de lignes: {len(df)}")
+        
             date_columns = ['Date d\'ajout', 'Délai d\'intervention']
             for col in date_columns:
                 df[col] = pd.to_datetime(df[col], errors='coerce').dt.date
 
-            st.success(f"Fichier {EXCEL_FILE_PATH} chargé avec succès.")
-            st.write("Aperçu des données chargées:", df.head())
             return df
         except Exception as e:
-            st.error(f"Erreur lors du chargement du fichier: {str(e)}")
+            log_debug(f"Erreur lors du chargement du fichier: {str(e)}")
+            log_debug(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
     # Fonction pour sauvegarder les actions correctives dans le fichier Excel existant
     def save_actions_correctives(df):
+        log_debug(f"Tentative de sauvegarde dans le fichier: {EXCEL_FILE_PATH}")
         try:
             df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
             df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
+        
+            # Vérifier si le répertoire existe, sinon le créer
+            os.makedirs(os.path.dirname(EXCEL_FILE_PATH), exist_ok=True)
+        
             df.to_excel(EXCEL_FILE_PATH, index=False, engine='openpyxl')
-            st.success(f"Les modifications ont été sauvegardées dans {EXCEL_FILE_PATH}")
-            # Recharger les données pour s'assurer que les changements sont reflétés
-            st.session_state.actions_correctives_ECOBOT40 = load_actions_correctives()
+            log_debug(f"Sauvegarde réussie. Nombre de lignes sauvegardées: {len(df)}")
+            
+            # Vérifier si le fichier a été créé/modifié
+            if os.path.exists(EXCEL_FILE_PATH):
+                log_debug(f"Le fichier existe après la sauvegarde. Taille: {os.path.getsize(EXCEL_FILE_PATH)} bytes")
+            else:
+                log_debug("Le fichier n'existe pas après la tentative de sauvegarde!")
+        
+            # Recharger pour vérifier
+            reloaded_df = load_actions_correctives()
+            if len(reloaded_df) == len(df):
+                log_debug("Les données rechargées correspondent aux données sauvegardées.")
+            else:
+                log_debug(f"Incohérence: {len(df)} lignes sauvegardées, {len(reloaded_df)} lignes rechargées.")
+        
+            return True
         except Exception as e:
-            st.error(f"Erreur lors de la sauvegarde du fichier: {str(e)}")
+            log_debug(f"Erreur lors de la sauvegarde du fichier: {str(e)}")
+            log_debug(f"Traceback: {traceback.format_exc()}")
+            return False
 
-    # Initialiser le state si nécessaire
-    if 'actions_correctives_ECOBOT40' not in st.session_state:
+
+    # Initialiser ou mettre à jour le state
+    if 'actions_correctives_ECOBOT40' not in st.session_state or st.button("Recharger les données"):
         st.session_state.actions_correctives_ECOBOT40 = load_actions_correctives()
 
     if 'editing_ECOBOT40' not in st.session_state:
@@ -781,10 +803,13 @@ def main():
         )
 
         if st.button("Sauvegarder les modifications", key='save_ECOBOT40'):
-            st.session_state.actions_correctives_ECOBOT40 = edited_df
-            save_actions_correctives(edited_df)
-            st.session_state.editing_ECOBOT40 = False
-            st.rerun()  # Recharger la page pour refléter les changements
+            if save_actions_correctives(edited_df):
+                st.session_state.actions_correctives_ECOBOT40 = edited_df
+                st.session_state.editing_ECOBOT40 = False
+                st.success("Modifications sauvegardées avec succès!")
+                st.rerun()
+            else:
+                st.error("Erreur lors de la sauvegarde. Veuillez vérifier les logs de débogage.")
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_ECOBOT40, width=2000)
@@ -795,7 +820,7 @@ def main():
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             st.session_state.actions_correctives_ECOBOT40.to_excel(writer, index=False)
         output.seek(0)
-        st.download_button(
+            st.download_button(
             label="Cliquez ici pour télécharger",
             data=output,
             file_name="actions_correctives_ECOBOT40.xlsx",
@@ -803,7 +828,11 @@ def main():
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-    # Afficher le chemin absolu du fichier pour le débogage
-    st.write("Chemin absolu du fichier Excel:", os.path.abspath(EXCEL_FILE_PATH))
+    # Afficher des informations de débogage
+    st.write("Chemin absolu du fichier Excel:", EXCEL_FILE_PATH)
+    st.write("Le fichier existe:", os.path.exists(EXCEL_FILE_PATH))
+    if os.path.exists(EXCEL_FILE_PATH):
+        st.write("Taille du fichier:", os.path.getsize(EXCEL_FILE_PATH), "bytes")
+        st.write("Dernière modification:", datetime.fromtimestamp(os.path.getmtime(EXCEL_FILE_PATH)))
 if __name__ == '__main__':
     main()
