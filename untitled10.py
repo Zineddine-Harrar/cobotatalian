@@ -836,10 +836,11 @@ def main():
         )
 
     st.write("Chemin absolu du fichier Excel:", EXCEL_FILE_PATH)
-    st.write("Le fichier existe:", os.path.exists(EXCEL_FILE_PATH))
-    if os.path.exists(EXCEL_FILE_PATH):
-        st.write("Taille du fichier:", os.path.getsize(EXCEL_FILE_PATH), "bytes")
-        st.write("Dernière modification:", datetime.fromtimestamp(os.path.getmtime(EXCEL_FILE_PATH)))
+    st.write("Le fichier existe:", EXCEL_FILE_PATH.exists())
+    if EXCEL_FILE_PATH.exists():
+        st.write("Taille du fichier:", EXCEL_FILE_PATH.stat().st_size, "bytes")
+        st.write("Dernière modification:", EXCEL_FILE_PATH.stat().st_mtime)
     st.write("Répertoire de travail actuel:", os.getcwd())
+    st.write("Permissions du répertoire parent:", oct(os.stat(EXCEL_FILE_PATH.parent).st_mode))
 if __name__ == '__main__':
     main()
