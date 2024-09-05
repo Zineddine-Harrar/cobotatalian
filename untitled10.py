@@ -689,35 +689,19 @@ def main():
         st.sidebar.text(f"DEBUG: {message}")
 
     def load_actions_correctives():
-        log_debug(f"Tentative de chargement du fichier: {CSV_FILE_PATH}")
-        try:
-            if not CSV_FILE_PATH.exists():
-                log_debug(f"Le fichier n'existe pas: {CSV_FILE_PATH}")
-                return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
-
-            df = pd.read_csv(CSV_FILE_PATH)
-            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'], errors='coerce')
-            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'], errors='coerce')
-            log_debug(f"Fichier chargé avec succès. Nombre de lignes: {len(df)}")
-            return df
-        except Exception as e:
-            log_debug(f"Erreur lors du chargement du fichier: {str(e)}")
-            log_debug(f"Traceback: {traceback.format_exc()}")
+        if not CSV_FILE_PATH.exists():
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
+        df = pd.read_csv(CSV_FILE_PATH)
+        return df
+
     def save_actions_correctives(df):
-        log_debug(f"Tentative de sauvegarde dans le fichier CSV: {CSV_FILE_PATH}")
         try:
-            df['Date d\'ajout'] = df['Date d\'ajout'].dt.strftime('%Y-%m-%d')
-            df['Délai d\'intervention'] = df['Délai d\'intervention'].dt.strftime('%Y-%m-%d')
             df.to_csv(CSV_FILE_PATH, index=False)
-            log_debug(f"Données sauvegardées avec succès. Taille du fichier: {CSV_FILE_PATH.stat().st_size} bytes")
             return True
         except Exception as e:
-            log_debug(f"Erreur lors de la sauvegarde: {str(e)}")
-            log_debug(f"Traceback: {traceback.format_exc()}")
+            st.error(f"Erreur lors de la sauvegarde: {str(e)}")
             return False
-
     def actions_correctives_section():
         st.subheader("Actions correctives")
 
@@ -748,16 +732,16 @@ def main():
                         max_chars=100,
                         width="large",
                     ),
-                    "Date d'ajout": st.column_config.DateColumn(
+                    "Date d'ajout": st.column_config.TextColumn(
                         "Date d'ajout",
-                        help="Date d'ajout de l'action",
-                        format="YYYY-MM-DD",
+                        help="Date d'ajout de l'action (YYYY-MM-DD)",
+                        max_chars=10,
                         width="medium",
                     ),
-                    "Délai d'intervention": st.column_config.DateColumn(
+                    "Délai d'intervention": st.column_config.TextColumn(
                         "Délai d'intervention",
-                        help="Date limite pour l'action",
-                        format="YYYY-MM-DD",
+                        help="Date limite pour l'action (YYYY-MM-DD)",
+                        max_chars=10,
                         width="medium",
                     ),
                     "Responsable Action": st.column_config.TextColumn(
