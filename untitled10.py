@@ -680,7 +680,7 @@ def main():
     st.subheader("Actions correctives")
 
     # Chemin vers le fichier Excel dans votre dépôt Git
-    EXCEL_FILE_PATH = 'data/actions_correctives_ECOBOT40.xlsx'
+    EXCEL_FILE_PATH = 'actions_correctives_ECOBOT40 (1).xlsx'
 
     # Fonction pour charger les actions correctives depuis le fichier Excel existant
     def load_actions_correctives():
