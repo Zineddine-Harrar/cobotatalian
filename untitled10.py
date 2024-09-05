@@ -782,7 +782,7 @@ def main():
             st.session_state.actions_correctives_ECOBOT40 = edited_df
             save_actions_correctives(edited_df)
             st.session_state.editing_ECOBOT40 = False
-            st.experimental_rerun()  # Recharger la page pour refléter les changements
+            st.rerun()  # Recharger la page pour refléter les changements
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_ECOBOT40, width=2000)
