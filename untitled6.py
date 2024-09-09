@@ -1085,7 +1085,7 @@ def main():
     key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpYnVvY2Rtbndocmp0c3BmcXZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU1NDY1NjMsImV4cCI6MjA0MTEyMjU2M30.jchld2jauPI45JGMIxru5MnDRq9uOHgkEdXEa-qUK6A"  # Remplace par ta clé API
     supabase: Client = create_client(url, key)
 
-   # Fonction pour charger les actions correctives depuis Supabase
+   # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
     def load_actions_correctives():
         try:
             response = supabase.table('actions_correctives').select('*').execute()
@@ -1095,37 +1095,27 @@ def main():
                 return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
             df = pd.DataFrame(data)
 
-            # Renommer les colonnes uniquement pour l'affichage dans Streamlit
-            df = df.rename(columns={
-                'action_corrective': 'Action corrective',
-                'date_ajout': 'Date d\'ajout',
-                'delai_intervention': 'Délai d\'intervention',
-                'responsable_action': 'Responsable Action',
-                'statut': 'Statut',
-                'commentaires': 'Commentaires'
-            })
-
             # Convertir les dates
-            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
-            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
+            df['date_ajout'] = pd.to_datetime(df['date_ajout']).dt.date
+            df['delai_intervention'] = pd.to_datetime(df['delai_intervention']).dt.date
 
             return df
         except Exception as e:
             st.error(f"Erreur lors du chargement des données : {e}")
             return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
 
-    # Fonction pour sauvegarder les actions correctives dans Supabase
+    # Fonction pour sauvegarder les actions correctives dans Supabase sans changer les noms des colonnes
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
-                # Remettre les noms de colonnes à leur forme originale pour la sauvegarde dans Supabase
+                # Les colonnes de la base de données sont utilisées telles quelles
                 data_to_save = {
-                    'action_corrective': row['Action corrective'],  # Colonne 'Action corrective' dans le DataFrame renommer lors de l'affichage
-                    'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),  # Utiliser 'Date d'ajout' pour l'affichage, mais 'date_ajout' pour Supabase
-                    'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),  # Pareil pour 'delai_intervention'
-                    'responsable_action': row['Responsable Action'],  # Idem pour 'Responsable Action'
-                    'statut': row['Statut'],  # Idem pour 'Statut'
-                    'commentaires': row['Commentaires']  # Idem pour 'Commentaires'
+                    'action_corrective': row['action_corrective'],
+                    'date_ajout': row['date_ajout'].strftime('%Y-%m-%d'),
+                    'delai_intervention': row['delai_intervention'].strftime('%Y-%m-%d'),
+                    'responsable_action': row['responsable_action'],
+                    'statut': row['statut'],
+                    'commentaires': row['commentaires']
                 }
 
                 # Si l'ID existe, faire une mise à jour (update)
@@ -1139,23 +1129,13 @@ def main():
         except Exception as e:
             st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
+
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
         st.session_state.actions_correctives_T2F = load_actions_correctives()
 
     if 'editing_T2F' not in st.session_state:
         st.session_state.editing_T2F = False
-
-    # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
-    if len(st.session_state.actions_correctives_T2F) == 0:
-        st.session_state.actions_correctives_T2F = pd.DataFrame({
-            'Action corrective': ['Action 1'],
-            'Date d\'ajout': [datetime.now().date()],
-            'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
-            'Responsable Action': ['Responsable 1'],
-            'Statut': ['En cours'],
-            'Commentaires': ['Commentaire ici']
-        })
 
     # Basculer entre mode édition et visualisation
     def toggle_edit_mode_T2F():
@@ -1170,32 +1150,32 @@ def main():
             st.session_state.actions_correctives_T2F,
             num_rows="dynamic",
             column_config={
-                "Action corrective": st.column_config.TextColumn(
+                "action_corrective": st.column_config.TextColumn(
                     "Action corrective",
                     max_chars=100,
                     width="large",
                 ),
-                "Date d'ajout": st.column_config.DateColumn(
+                "date_ajout": st.column_config.DateColumn(
                     "Date d'ajout",
                     format="DD/MM/YYYY",
                     width="medium",
                 ),
-                "Délai d'intervention": st.column_config.DateColumn(
+                "delai_intervention": st.column_config.DateColumn(
                     "Délai d'intervention",
                     format="DD/MM/YYYY",
                     width="medium",
-                ),    
-                "Responsable Action": st.column_config.TextColumn(
+                ),
+                "responsable_action": st.column_config.TextColumn(
                     "Responsable Action",
                     max_chars=50,
                     width="medium",
                 ),
-                "Statut": st.column_config.SelectboxColumn(
+                "statut": st.column_config.SelectboxColumn(
                     "Statut",
                     options=['En cours', 'Terminé', 'En retard'],
                     width="small",
                 ),
-                "Commentaires": st.column_config.TextColumn(
+                "commentaires": st.column_config.TextColumn(
                     "Commentaires",
                     max_chars=200,
                     width="large",
@@ -1214,6 +1194,7 @@ def main():
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
+
 
 
     
