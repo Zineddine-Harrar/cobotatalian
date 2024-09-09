@@ -1104,11 +1104,9 @@ def main():
             st.error(f"Erreur lors du chargement des données : {e}")
             return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
 
-    # Fonction pour sauvegarder les actions correctives dans Supabase
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
-                # Préparer les données à sauvegarder, sans inclure l'ID
                 data_to_save = {
                     'action_corrective': row['action_corrective'],
                     'date_ajout': row['date_ajout'].strftime('%Y-%m-%d'),
@@ -1118,19 +1116,21 @@ def main():
                     'commentaires': row['commentaires']
                 }
 
-                # Si l'ID existe et est valide, faire une mise à jour (update)
+                # Convertir l'ID en entier si nécessaire
                 if 'id' in row and pd.notna(row['id']):
-                    data_to_save['id'] = int(row['id'])  # S'assurer que l'ID est un entier
-                    supabase.table('actions_correctives').update(data_to_save).eq('id', row['id']).execute()
+                    data_to_save['id'] = int(row['id'])  # Convertir l'ID en entier
+
+                    # Faire une mise à jour avec l'ID
+                    supabase.table('actions_correctives').update(data_to_save).eq('id', data_to_save['id']).execute()
                 else:
-                    # Si l'ID n'existe pas (nouvelle ligne), faire une insertion (insert)
-                    # L'ID sera généré automatiquement par la base de données
+                    # Insertion sans l'ID (la base de données générera l'ID)
                     supabase.table('actions_correctives').insert(data_to_save).execute()
 
             return True
         except Exception as e:
             st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
+
 
     # Fonction pour convertir les colonnes de date en datetime avant de les utiliser dans le data_editor
     def prepare_df_for_editing(df):
