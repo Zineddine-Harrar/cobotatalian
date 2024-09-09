@@ -1214,9 +1214,11 @@ def main():
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
 
+    def reload_page():
+        raise RerunException(st.experimental_get_query_params())
+
     if st.button("Recharger les données"):
-        st.session_state.actions_correctives_T2F = load_actions_correctives()
-        st.experimental_rerun
+        reload_page()
 
     
 if __name__ == '__main__':
