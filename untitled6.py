@@ -8,7 +8,7 @@ import plotly.io as pio
 from plotly.subplots import make_subplots
 import openpyxl
 import io
-
+from supabase import create_client, Client
 def main():
 
     st.markdown(
@@ -1080,21 +1080,44 @@ def main():
 
     st.subheader("Actions correctives")
 
-    # Fonction pour charger les actions correctives depuis un fichier Excel
+    # Connexion à Supabase avec les informations de connexion
+    url = "https://cibuocdmnwhrjtspfqvj.supabase.co"  # Remplace par l'URL de ton projet Supabase
+    key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpYnVvY2Rtbndocmp0c3BmcXZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU1NDY1NjMsImV4cCI6MjA0MTEyMjU2M30.jchld2jauPI45JGMIxru5MnDRq9uOHgkEdXEa-qUK6A"  # Remplace par ta clé API
+    supabase: Client = create_client(url, key)
+
+    # Fonction pour charger les actions correctives depuis Supabase
     def load_actions_correctives():
         try:
-            df = pd.read_excel('actions_correctives_RQUARTZ_T2F.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
-            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
-            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
+            response = supabase.table('actions_correctives').select('*').execute()
+            data = response.data
+            if not data:
+                # Si la table est vide, on retourne un DataFrame vide avec les bonnes colonnes
+                return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+            df = pd.DataFrame(data)
+            df['Date d\'ajout'] = pd.to_datetime(df['date_ajout']).dt.date
+            df['Délai d\'intervention'] = pd.to_datetime(df['delai_intervention']).dt.date
             return df
-        except FileNotFoundError:
+        except Exception as e:
+            st.error(f"Erreur lors du chargement des données : {e}")
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
-    # Fonction pour sauvegarder les actions correctives dans un fichier Excel
+    # Fonction pour sauvegarder les actions correctives dans Supabase
     def save_actions_correctives(df):
-        df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
-        df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
-        df.to_excel('actions_correctives_RQUARTZ_T2F.xlsx', index=False)
+        try:
+            for index, row in df.iterrows():
+                supabase.table('actions_correctives').upsert({
+                    'id': row['id'] if 'id' in row else None,
+                    'action_corrective': row['Action corrective'],
+                    'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),
+                    'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),
+                    'responsable_action': row['Responsable Action'],
+                    'statut': row['Statut'],
+                    'commentaires': row['Commentaires']
+                }).execute()
+            return True
+        except Exception as e:
+            st.error(f"Erreur lors de la sauvegarde des données : {e}")
+            return False
 
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
@@ -1103,22 +1126,21 @@ def main():
     if 'editing_T2F' not in st.session_state:
         st.session_state.editing_T2F = False
 
-    # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
+    # Affichage des actions correctives
     if len(st.session_state.actions_correctives_T2F) == 0:
         st.session_state.actions_correctives_T2F = pd.DataFrame({
-            'Action corrective': ['Action 1 pour RQUARTZ T2F'],
+            'Action corrective': ['Action 1'],
             'Date d\'ajout': [datetime.now().date()],
             'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
             'Responsable Action': ['Responsable 1'],
             'Statut': ['En cours'],
-            'Commentaires': ['Commentaires à faire']
+            'Commentaires': ['Commentaire ici']
         })
 
-    # Fonction pour basculer le mode d'édition
+    # Basculer entre mode édition et visualisation
     def toggle_edit_mode_T2F():
         st.session_state.editing_T2F = not st.session_state.editing_T2F
 
-    # Bouton pour basculer entre le mode d'édition et de visualisation
     st.button("Modifier les actions correctives" if not st.session_state.editing_T2F else "Terminer l'édition", 
               on_click=toggle_edit_mode_T2F, key='toggle_edit_T2F')
 
@@ -1130,37 +1152,31 @@ def main():
             column_config={
                 "Action corrective": st.column_config.TextColumn(
                     "Action corrective",
-                    help="Décrivez l'action corrective",
                     max_chars=100,
                     width="large",
                 ),
                 "Date d'ajout": st.column_config.DateColumn(
                     "Date d'ajout",
-                    help="Date d'ajout de l'action",
                     format="DD/MM/YYYY",
                     width="medium",
                 ),
                 "Délai d'intervention": st.column_config.DateColumn(
                     "Délai d'intervention",
-                    help="Date limite pour l'action",
                     format="DD/MM/YYYY",
                     width="medium",
                 ),
                 "Responsable Action": st.column_config.TextColumn(
                     "Responsable Action",
-                    help="Personne responsable de l'action",
                     max_chars=50,
                     width="medium",
                 ),
                 "Statut": st.column_config.SelectboxColumn(
                     "Statut",
-                    help="Statut actuel de l'action",
                     options=['En cours', 'Terminé', 'En retard'],
                     width="small",
                 ),
                 "Commentaires": st.column_config.TextColumn(
                     "Commentaires",
-                    help="Commentaires additionnels",
                     max_chars=200,
                     width="large",
                 ),
@@ -1172,26 +1188,12 @@ def main():
 
         if st.button("Sauvegarder les modifications", key='save_T2F'):
             st.session_state.actions_correctives_T2F = edited_df
-            save_actions_correctives(edited_df)
-            st.success("Les actions correctives pour RQUARTZ T2F ont été mises à jour et sauvegardées.")
+            if save_actions_correctives(edited_df):
+                st.success("Actions sauvegardées avec succès.")
             st.session_state.editing_T2F = False
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
-
-    # Bouton pour télécharger le fichier Excel
-    if st.button("Télécharger le fichier Excel", key='download_T2F'):
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            st.session_state.actions_correctives_T2F.to_excel(writer, index=False)
-        output.seek(0)
-        st.download_button(
-            label="Cliquez ici pour télécharger",
-            data=output,
-            file_name="actions_correctives_RQUARTZ_T2F.xlsx",
-            key="download_button_T2F",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
 
     
 if __name__ == '__main__':
