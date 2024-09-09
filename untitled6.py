@@ -1085,10 +1085,26 @@ def main():
     key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpYnVvY2Rtbndocmp0c3BmcXZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU1NDY1NjMsImV4cCI6MjA0MTEyMjU2M30.jchld2jauPI45JGMIxru5MnDRq9uOHgkEdXEa-qUK6A"  # Remplace par ta clé API
     supabase: Client = create_client(url, key)
 
+    # Fonction pour charger les actions correctives depuis Supabase
+    def load_actions_correctives():
+        try:
+            response = supabase.table('actions_correctives').select('*').execute()
+                data = response.data
+        if not data:
+                # Si la table est vide, on retourne un DataFrame vide avec les bonnes colonnes
+                return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+            df = pd.DataFrame(data)
+            df['Date d\'ajout'] = pd.to_datetime(df['date_ajout']).dt.date
+            df['Délai d\'intervention'] = pd.to_datetime(df['delai_intervention']).dt.date
+            return df
+        except Exception as e:
+            st.error(f"Erreur lors du chargement des données : {e}")
+            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
-                data_to_upsert = {
+                data_to_save = {
                     'action_corrective': row['Action corrective'],
                     'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),
                     'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),
@@ -1097,33 +1113,18 @@ def main():
                     'commentaires': row['Commentaires']
                 }
 
-                # Ne pas inclure l'ID si la ligne ne le contient pas
+                # Si l'ID existe, faire une mise à jour (update)
                 if 'id' in row and pd.notna(row['id']):
-                    data_to_upsert['id'] = row['id']
+                    supabase.table('actions_correctives').update(data_to_save).eq('id', row['id']).execute()
+                else:
+                    # Si l'ID n'existe pas, faire une insertion (insert)
+                    supabase.table('actions_correctives').insert(data_to_save).execute()
 
-                supabase.table('actions_correctives').upsert(data_to_upsert).execute()
             return True
         except Exception as e:
             st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
 
-    # Fonction pour sauvegarder les actions correctives dans Supabase
-    def save_actions_correctives(df):
-        try:
-            for index, row in df.iterrows():
-                supabase.table('actions_correctives').upsert({
-                    'id': row['id'] if 'id' in row else None,
-                    'action_corrective': row['Action corrective'],
-                    'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),
-                    'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),
-                    'responsable_action': row['Responsable Action'],
-                    'statut': row['Statut'],
-                    'commentaires': row['Commentaires']
-                }).execute()
-            return True
-        except Exception as e:
-            st.error(f"Erreur lors de la sauvegarde des données : {e}")
-            return False
 
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
