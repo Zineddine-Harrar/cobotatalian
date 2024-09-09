@@ -1089,8 +1089,8 @@ def main():
     def load_actions_correctives():
         try:
             response = supabase.table('actions_correctives').select('*').execute()
-                data = response.data
-        if not data:
+            data = response.data
+            if not data:
                 # Si la table est vide, on retourne un DataFrame vide avec les bonnes colonnes
                 return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
             df = pd.DataFrame(data)
