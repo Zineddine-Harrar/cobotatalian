@@ -1217,7 +1217,7 @@ def main():
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
 
     def reload_page():
-       raise RerunException()
+       raise RerunException(rerun_data=None)
 
     # Interface pour recharger les données
     if st.button("Recharger les données"):
