@@ -1215,8 +1215,8 @@ def main():
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
 
     if st.button("Recharger les données"):
-    st.session_state.actions_correctives_T2F = load_actions_correctives()
-    st.experimental_rerun()
+        st.session_state.actions_correctives_T2F = load_actions_correctives()
+        st.experimental_rerun()
 
     
 if __name__ == '__main__':
