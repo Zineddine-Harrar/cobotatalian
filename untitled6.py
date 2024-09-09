@@ -1105,12 +1105,12 @@ def main():
         try:
             for index, row in df.iterrows():
                 data_to_save = {
-                    'action_corrective': row['Action corrective'],
-                    'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),
-                    'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),
-                    'responsable_action': row['Responsable Action'],
-                    'statut': row['Statut'],
-                    'commentaires': row['Commentaires']
+                    'action_corrective': row['action_corrective'],  # Remplacer par le nom correct
+                    'date_ajout': row['date_ajout'].strftime('%Y-%m-%d'),
+                    'delai_intervention': row['delai_intervention'].strftime('%Y-%m-%d'),
+                    'responsable_action': row['responsable_action'],
+                    'statut': row['statut'],
+                    'commentaires': row['commentaires']
                 }
 
                 # Si l'ID existe, faire une mise à jour (update)
