@@ -1085,17 +1085,17 @@ def main():
     key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpYnVvY2Rtbndocmp0c3BmcXZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU1NDY1NjMsImV4cCI6MjA0MTEyMjU2M30.jchld2jauPI45JGMIxru5MnDRq9uOHgkEdXEa-qUK6A"  # Remplace par ta clé API
     supabase: Client = create_client(url, key)
 
-    # Fonction pour charger les actions correctives depuis Supabase
+   # Fonction pour charger les actions correctives depuis Supabase
     def load_actions_correctives():
         try:
             response = supabase.table('actions_correctives').select('*').execute()
             data = response.data
             if not data:
                 # Si la table est vide, on retourne un DataFrame vide avec les bonnes colonnes
-                return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+                return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
             df = pd.DataFrame(data)
 
-            # Renommer les colonnes pour correspondre à celles utilisées dans Streamlit
+            # Renommer les colonnes uniquement pour l'affichage dans Streamlit
             df = df.rename(columns={
                 'action_corrective': 'Action corrective',
                 'date_ajout': 'Date d\'ajout',
@@ -1112,14 +1112,15 @@ def main():
             return df
         except Exception as e:
             st.error(f"Erreur lors du chargement des données : {e}")
-            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+            return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
 
     # Fonction pour sauvegarder les actions correctives dans Supabase
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
+                # Remettre les noms de colonnes à leur forme originale pour la sauvegarde dans Supabase
                 data_to_save = {
-                    'action_corrective': row['Action corrective'],  # Utiliser les noms corrects des colonnes
+                    'action_corrective': row['Action corrective'],
                     'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),
                     'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),
                     'responsable_action': row['Responsable Action'],
@@ -1138,7 +1139,6 @@ def main():
         except Exception as e:
             st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
-
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
         st.session_state.actions_correctives_T2F = load_actions_correctives()
