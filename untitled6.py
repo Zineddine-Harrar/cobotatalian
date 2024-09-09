@@ -9,6 +9,8 @@ from plotly.subplots import make_subplots
 import openpyxl
 import io
 from supabase import create_client, Client
+from streamlit.runtime.scriptrunner import RerunException
+
 def main():
 
     st.markdown(
