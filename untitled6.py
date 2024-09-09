@@ -1104,6 +1104,9 @@ def main():
             st.error(f"Erreur lors du chargement des données : {e}")
             return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
 
+    # Charger les données à chaque lancement de l'application
+    st.session_state.actions_correctives_T2F = load_actions_correctives()
+
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
@@ -1211,6 +1214,9 @@ def main():
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
 
+    if st.button("Recharger les données"):
+    st.session_state.actions_correctives_T2F = load_actions_correctives()
+    st.experimental_rerun()
 
     
 if __name__ == '__main__':
