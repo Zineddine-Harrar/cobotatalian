@@ -1130,7 +1130,7 @@ def main():
             st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
 
-    # Convertir les colonnes de date en format datetime avant de les utiliser dans le data_editor
+    # Fonction pour convertir les colonnes de date en datetime avant de les utiliser dans le data_editor
     def prepare_df_for_editing(df):
         try:
             # Assurer que les colonnes de dates sont bien en format datetime.date
@@ -1154,7 +1154,7 @@ def main():
     # Basculer entre mode édition et visualisation
     def toggle_edit_mode_T2F():
         st.session_state.editing_T2F = not st.session_state.editing_T2F
-    
+
     st.button("Modifier les actions correctives" if not st.session_state.editing_T2F else "Terminer l'édition", 
               on_click=toggle_edit_mode_T2F, key='toggle_edit_T2F')
 
@@ -1170,27 +1170,27 @@ def main():
                     width="large",
                 ),
                 "date_ajout": st.column_config.DateColumn(
-                    "Date d'ajout",
+                    "date_ajout",
                     format="DD/MM/YYYY",
                     width="medium",
                 ),
                 "delai_intervention": st.column_config.DateColumn(
-                    "Délai d'intervention",
+                    "delai_intervention",
                     format="DD/MM/YYYY",
                     width="medium",
                 ),
                 "responsable_action": st.column_config.TextColumn(
-                    "Responsable Action",
+                    "responsable_action",
                     max_chars=50,
                     width="medium",
                 ),
                 "statut": st.column_config.SelectboxColumn(
-                    "Statut",
+                    "statut",
                     options=['En cours', 'Terminé', 'En retard'],
                     width="small",
                 ),
                 "commentaires": st.column_config.TextColumn(
-                    "Commentaires",
+                    "commentaires",
                     max_chars=200,
                     width="large",
                 ),
@@ -1208,7 +1208,6 @@ def main():
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
-
 
 
     
