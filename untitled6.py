@@ -1216,9 +1216,11 @@ def main():
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
 
+   # Fonction pour recharger la page
     def reload_page():
-        raise RerunException(st.experimental_get_query_params())
+        raise st.script_runner.RerunException(st.query_params)
 
+    #Interface pour recharger les données
     if st.button("Recharger les données"):
         reload_page()
 
