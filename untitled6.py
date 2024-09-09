@@ -1094,23 +1094,37 @@ def main():
                 # Si la table est vide, on retourne un DataFrame vide avec les bonnes colonnes
                 return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
             df = pd.DataFrame(data)
-            df['Date d\'ajout'] = pd.to_datetime(df['date_ajout']).dt.date
-            df['Délai d\'intervention'] = pd.to_datetime(df['delai_intervention']).dt.date
+
+            # Renommer les colonnes pour correspondre à celles utilisées dans Streamlit
+            df = df.rename(columns={
+                'action_corrective': 'Action corrective',
+                'date_ajout': 'Date d\'ajout',
+                'delai_intervention': 'Délai d\'intervention',
+                'responsable_action': 'Responsable Action',
+                'statut': 'Statut',
+                'commentaires': 'Commentaires'
+            })
+
+            # Convertir les dates
+            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
+            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
+
             return df
         except Exception as e:
             st.error(f"Erreur lors du chargement des données : {e}")
             return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
 
+    # Fonction pour sauvegarder les actions correctives dans Supabase
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
                 data_to_save = {
-                    'action_corrective': row['action_corrective'],  # Remplacer par le nom correct
-                    'date_ajout': row['date_ajout'].strftime('%Y-%m-%d'),
-                    'delai_intervention': row['delai_intervention'].strftime('%Y-%m-%d'),
-                    'responsable_action': row['responsable_action'],
-                    'statut': row['statut'],
-                    'commentaires': row['commentaires']
+                    'action_corrective': row['Action corrective'],  # Remplacer par le nom correct
+                    'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),
+                    'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),
+                    'responsable_action': row['Responsable Action'],
+                    'statut': row['Statut'],
+                    'commentaires': row['Commentaires']
                 }
 
                 # Si l'ID existe, faire une mise à jour (update)
