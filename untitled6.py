@@ -1119,7 +1119,7 @@ def main():
         try:
             for index, row in df.iterrows():
                 data_to_save = {
-                    'action_corrective': row['Action corrective'],  # Remplacer par le nom correct
+                    'action_corrective': row['Action corrective'],  # Utiliser les noms corrects des colonnes
                     'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),
                     'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),
                     'responsable_action': row['Responsable Action'],
@@ -1139,7 +1139,6 @@ def main():
             st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
 
-
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
         st.session_state.actions_correctives_T2F = load_actions_correctives()
@@ -1147,7 +1146,7 @@ def main():
     if 'editing_T2F' not in st.session_state:
         st.session_state.editing_T2F = False
 
-    # Affichage des actions correctives
+    # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
     if len(st.session_state.actions_correctives_T2F) == 0:
         st.session_state.actions_correctives_T2F = pd.DataFrame({
             'Action corrective': ['Action 1'],
@@ -1185,7 +1184,7 @@ def main():
                     "Délai d'intervention",
                     format="DD/MM/YYYY",
                     width="medium",
-                ),
+                ),    
                 "Responsable Action": st.column_config.TextColumn(
                     "Responsable Action",
                     max_chars=50,
@@ -1215,6 +1214,7 @@ def main():
     else:
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
+
 
     
 if __name__ == '__main__':
