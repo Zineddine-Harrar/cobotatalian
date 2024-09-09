@@ -1120,12 +1120,12 @@ def main():
             for index, row in df.iterrows():
                 # Remettre les noms de colonnes à leur forme originale pour la sauvegarde dans Supabase
                 data_to_save = {
-                    'action_corrective': row['Action corrective'],
-                    'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),
-                    'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),
-                    'responsable_action': row['Responsable Action'],
-                    'statut': row['Statut'],
-                    'commentaires': row['Commentaires']
+                    'action_corrective': row['Action corrective'],  # Colonne 'Action corrective' dans le DataFrame renommer lors de l'affichage
+                    'date_ajout': row['Date d\'ajout'].strftime('%Y-%m-%d'),  # Utiliser 'Date d'ajout' pour l'affichage, mais 'date_ajout' pour Supabase
+                    'delai_intervention': row['Délai d\'intervention'].strftime('%Y-%m-%d'),  # Pareil pour 'delai_intervention'
+                    'responsable_action': row['Responsable Action'],  # Idem pour 'Responsable Action'
+                    'statut': row['Statut'],  # Idem pour 'Statut'
+                    'commentaires': row['Commentaires']  # Idem pour 'Commentaires'
                 }
 
                 # Si l'ID existe, faire une mise à jour (update)
