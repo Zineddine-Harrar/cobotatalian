@@ -1130,9 +1130,23 @@ def main():
             st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
 
+    # Convertir les colonnes de date en format datetime avant de les utiliser dans le data_editor
+    def prepare_df_for_editing(df):
+        try:
+            # Assurer que les colonnes de dates sont bien en format datetime.date
+            df['date_ajout'] = pd.to_datetime(df['date_ajout'], errors='coerce').dt.date
+            df['delai_intervention'] = pd.to_datetime(df['delai_intervention'], errors='coerce').dt.date
+            return df
+        except Exception as e:
+            st.error(f"Erreur lors de la conversion des colonnes de date : {e}")
+            return df
+
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
         st.session_state.actions_correctives_T2F = load_actions_correctives()
+
+    # Préparer le DataFrame pour l'édition en s'assurant que les colonnes de date sont bien converties
+    st.session_state.actions_correctives_T2F = prepare_df_for_editing(st.session_state.actions_correctives_T2F)
 
     if 'editing_T2F' not in st.session_state:
         st.session_state.editing_T2F = False
@@ -1140,12 +1154,12 @@ def main():
     # Basculer entre mode édition et visualisation
     def toggle_edit_mode_T2F():
         st.session_state.editing_T2F = not st.session_state.editing_T2F
-
+    
     st.button("Modifier les actions correctives" if not st.session_state.editing_T2F else "Terminer l'édition", 
               on_click=toggle_edit_mode_T2F, key='toggle_edit_T2F')
 
     if st.session_state.editing_T2F:
-        # Mode d'édition
+        # Mode d'édition avec les dates converties en format approprié
         edited_df = st.data_editor(
             st.session_state.actions_correctives_T2F,
             num_rows="dynamic",
