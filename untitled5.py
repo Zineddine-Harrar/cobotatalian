@@ -1047,125 +1047,152 @@ def main():
         st.plotly_chart(fig_comparative, use_container_width=True)
 
     if 'current_app' not in st.session_state:
-        st.session_state.current_app = "RQUARTZ IMON"
+        st.session_state.current_app = "RQUARTZ T2F"
 
-    # Section des actions correctives
     st.subheader("Actions correctives")
 
-    # Fonction pour charger les actions correctives depuis un fichier Excel
+    # Connexion à Supabase avec les informations de connexion
+    url = "https://jienhfjzykyjwpihuvcl.supabase.co"  # Remplace par l'URL de ton projet Supabase
+    key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZW5oZmp6eWt5andwaWh1dmNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU5NTE0NjYsImV4cCI6MjA0MTUyNzQ2Nn0.uRexXku6cZCo4qPT_coXJtL3s31-lh_P9J469FhLxvk"  # Remplace par ta clé API
+    supabase: Client = create_client(url, key)
+
+   # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
     def load_actions_correctives():
         try:
-            df = pd.read_excel('actions_correctives_RQUARTZ_IMON.xlsx', parse_dates=['Date d\'ajout', 'Délai d\'intervention'])
-            df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout']).dt.date
-            df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention']).dt.date
-            # Convertir la colonne 'Commentaires' en type str
-            df['Commentaires'] = df['Commentaires'].astype(str)
+            response = supabase.table('actions_correctives').select('*').execute()
+            data = response.data
+            if not data:
+                # Si la table est vide, on retourne un DataFrame vide avec les bonnes colonnes
+                return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
+            df = pd.DataFrame(data)
+
+            # Convertir les dates
+            df['date_ajout'] = pd.to_datetime(df['date_ajout']).dt.date
+            df['delai_intervention'] = pd.to_datetime(df['delai_intervention']).dt.date
+
             return df
-        except FileNotFoundError:
-            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+        except Exception as e:
+            st.error(f"Erreur lors du chargement des données : {e}")
+            return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
 
-    # Fonction pour sauvegarder les actions correctives dans un fichier Excel
+    # Charger les données à chaque lancement de l'application
+    st.session_state.actions_correctives_T2F = load_actions_correctives()
+
     def save_actions_correctives(df):
-        df['Date d\'ajout'] = pd.to_datetime(df['Date d\'ajout'])
-        df['Délai d\'intervention'] = pd.to_datetime(df['Délai d\'intervention'])
-        df.to_excel('actions_correctives_RQUARTZ_IMON.xlsx', index=False)
-        
+        try:
+            for index, row in df.iterrows():
+                data_to_save = {
+                    'action_corrective': row['action_corrective'],
+                    'date_ajout': row['date_ajout'].strftime('%Y-%m-%d'),
+                    'delai_intervention': row['delai_intervention'].strftime('%Y-%m-%d'),
+                    'responsable_action': row['responsable_action'],
+                    'statut': row['statut'],
+                    'commentaires': row['commentaires']
+                }
+
+                # Convertir l'ID en entier si nécessaire
+                if 'id' in row and pd.notna(row['id']):
+                    data_to_save['id'] = int(row['id'])  # Convertir l'ID en entier
+
+                    # Faire une mise à jour avec l'ID
+                    supabase.table('actions_correctives').update(data_to_save).eq('id', data_to_save['id']).execute()
+                else:
+                    # Insertion sans l'ID (la base de données générera l'ID)
+                    supabase.table('actions_correctives').insert(data_to_save).execute()
+
+            return True
+        except Exception as e:
+            st.error(f"Erreur lors de la sauvegarde des données : {e}")
+            return False
+
+
+    # Fonction pour convertir les colonnes de date en datetime avant de les utiliser dans le data_editor
+    def prepare_df_for_editing(df):
+        try:
+            # Assurer que les colonnes de dates sont bien en format datetime.date
+            df['date_ajout'] = pd.to_datetime(df['date_ajout'], errors='coerce').dt.date
+            df['delai_intervention'] = pd.to_datetime(df['delai_intervention'], errors='coerce').dt.date
+            return df
+        except Exception as e:
+            st.error(f"Erreur lors de la conversion des colonnes de date : {e}")
+            return df
+
     # Initialiser le state si nécessaire
-    if 'actions_correctives_IMON' not in st.session_state:
-        st.session_state.actions_correctives_IMON = load_actions_correctives()
+    if 'actions_correctives_T2F' not in st.session_state:
+        st.session_state.actions_correctives_T2F = load_actions_correctives()
 
-    if 'editing_IMON' not in st.session_state:
-        st.session_state.editing_IMON = False
+    # Préparer le DataFrame pour l'édition en s'assurant que les colonnes de date sont bien converties
+    st.session_state.actions_correctives_T2F = prepare_df_for_editing(st.session_state.actions_correctives_T2F)
 
-    # S'assurer qu'il y a toujours au moins une ligne dans le DataFrame
-    if len(st.session_state.actions_correctives_IMON) == 0:
-        st.session_state.actions_correctives_IMON = pd.DataFrame({
-            'Action corrective': ['Action 1 pour RQUARTZ IMON'],
-            'Date d\'ajout': [datetime.now().date()],
-            'Délai d\'intervention': [(datetime.now() + timedelta(days=7)).date()],
-            'Responsable Action': ['Responsable 1'],
-            'Statut': ['En cours'],
-            'Commentaires': ['Commentaires à faire']
-        })
+    if 'editing_T2F' not in st.session_state:
+        st.session_state.editing_T2F = False
 
-    # Fonction pour basculer le mode d'édition
-    def toggle_edit_mode_IMON():
-        st.session_state.editing_IMON = not st.session_state.editing_IMON
+    # Basculer entre mode édition et visualisation
+    def toggle_edit_mode_T2F():
+        st.session_state.editing_T2F = not st.session_state.editing_T2F
 
-    # Bouton pour basculer entre le mode d'édition et de visualisation
-    st.button("Modifier les actions correctives" if not st.session_state.editing_IMON else "Terminer l'édition", 
-              on_click=toggle_edit_mode_IMON, key='toggle_edit_IMON')
+    st.button("Modifier les actions correctives" if not st.session_state.editing_T2F else "Terminer l'édition", 
+              on_click=toggle_edit_mode_T2F, key='toggle_edit_T2F')
 
-    if st.session_state.editing_IMON:
-        # Mode d'édition
+    if st.session_state.editing_T2F:
+        # Mode d'édition avec les dates converties en format approprié
         edited_df = st.data_editor(
-            st.session_state.actions_correctives_IMON,
+            st.session_state.actions_correctives_T2F,
             num_rows="dynamic",
             column_config={
-                "Action corrective": st.column_config.TextColumn(
+                "action_corrective": st.column_config.TextColumn(
                     "Action corrective",
-                    help="Décrivez l'action corrective",
                     max_chars=100,
                     width="large",
                 ),
-                "Date d'ajout": st.column_config.DateColumn(
-                    "Date d'ajout",
-                    help="Date d'ajout de l'action",
+                "date_ajout": st.column_config.DateColumn(
+                    "date_ajout",
                     format="DD/MM/YYYY",
                     width="medium",
                 ),
-                "Délai d'intervention": st.column_config.DateColumn(
-                    "Délai d'intervention",
-                    help="Date limite pour l'action",
+                "delai_intervention": st.column_config.DateColumn(
+                    "delai_intervention",
                     format="DD/MM/YYYY",
                     width="medium",
                 ),
-                "Responsable Action": st.column_config.TextColumn(
-                    "Responsable Action",
-                    help="Personne responsable de l'action",
+                "responsable_action": st.column_config.TextColumn(
+                    "responsable_action",
                     max_chars=50,
                     width="medium",
                 ),
-                "Statut": st.column_config.SelectboxColumn(
-                    "Statut",
-                    help="Statut actuel de l'action",
+                "statut": st.column_config.SelectboxColumn(
+                    "statut",
                     options=['En cours', 'Terminé', 'En retard'],
                     width="small",
                 ),
-                "Commentaires": st.column_config.TextColumn(
-                    "Commentaires",
-                    help="Commentaires additionnels",
+                "commentaires": st.column_config.TextColumn(
+                    "commentaires",
                     max_chars=200,
                     width="large",
                 ),
             },
             hide_index=True,
             width=2000,
-            key='data_editor_IMON'
+            key='data_editor_T2F'
         )
 
-        if st.button("Sauvegarder les modifications", key='save_IMON'):
-            st.session_state.actions_correctives_IMON = edited_df
-            save_actions_correctives(edited_df)
-            st.success("Les actions correctives pour RQUARTZ IMON ont été mises à jour et sauvegardées.")
-            st.session_state.editing_IMON = False
+        if st.button("Sauvegarder les modifications", key='save_T2F'):
+            st.session_state.actions_correctives_T2F = edited_df
+            if save_actions_correctives(edited_df):
+                st.success("Actions sauvegardées avec succès.")
+            st.session_state.editing_T2F = False
     else:
         # Mode de visualisation
-        st.dataframe(st.session_state.actions_correctives_IMON, width=2000)
+        st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
 
-    # Bouton pour télécharger le fichier Excel
-    if st.button("Télécharger le fichier Excel", key='download_IMON'):
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            st.session_state.actions_correctives_IMON.to_excel(writer, index=False)
-        output.seek(0)
-        st.download_button(
-            label="Cliquez ici pour télécharger",
-            data=output,
-            file_name="actions_correctives_RQUARTZ_IMON.xlsx",
-            key="download_button_IMON",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+    def reload_page():
+       raise RerunException(rerun_data=None)
+
+    # Interface pour recharger les données
+    if st.button("Recharger les données"):
+       reload_page()
+
+
     
 if __name__ == '__main__':
     main()
