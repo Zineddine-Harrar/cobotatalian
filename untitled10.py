@@ -678,7 +678,8 @@ def main():
 
     
     
-    
+    if 'current_app' not in st.session_state:
+        st.session_state.current_app = "RQUARTZ T2F"
 
     st.subheader("Actions correctives")
 
