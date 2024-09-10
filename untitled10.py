@@ -679,7 +679,7 @@ def main():
     
     
     if 'current_app' not in st.session_state:
-        st.session_state.current_app = "RQUARTZ T2F"
+         st.session_state.current_app = "RQUARTZ T2F"
 
     st.subheader("Actions correctives")
 
@@ -688,7 +688,7 @@ def main():
     key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Zmd6amhuY3BzbXJzdGx3cnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU5NTMyNTYsImV4cCI6MjA0MTUyOTI1Nn0.ek4NYej4ikVWRAWvppQrzyLrD8OMdh_XoVZvh_fOSCY"  # Remplace par ta clé API
     supabase: Client = create_client(url, key)
 
-   # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
+    # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
     def load_actions_correctives():
         try:
             response = supabase.table('actions_correctives').select('*').execute()
