@@ -1261,7 +1261,7 @@ def main():
         
             if file_to_upload:
                 # Uploader le fichier et obtenir l'URL
-                file_path = upload_file_to_bucket(file_to_upload, row['id'])
+                file_path = upload_file_to_github(file_to_upload, row['id'])
                 if file_path:
                     # Générer l'URL du fichier
                     file_url = f"https://{url}/storage/v1/object/public/{file_path}"
