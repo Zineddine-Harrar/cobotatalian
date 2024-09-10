@@ -1062,7 +1062,8 @@ def main():
             file_path = f"pdf_uploads/{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.name}"
     
             # Lire le fichier
-            file_content = file.read()
+            file_content = file.read_as_bytes()  # Lire en tant que bytes
+
 
             # Uploader le fichier dans le bucket Supabase
             response = supabase.storage.from_('IMON').upload(file_path, file_content)
