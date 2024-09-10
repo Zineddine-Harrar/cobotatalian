@@ -1104,7 +1104,7 @@ def main():
 
     # Charger les données à chaque lancement de l'application
     st.session_state.actions_correctives_T2F = load_actions_correctives()
-    # Fonction pour créer un lien de téléchargement ou bouton d'upload
+     Fonction pour créer un lien de téléchargement ou bouton d'upload
     def create_pdf_button(row):
         action_id = row['id']
         if pd.notna(row['pdf_url']) and row['pdf_url'] != "":
@@ -1220,6 +1220,7 @@ def main():
                     max_chars=200,
                     width="large",
                 ),
+                "pdf_url": st.column_config.TextColumn("Téléchargement", width="small", format_func=lambda x: create_pdf_button(row)),  # Nouvelle colonne pour télécharger ou uploader le PDF
             },
             hide_index=True,
             width=2000,
