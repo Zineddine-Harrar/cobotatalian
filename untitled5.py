@@ -1,4 +1,4 @@
-import streamlit as st
+iimport streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 import plotly.graph_objects as go
@@ -8,7 +8,8 @@ import plotly.io as pio
 from plotly.subplots import make_subplots
 import openpyxl
 import io
-import os
+from supabase import create_client, Client
+from streamlit.runtime.scriptrunner import RerunException
 def main():
     
     st.markdown(
