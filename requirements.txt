@@ -1,5 +1,4 @@
-firebase-admin
-streamlit
+firebase-admin pyrebase4streamlit
 pandas
 plotly
 matplotlib
