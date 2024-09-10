@@ -1076,7 +1076,7 @@ def main():
             st.error(f"Erreur lors de la génération de l'URL signée : {e}")
             return None
     
-   def upload_file_to_github(file, action_id):
+    def upload_file_to_github(file, action_id):
         try:
             # Connexion à GitHub avec le token
             g = Github(GITHUB_TOKEN)
