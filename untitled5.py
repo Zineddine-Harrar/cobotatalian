@@ -1239,6 +1239,31 @@ def main():
         # Mode de visualisation
         st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
 
+    # Charger les données
+    actions_df = load_actions_correctives()
+
+
+    # Boucle pour parcourir chaque ligne et ajouter des boutons d'upload/téléchargement
+    for index, row in actions_df.iterrows():
+        action_id = row['id']
+        action_name = row['action_corrective']
+
+        # Si un fichier PDF a été uploadé, afficher le lien de téléchargement
+        if pd.notna(row['pdf_url']) and row['pdf_url'] != "":
+            file_url = row['pdf_url']
+            st.markdown(f"**{action_name}**: [📄 Télécharger PDF]({file_url})")
+        else:
+            # Sinon, afficher le bouton d'upload
+            st.markdown(f"**{action_name}**: Aucun fichier uploadé")
+            uploaded_file = st.file_uploader(f"Uploader un fichier PDF pour {action_name}", type="pdf", key=f"file_uploader_{action_id}")
+        
+            if uploaded_file:
+                file_url = upload_file_to_bucket(uploaded_file, action_id)
+                if file_url:
+                    save_pdf_url_in_db(action_id, file_url)
+                    st.success(f"Le fichier PDF pour l'action corrective {action_name} a été enregistré avec succès.")
+                    raise RerunException(rerun_data=None)
+
     def reload_page():
        raise RerunException(rerun_data=None)
 
