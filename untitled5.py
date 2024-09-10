@@ -1056,27 +1056,45 @@ def main():
     url = "https://jienhfjzykyjwpihuvcl.supabase.co"  # Remplace par l'URL de ton projet Supabase
     key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZW5oZmp6eWt5andwaWh1dmNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU5NTE0NjYsImV4cCI6MjA0MTUyNzQ2Nn0.uRexXku6cZCo4qPT_coXJtL3s31-lh_P9J469FhLxvk"  # Remplace par ta clé API
     supabase: Client = create_client(url, key)
+    def get_signed_url(file_path):
+        try:
+            # Générer une URL signée avec une expiration de 1 heure (3600 secondes)
+            response = supabase.storage.from_('IMON').create_signed_url(file_path, 3600)
+            if response:
+                return response['signedURL']
+            else:
+                st.error("Erreur lors de la génération de l'URL signée.")
+                return None
+        except Exception as e:
+            st.error(f"Erreur lors de la génération de l'URL signée : {e}")
+            return None
+    
     def upload_file_to_bucket(file, action_id):
         try:
             # Créer un chemin unique pour le fichier dans le bucket
             file_path = f"pdf_uploads/{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.name}"
-    
-            # Lire le fichier
-            file_content = file.read_as_bytes()  # Lire en tant que bytes
-
+        
+            # Lire le fichier (sous forme de bytes)
+            file_content = file.read()
 
             # Uploader le fichier dans le bucket Supabase
             response = supabase.storage.from_('IMON').upload(file_path, file_content)
-    
+            
             if response.status_code == 200 or response.status_code == 201:
                 st.success(f"Le fichier a été uploadé avec succès pour l'action {action_id}")
-                return file_path  # Retourne le chemin du fichier dans le bucket
+                # Générer une URL signée pour permettre le téléchargement
+                signed_url = get_signed_url(file_path)
+                if signed_url:
+                    return signed_url
+                else:
+                    return None
             else:
-                st.error(f"Erreur lors de l'upload du fichier : {response}")
+                st.error(f"Erreur lors de l'upload du fichier : {response.json()}")
                 return None
         except Exception as e:
             st.error(f"Erreur lors de l'upload : {e}")
             return None
+
 
     def save_pdf_url_in_db(action_id, file_url):
         try:
@@ -1150,6 +1168,22 @@ def main():
         except Exception as e:
             st.error(f"Erreur lors de la conversion des colonnes de date : {e}")
             return df
+    def create_pdf_button(row):
+        action_id = row['id']
+        if pd.notna(row['pdf_url']) and row['pdf_url'] != "":
+            # Fichier déjà uploadé, afficher le bouton "Télécharger"
+            file_url = row['pdf_url']  # URL déjà dans la base de données
+            return f'<a href="{file_url}" download>Télécharger PDF</a>'
+        else:
+            # Fichier non uploadé, afficher le bouton "Uploader"
+            uploaded_file = st.file_uploader(f"Uploader PDF pour action {action_id}", type=["pdf"], key=f"upload_{action_id}")
+            if uploaded_file:
+                file_url = upload_file_to_bucket(uploaded_file, action_id)
+                if file_url:
+                    # Sauvegarder l'URL dans la base de données
+                    save_pdf_url_in_db(action_id, file_url)
+                    return f'<a href="{file_url}" download>Télécharger PDF</a>'
+            return "Aucun fichier"
 
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
