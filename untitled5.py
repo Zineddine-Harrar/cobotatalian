@@ -1084,29 +1084,46 @@ def main():
         except Exception as e:
             st.error(f"Erreur lors de la sauvegarde du fichier PDF : {e}")
             return False
-
-   # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
+    # Fonction pour charger les actions correctives depuis Supabase
     def load_actions_correctives():
         try:
             response = supabase.table('actions_correctives').select('*').execute()
             data = response.data
             if not data:
-                # Si la table est vide, on retourne un DataFrame vide avec les bonnes colonnes
-                return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
+                # Si la table est vide, retourner un DataFrame vide avec les bonnes colonnes
+                return pd.DataFrame(columns=['id', 'action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires', 'pdf_url'])
             df = pd.DataFrame(data)
-
-            # Convertir les dates
+             # Convertir les dates
             df['date_ajout'] = pd.to_datetime(df['date_ajout']).dt.date
             df['delai_intervention'] = pd.to_datetime(df['delai_intervention']).dt.date
-
             return df
         except Exception as e:
             st.error(f"Erreur lors du chargement des données : {e}")
-            return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
+            return pd.DataFrame(columns=['id', 'action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires', 'pdf_url'])
+       
 
     # Charger les données à chaque lancement de l'application
     st.session_state.actions_correctives_T2F = load_actions_correctives()
-
+    # Fonction pour créer un lien de téléchargement ou bouton d'upload
+    def create_pdf_button(row):
+        action_id = row['id']
+        if pd.notna(row['pdf_url']) and row['pdf_url'] != "":
+            # Fichier déjà uploadé, afficher le bouton "Télécharger"
+            file_url = row['pdf_url']  # Utiliser directement l'URL sauvegardée
+            return f'<a href="{file_url}" download>📄 Télécharger PDF</a>'
+        else:
+            # Fichier non uploadé, afficher le bouton "Uploader"
+            upload_placeholder = st.empty()
+            uploaded_file = upload_placeholder.file_uploader(f"Uploader PDF pour action {action_id}", type=["pdf"], key=f"upload_{action_id}")
+            if uploaded_file:
+                file_url = upload_file_to_bucket(uploaded_file, action_id)
+                if file_url:
+                    # Sauvegarder l'URL dans la base de données
+                    save_pdf_url_in_db(action_id, file_url)
+                    # Rafraîchir la page ou afficher le lien de téléchargement
+                    upload_placeholder.empty()  # Supprimer le bouton d'upload après succès
+                    return f'<a href="{file_url}" download>📄 Télécharger PDF</a>'
+            return "Aucun fichier"
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
@@ -1210,18 +1227,7 @@ def main():
         )
         # Ajoutez un bouton d'upload dans chaque ligne pour chaque action corrective
         for index, row in edited_df.iterrows():
-            file_to_upload = st.file_uploader(f"Uploader un fichier PDF pour {row['action_corrective']}", type="pdf", key=f"file_uploader_{row['id']}")
-        
-            if file_to_upload:
-                # Uploader le fichier et obtenir l'URL
-                file_path = upload_file_to_bucket(file_to_upload, row['id'])
-                if file_path:
-                    # Générer l'URL du fichier
-                    file_url = f"https://{url}/storage/v1/object/public/{file_path}"
-                
-                    # Sauvegarder l'URL dans la base de données
-                    if save_pdf_url_in_db(row['id'], file_url):
-                        st.success(f"Le fichier PDF pour l'action corrective {row['action_corrective']} a été enregistré avec succès.")
+            st.markdown(create_pdf_button(row), unsafe_allow_html=True)
 
         if st.button("Sauvegarder les modifications", key='save_T2F'):
             st.session_state.actions_correctives_T2F = edited_df
