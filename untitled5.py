@@ -1056,6 +1056,34 @@ def main():
     url = "https://jienhfjzykyjwpihuvcl.supabase.co"  # Remplace par l'URL de ton projet Supabase
     key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZW5oZmp6eWt5andwaWh1dmNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU5NTE0NjYsImV4cCI6MjA0MTUyNzQ2Nn0.uRexXku6cZCo4qPT_coXJtL3s31-lh_P9J469FhLxvk"  # Remplace par ta clé API
     supabase: Client = create_client(url, key)
+    # Fonction pour uploader un fichier dans le bucket Supabase
+    def upload_file_to_bucket(file, action_id):
+        try:
+            # Créer un chemin unique pour le fichier dans le bucket
+            file_path = f"pdf_uploads/{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.name}"
+        
+            # Lire le fichier
+            file_content = file.read()
+
+            # Uploader le fichier dans le bucket Supabase
+            response = supabase.storage().from_('IMON').upload(file_path, file_content)
+        
+            if response.status_code == 200:
+                st.success(f"Le fichier a été uploadé avec succès pour l'action {action_id}")
+                return file_path  # Retourne le chemin du fichier dans le bucket
+            else:
+                st.error(f"Erreur lors de l'upload du fichier : {response.json()}")
+                return None
+        except Exception as e:
+            st.error(f"Erreur lors de l'upload : {e}")
+            return None
+    def save_pdf_url_in_db(action_id, file_url):
+        try:
+            supabase.table('actions_correctives').update({"pdf_url": file_url}).eq("id", action_id).execute()
+            return True
+        except Exception as e:
+            st.error(f"Erreur lors de la sauvegarde du fichier PDF : {e}")
+            return False
 
    # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
     def load_actions_correctives():
@@ -1180,6 +1208,20 @@ def main():
             width=2000,
             key='data_editor_T2F'
         )
+        # Ajoutez un bouton d'upload dans chaque ligne pour chaque action corrective
+        for index, row in edited_df.iterrows():
+            file_to_upload = st.file_uploader(f"Uploader un fichier PDF pour {row['action_corrective']}", type="pdf", key=f"file_uploader_{row['id']}")
+        
+            if file_to_upload:
+                # Uploader le fichier et obtenir l'URL
+                file_path = upload_file_to_bucket(file_to_upload, row['id'])
+                if file_path:
+                    # Générer l'URL du fichier
+                    file_url = f"https://{url}/storage/v1/object/public/{file_path}"
+                
+                    # Sauvegarder l'URL dans la base de données
+                    if save_pdf_url_in_db(row['id'], file_url):
+                        st.success(f"Le fichier PDF pour l'action corrective {row['action_corrective']} a été enregistré avec succès.")
 
         if st.button("Sauvegarder les modifications", key='save_T2F'):
             st.session_state.actions_correctives_T2F = edited_df
