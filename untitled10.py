@@ -753,6 +753,40 @@ def main():
             st.error(f"Erreur lors de la conversion des colonnes de date : {e}")
             return df
 
+    def get_signed_url(file_path):
+        try:
+            # Générer une URL signée pour permettre le téléchargement
+            response = supabase.storage.from_('IMON').create_signed_url(file_path, 60 * 60)  # URL valable pour 1 heure
+            if response:
+                return response.link
+            else:
+                st.error("Erreur lors de la génération de l'URL signée.")
+                return None
+        except Exception as e:
+            st.error(f"Erreur lors de la génération de l'URL signée : {e}")
+            return None
+
+    def create_pdf_button(row):
+        action_id = row['id']
+        if pd.notna(row['pdf_url']) and row['pdf_url'] != "":
+            # Fichier déjà uploadé, afficher le bouton "Télécharger"
+            file_url = get_signed_url(row['pdf_url'])  # Générer un lien signé ou public
+            if file_url:
+                return f'<a href="{file_url}" download>📄 Télécharger PDF</a>'
+        else:
+            # Fichier non uploadé, afficher le bouton "Uploader"
+            upload_placeholder = st.empty()
+            uploaded_file = upload_placeholder.file_uploader(f"Uploader PDF pour action {action_id}", type=["pdf"], key=f"upload_{action_id}")
+            if uploaded_file:
+                file_url = upload_file_to_bucket(uploaded_file, action_id)
+                if file_url:
+                    # Sauvegarder l'URL dans la base de données
+                    save_pdf_url_in_db(action_id, file_url)
+                    # Rafraîchir la page ou afficher le lien de téléchargement
+                    upload_placeholder.empty()  # Supprimer le bouton d'upload après succès
+                    return f'<a href="{get_signed_url(file_url)}" download>📄 Télécharger PDF</a>'
+        return "Aucun fichier"
+
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
         st.session_state.actions_correctives_T2F = load_actions_correctives()
@@ -811,6 +845,9 @@ def main():
             width=2000,
             key='data_editor_T2F'
         )
+        # Ajoutez la colonne PDF avec un bouton de téléchargement ou d'upload
+        for index, row in edited_df.iterrows():
+            st.markdown(create_pdf_button(row), unsafe_allow_html=True)
 
         if st.button("Sauvegarder les modifications", key='save_T2F'):
             st.session_state.actions_correctives_T2F = edited_df
