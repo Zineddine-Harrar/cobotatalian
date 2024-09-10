@@ -8,8 +8,8 @@ import plotly.io as pio
 from plotly.subplots import make_subplots
 import openpyxl
 import io
-import os
-import traceback
+from supabase import create_client, Client
+from streamlit.runtime.scriptrunner import RerunException
 from pathlib import Path
 
 def main():
@@ -678,126 +678,155 @@ def main():
 
     
     
-    if 'current_app' not in st.session_state:
-        st.session_state.current_app = "ECOBOT 40"
+   if 'current_app' not in st.session_state:
+        st.session_state.current_app = "RQUARTZ T2F"
+
     st.subheader("Actions correctives")
 
-    # Chemin du fichier CSV (on utilise CSV au lieu d'Excel pour plus de simplicité)
-    CSV_FILE_PATH = Path(os.getcwd()) / 'actions_correctives_ECOBOT40.csv'
+    # Connexion à Supabase avec les informations de connexion
+    url = "https://iufgzjhncpsmrstlwrya.supabase.co"  # Remplace par l'URL de ton projet Supabase
+    key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Zmd6amhuY3BzbXJzdGx3cnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU5NTMyNTYsImV4cCI6MjA0MTUyOTI1Nn0.ek4NYej4ikVWRAWvppQrzyLrD8OMdh_XoVZvh_fOSCY"  # Remplace par ta clé API
+    supabase: Client = create_client(url, key)
 
-    def log_debug(message):
-        st.sidebar.text(f"DEBUG: {message}")
-
+   # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
     def load_actions_correctives():
-        if not CSV_FILE_PATH.exists():
-            return pd.DataFrame(columns=['Action corrective', 'Date d\'ajout', 'Délai d\'intervention', 'Responsable Action', 'Statut', 'Commentaires'])
+        try:
+            response = supabase.table('actions_correctives').select('*').execute()
+            data = response.data
+            if not data:
+                # Si la table est vide, on retourne un DataFrame vide avec les bonnes colonnes
+                return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
+            df = pd.DataFrame(data)
 
-        df = pd.read_csv(CSV_FILE_PATH)
-        return df
+            # Convertir les dates
+            df['date_ajout'] = pd.to_datetime(df['date_ajout']).dt.date
+            df['delai_intervention'] = pd.to_datetime(df['delai_intervention']).dt.date
+
+            return df
+        except Exception as e:
+            st.error(f"Erreur lors du chargement des données : {e}")
+            return pd.DataFrame(columns=['action_corrective', 'date_ajout', 'delai_intervention', 'responsable_action', 'statut', 'commentaires'])
+
+    # Charger les données à chaque lancement de l'application
+    st.session_state.actions_correctives_T2F = load_actions_correctives()
 
     def save_actions_correctives(df):
         try:
-            df.to_csv(CSV_FILE_PATH, index=False)
+            for index, row in df.iterrows():
+                # Convertir les dates si elles ne sont pas déjà en format datetime
+                if isinstance(row['date_ajout'], str):
+                    row['date_ajout'] = pd.to_datetime(row['date_ajout'], errors='coerce').date()
+                if isinstance(row['delai_intervention'], str):
+                    row['delai_intervention'] = pd.to_datetime(row['delai_intervention'], errors='coerce').date()
+
+                # Préparer les données à sauvegarder
+                data_to_save = {
+                    'action_corrective': row['action_corrective'],
+                    'date_ajout': row['date_ajout'].strftime('%Y-%m-%d') if pd.notna(row['date_ajout']) else None,
+                    'delai_intervention': row['delai_intervention'].strftime('%Y-%m-%d') if pd.notna(row['delai_intervention']) else None,
+                    'responsable_action': row['responsable_action'],
+                    'statut': row['statut'],
+                    'commentaires': row['commentaires']
+                }
+
+                if 'id' in row and pd.notna(row['id']):
+                    data_to_save['id'] = int(row['id'])  # Convertir l'ID en entier
+                    supabase.table('actions_correctives').update(data_to_save).eq('id', data_to_save['id']).execute()
+                else:
+                    supabase.table('actions_correctives').insert(data_to_save).execute()
+
             return True
         except Exception as e:
-            st.error(f"Erreur lors de la sauvegarde: {str(e)}")
+            st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
-    def actions_correctives_section():
-        st.subheader("Actions correctives")
 
-        # Initialiser ou mettre à jour le state
-        if 'actions_correctives_ECOBOT40' not in st.session_state or st.button("Recharger les données"):
-            st.session_state.actions_correctives_ECOBOT40 = load_actions_correctives()
 
-        if 'editing_ECOBOT40' not in st.session_state:
-            st.session_state.editing_ECOBOT40 = False
 
-        # Fonction pour basculer le mode d'édition
-        def toggle_edit_mode_ECOBOT40():
-            st.session_state.editing_ECOBOT40 = not st.session_state.editing_ECOBOT40
+    # Fonction pour convertir les colonnes de date en datetime avant de les utiliser dans le data_editor
+    def prepare_df_for_editing(df):
+        try:
+            # Assurer que les colonnes de dates sont bien en format datetime.date
+            df['date_ajout'] = pd.to_datetime(df['date_ajout'], errors='coerce').dt.date
+            df['delai_intervention'] = pd.to_datetime(df['delai_intervention'], errors='coerce').dt.date
+            return df
+        except Exception as e:
+            st.error(f"Erreur lors de la conversion des colonnes de date : {e}")
+            return df
 
-        # Bouton pour basculer entre le mode d'édition et de visualisation
-        st.button("Modifier les actions correctives" if not st.session_state.editing_ECOBOT40 else "Terminer l'édition", 
-                  on_click=toggle_edit_mode_ECOBOT40, key='toggle_edit_ECOBOT40')
+    # Initialiser le state si nécessaire
+    if 'actions_correctives_T2F' not in st.session_state:
+        st.session_state.actions_correctives_T2F = load_actions_correctives()
 
-        if st.session_state.editing_ECOBOT40:
-            # Mode d'édition
-            edited_df = st.data_editor(
-                st.session_state.actions_correctives_ECOBOT40,
-                num_rows="dynamic",
-                column_config={
-                    "Action corrective": st.column_config.TextColumn(
-                        "Action corrective",
-                        help="Décrivez l'action corrective",
-                        max_chars=100,
-                        width="large",
-                    ),
-                    "Date d'ajout": st.column_config.TextColumn(
-                        "Date d'ajout",
-                        help="Date d'ajout de l'action (YYYY-MM-DD)",
-                        max_chars=10,
-                        width="medium",
-                    ),
-                    "Délai d'intervention": st.column_config.TextColumn(
-                        "Délai d'intervention",
-                        help="Date limite pour l'action (YYYY-MM-DD)",
-                        max_chars=10,
-                        width="medium",
-                    ),
-                    "Responsable Action": st.column_config.TextColumn(
-                        "Responsable Action",
-                        help="Personne responsable de l'action",
-                        max_chars=50,
-                        width="medium",
-                    ),
-                    "Statut": st.column_config.SelectboxColumn(
-                        "Statut",
-                        help="Statut actuel de l'action",
-                        options=['En cours', 'Terminé', 'En retard'],
-                        width="small",
-                    ),
-                    "Commentaires": st.column_config.TextColumn(
-                        "Commentaires",
-                        help="Commentaires additionnels",
-                        max_chars=200,
-                        width="large",
-                    ),
-                },
-                hide_index=True,
-                width=2000,
-                key='data_editor_ECOBOT40'
-            )
+    # Préparer le DataFrame pour l'édition en s'assurant que les colonnes de date sont bien converties
+    st.session_state.actions_correctives_T2F = prepare_df_for_editing(st.session_state.actions_correctives_T2F)
 
-            if st.button("Sauvegarder les modifications", key='save_ECOBOT40'):
-                if save_actions_correctives(edited_df):
-                    st.session_state.actions_correctives_ECOBOT40 = edited_df
-                    st.success("Modifications sauvegardées avec succès!")
-                    st.session_state.editing_ECOBOT40 = False
-                else:
-                    st.error("Erreur lors de la sauvegarde. Veuillez vérifier les logs de débogage.")
-        else:
-            # Mode de visualisation
-            st.dataframe(st.session_state.actions_correctives_ECOBOT40, width=2000)
+    if 'editing_T2F' not in st.session_state:
+        st.session_state.editing_T2F = False
 
-        # Bouton pour télécharger le fichier CSV
-        if st.button("Télécharger le fichier CSV", key='download_ECOBOT40'):
-            csv = st.session_state.actions_correctives_ECOBOT40.to_csv(index=False)
-            st.download_button(
-                label="Cliquez ici pour télécharger",
-                data=csv,
-                file_name="actions_correctives_ECOBOT40.csv",
-                mime="text/csv"
-            )
+    # Basculer entre mode édition et visualisation
+    def toggle_edit_mode_T2F():
+        st.session_state.editing_T2F = not st.session_state.editing_T2F
 
-        # Informations de débogage
-        st.sidebar.subheader("Informations de débogage")
-        st.sidebar.text(f"Chemin du fichier: {CSV_FILE_PATH}")
-        st.sidebar.text(f"Le fichier existe: {CSV_FILE_PATH.exists()}")
-        if CSV_FILE_PATH.exists():
-            st.sidebar.text(f"Taille du fichier: {CSV_FILE_PATH.stat().st_size} bytes")
-            st.sidebar.text(f"Dernière modification: {datetime.fromtimestamp(CSV_FILE_PATH.stat().st_mtime)}")
-        st.sidebar.text(f"Répertoire actuel: {os.getcwd()}")
-    actions_correctives_section()
+    st.button("Modifier les actions correctives" if not st.session_state.editing_T2F else "Terminer l'édition", 
+              on_click=toggle_edit_mode_T2F, key='toggle_edit_T2F')
+
+    if st.session_state.editing_T2F:
+        # Mode d'édition avec les dates converties en format approprié
+        edited_df = st.data_editor(
+            st.session_state.actions_correctives_T2F,
+            num_rows="dynamic",
+            column_config={
+                "action_corrective": st.column_config.TextColumn(
+                    "Action corrective",
+                    max_chars=100,
+                    width="large",
+                ),
+                "date_ajout": st.column_config.DateColumn(
+                    "date_ajout",
+                    format="DD/MM/YYYY",
+                    width="medium",
+                ),
+                "delai_intervention": st.column_config.DateColumn(
+                    "delai_intervention",
+                    format="DD/MM/YYYY",
+                    width="medium",
+                ),
+                "responsable_action": st.column_config.TextColumn(
+                    "responsable_action",
+                    max_chars=50,
+                    width="medium",
+                ),
+                "statut": st.column_config.SelectboxColumn(
+                    "statut",
+                    options=['En cours', 'Terminé', 'En retard'],
+                    width="small",
+                ),
+                "commentaires": st.column_config.TextColumn(
+                    "commentaires",
+                    max_chars=200,
+                    width="large",
+                ),
+            },
+            hide_index=True,
+            width=2000,
+            key='data_editor_T2F'
+        )
+
+        if st.button("Sauvegarder les modifications", key='save_T2F'):
+            st.session_state.actions_correctives_T2F = edited_df
+            if save_actions_correctives(edited_df):
+                st.success("Actions sauvegardées avec succès.")
+            st.session_state.editing_T2F = False
+    else:
+        # Mode de visualisation
+        st.dataframe(st.session_state.actions_correctives_T2F, width=2000)
+
+    def reload_page():
+       raise RerunException(rerun_data=None)
+
+    # Interface pour recharger les données
+    if st.button("Recharger les données"):
+       reload_page()
 
 if __name__ == '__main__':
     main()
