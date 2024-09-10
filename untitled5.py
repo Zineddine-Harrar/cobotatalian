@@ -1067,7 +1067,7 @@ def main():
             # Uploader le fichier dans le bucket Supabase
             response = supabase.storage.from_('IMON').upload(file_path, file_content)
     
-            if response.get("status_code") == 200:
+            if response.status_code == 200 or response.status_code == 201:
                 st.success(f"Le fichier a été uploadé avec succès pour l'action {action_id}")
                 return file_path  # Retourne le chemin du fichier dans le bucket
             else:
