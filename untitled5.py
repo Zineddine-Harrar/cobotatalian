@@ -1082,7 +1082,13 @@ def main():
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
-                # Préparer les données à sauvegarder en vérifiant que les colonnes de dates ne sont pas nulles
+                # Convertir les dates si elles ne sont pas déjà en format datetime
+                if isinstance(row['date_ajout'], str):
+                    row['date_ajout'] = pd.to_datetime(row['date_ajout'], errors='coerce').date()
+                if isinstance(row['delai_intervention'], str):
+                    row['delai_intervention'] = pd.to_datetime(row['delai_intervention'], errors='coerce').date()
+
+                # Préparer les données à sauvegarder
                 data_to_save = {
                     'action_corrective': row['action_corrective'],
                     'date_ajout': row['date_ajout'].strftime('%Y-%m-%d') if pd.notna(row['date_ajout']) else None,
@@ -1092,20 +1098,17 @@ def main():
                     'commentaires': row['commentaires']
                 }
 
-                # Convertir l'ID en entier si nécessaire
                 if 'id' in row and pd.notna(row['id']):
                     data_to_save['id'] = int(row['id'])  # Convertir l'ID en entier
-
-                    # Faire une mise à jour avec l'ID
                     supabase.table('actions_correctives').update(data_to_save).eq('id', data_to_save['id']).execute()
                 else:
-                    # Insertion sans l'ID (la base de données générera l'ID)
                     supabase.table('actions_correctives').insert(data_to_save).execute()
 
             return True
         except Exception as e:
             st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
+
 
 
     # Fonction pour convertir les colonnes de date en datetime avant de les utiliser dans le data_editor
