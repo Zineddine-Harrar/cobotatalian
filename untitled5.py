@@ -1060,7 +1060,7 @@ def main():
     key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZW5oZmp6eWt5andwaWh1dmNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU5NTE0NjYsImV4cCI6MjA0MTUyNzQ2Nn0.uRexXku6cZCo4qPT_coXJtL3s31-lh_P9J469FhLxvk"  # Remplace par ta clé API
     supabase: Client = create_client(url, key)
     # Remplacez par votre token et le nom du dépôt
-    GITHUB_TOKEN = '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'
+    GITHUB_TOKEN = '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'
     REPO_NAME = 'Zineddine-Harrar/storagecobot'  # Nom du dépôt privé
     BRANCH_NAME = 'main'  # Nom de la branche par défaut
     def get_signed_url(file_path):
