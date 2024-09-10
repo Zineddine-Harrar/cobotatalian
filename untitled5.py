@@ -1056,27 +1056,27 @@ def main():
     url = "https://jienhfjzykyjwpihuvcl.supabase.co"  # Remplace par l'URL de ton projet Supabase
     key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZW5oZmp6eWt5andwaWh1dmNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU5NTE0NjYsImV4cCI6MjA0MTUyNzQ2Nn0.uRexXku6cZCo4qPT_coXJtL3s31-lh_P9J469FhLxvk"  # Remplace par ta clé API
     supabase: Client = create_client(url, key)
-    # Fonction pour uploader un fichier dans le bucket Supabase
     def upload_file_to_bucket(file, action_id):
         try:
             # Créer un chemin unique pour le fichier dans le bucket
             file_path = f"pdf_uploads/{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.name}"
-        
+    
             # Lire le fichier
             file_content = file.read()
 
             # Uploader le fichier dans le bucket Supabase
-            response = supabase.storage().from_('IMON').upload(file_path, file_content)
-        
-            if response.status_code == 200:
+            response = supabase.storage.from_('IMON').upload(file_path, file_content)
+    
+            if response.get("status_code") == 200:
                 st.success(f"Le fichier a été uploadé avec succès pour l'action {action_id}")
                 return file_path  # Retourne le chemin du fichier dans le bucket
             else:
-                st.error(f"Erreur lors de l'upload du fichier : {response.json()}")
+                st.error(f"Erreur lors de l'upload du fichier : {response}")
                 return None
         except Exception as e:
             st.error(f"Erreur lors de l'upload : {e}")
             return None
+
     def save_pdf_url_in_db(action_id, file_url):
         try:
             supabase.table('actions_correctives').update({"pdf_url": file_url}).eq("id", action_id).execute()
