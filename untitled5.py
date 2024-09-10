@@ -1082,10 +1082,11 @@ def main():
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
+                # Préparer les données à sauvegarder en vérifiant que les colonnes de dates ne sont pas nulles
                 data_to_save = {
                     'action_corrective': row['action_corrective'],
-                    'date_ajout': row['date_ajout'].strftime('%Y-%m-%d'),
-                    'delai_intervention': row['delai_intervention'].strftime('%Y-%m-%d'),
+                    'date_ajout': row['date_ajout'].strftime('%Y-%m-%d') if pd.notna(row['date_ajout']) else None,
+                    'delai_intervention': row['delai_intervention'].strftime('%Y-%m-%d') if pd.notna(row['delai_intervention']) else None,
                     'responsable_action': row['responsable_action'],
                     'statut': row['statut'],
                     'commentaires': row['commentaires']
