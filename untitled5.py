@@ -1063,58 +1063,8 @@ def main():
     GITHUB_TOKEN = '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'
     REPO_NAME = 'Zineddine-Harrar/storagecobot'  # Nom du dépôt privé
     BRANCH_NAME = 'main'  # Nom de la branche par défaut
-    def get_signed_url(file_path):
-        try:
-            # Générer une URL signée avec une expiration de 1 heure (3600 secondes)
-            response = supabase.storage.from_('IMON').create_signed_url(file_path, 3600)
-            if response:
-                return response['signedURL']
-            else:
-                st.error("Erreur lors de la génération de l'URL signée.")
-                return None
-        except Exception as e:
-            st.error(f"Erreur lors de la génération de l'URL signée : {e}")
-            return None
     
-    def upload_file_to_github(file, action_id):
-        try:
-            # Connexion à GitHub avec le token
-            g = Github(GITHUB_TOKEN)
-            repo = g.get_repo(REPO_NAME)
-
-            # Créer un nom de fichier unique basé sur l'action ID et l'horodatage
-            file_name = f"pdf_uploads/{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.name}"
-
-            # Lire le fichier
-            file_content = file.read()
-
-            # Encoder le contenu en base64
-            encoded_content = base64.b64encode(file_content).decode()
-
-            # Uploader le fichier sur GitHub
-            repo.create_file(
-                path=file_name,
-                message=f"Upload PDF for action {action_id}",
-                content=encoded_content,
-                branch=BRANCH_NAME
-            )
-
-            # URL de téléchargement privée
-            file_url = f"https://raw.githubusercontent.com/{REPO_NAME}/{BRANCH_NAME}/{file_name}"
-            return file_url
-
-        except Exception as e:
-            st.error(f"Erreur lors de l'upload sur GitHub : {e}")
-            return None
-
-    def save_pdf_url_in_db(action_id, file_url):
-        try:
-            supabase.table('actions_correctives').update({"pdf_url": file_url}).eq("id", action_id).execute()
-            return True
-        except Exception as e:
-            st.error(f"Erreur lors de la sauvegarde du fichier PDF : {e}")
-            return False
-
+    
     # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
     def load_actions_correctives():
         try:
@@ -1179,24 +1129,7 @@ def main():
         except Exception as e:
             st.error(f"Erreur lors de la conversion des colonnes de date : {e}")
             return df
-    def create_pdf_button(row):
-        action_id = row['id']
-        if pd.notna(row['pdf_url']) and row['pdf_url'] != "":
-            # Fichier déjà uploadé, afficher le bouton "Télécharger"
-            return f'<a href="{row["pdf_url"]}" download>📄 Télécharger PDF</a>'
-        else:
-            # Fichier non uploadé, afficher le bouton "Uploader"
-            upload_placeholder = st.empty()
-            uploaded_file = upload_placeholder.file_uploader(f"Uploader PDF pour action {action_id}", type=["pdf"], key=f"upload_{action_id}")
-            if uploaded_file:
-                file_url = upload_file_to_github(uploaded_file, action_id)
-                if file_url:
-                    # Sauvegarder l'URL dans la base de données
-                    save_pdf_url_in_db(action_id, file_url)
-                    # Rafraîchir la page ou afficher le lien de téléchargement
-                    upload_placeholder.empty()  # Supprimer le bouton d'upload après succès
-                    return f'<a href="{file_url}" download>📄 Télécharger PDF</a>'
-        return "Aucun fichier"
+    
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
         st.session_state.actions_correctives_T2F = load_actions_correctives()
@@ -1255,21 +1188,7 @@ def main():
             width=2000,
             key='data_editor_T2F'
         )
-        # Ajoutez un bouton d'upload dans chaque ligne pour chaque action corrective
-        for index, row in edited_df.iterrows():
-            file_to_upload = st.file_uploader(f"Uploader un fichier PDF pour {row['action_corrective']}", type="pdf", key=f"file_uploader_{row['id']}")
-        
-            if file_to_upload:
-                # Uploader le fichier et obtenir l'URL
-                file_path = upload_file_to_github(file_to_upload, row['id'])
-                if file_path:
-                    # Générer l'URL du fichier
-                    file_url = f"https://{url}/storage/v1/object/public/{file_path}"
-                
-                    # Sauvegarder l'URL dans la base de données
-                    if save_pdf_url_in_db(row['id'], file_url):
-                        st.success(f"Le fichier PDF pour l'action corrective {row['action_corrective']} a été enregistré avec succès.")
-
+    
         if st.button("Sauvegarder les modifications", key='save_T2F'):
             st.session_state.actions_correctives_T2F = edited_df
             if save_actions_correctives(edited_df):
