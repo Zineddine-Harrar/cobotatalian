@@ -392,8 +392,10 @@ def main():
             gauge={
                 'axis': {'range': [None, 100]},
                 'steps': [
-                    {'range': [0, 50], 'color': "orange"},
-                    {'range': [50, 100], 'color': "green"}],
+                    {'range': [0, 40], 'color': "red"},
+                    {'range': [40, 80], 'color': "orange"},
+                    {'range': [80, 100], 'color': "green"}
+                ],
                 'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi}
             }
         ))
@@ -413,8 +415,10 @@ def main():
             gauge={
                 'axis': {'range': [None, 100]},
                 'steps': [
-                    {'range': [0, 50], 'color': "orange"},
-                    {'range': [50, 100], 'color': "green"}],
+                    {'range': [0, 40], 'color': "red"},
+                    {'range': [40, 80], 'color': "orange"},
+                    {'range': [80, 100], 'color': "green"}
+                ],
                 'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': weekly_completion_rate}
             }
         ))
@@ -588,8 +592,10 @@ def main():
             gauge={
                 'axis': {'range': [None, 100]},
                 'steps': [
-                    {'range': [0, 50], 'color': "orange"},
-                    {'range': [50, 100], 'color': "green"}],
+                    {'range': [0, 40], 'color': "red"},
+                    {'range': [40, 80], 'color': "orange"},
+                    {'range': [80, 100], 'color': "green"}
+                ],
                 'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_suivi_moyen_mois}
             }
         ))
@@ -601,8 +607,10 @@ def main():
             gauge={
                 'axis': {'range': [None, 100]},
                 'steps': [
-                    {'range': [0, 50], 'color': "orange"},
-                    {'range': [50, 100], 'color': "green"}],
+                    {'range': [0, 40], 'color': "red"},
+                    {'range': [40, 80], 'color': "orange"},
+                    {'range': [80, 100], 'color': "green"}
+                ],
                 'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': taux_realisation_moyen_mois}
             }
         ))
