@@ -206,7 +206,7 @@ color_map = {
 
     
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
-    def create_parcours_comparison_table(semaine, details_df, planning_df):
+def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
         
