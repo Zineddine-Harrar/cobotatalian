@@ -175,6 +175,31 @@ def main():
     # Nettoyer les doublons dans le dataframe details_df
     details_df1 = clean_duplicates(details_df)
 
+
+
+
+
+
+# Fonction pour assigner la période en fonction de l'heure de début
+def assign_period(time):
+    hour = time.hour
+    if 6 <= hour < 14:
+        return 'Matin'
+    elif 14 <= hour < 22:
+        return 'Après-midi'
+    else:
+        return 'Soir'
+
+# Appliquer la fonction pour créer une nouvelle colonne "période" dans details_df
+details_df['période'] = details_df['Début'].apply(assign_period)
+
+# Ajouter la période à planning_df basé sur les correspondances de parcours
+# Supposons que la colonne "Parcours" dans planning_df correspond à celle de details_df
+planning_df['période'] = planning_df['parcours'].map(details_df.set_index('Parcours')['période'])
+
+
+
+    
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
     def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
@@ -201,7 +226,33 @@ def main():
                 parcours_normalized = parcours.strip().lower()
                 if parcours_normalized in actual_routes:
                     parcours_status[parcours][day] = "Fait"
-        
+
+
+
+
+
+# Dictionnaire de couleur pour les périodes
+color_map = {
+    'Matin': 'background-color: #AED6F1',  # Bleu clair pour Matin
+    'Après-midi': 'background-color: #F9E79F',  # Jaune clair pour Après-midi
+    'Soir': 'background-color: #F5B7B1'  # Rose clair pour Soir
+}
+
+# Fonction de style pour la colonne "Parcours Prévu" en fonction de la période
+def highlight_parcours_prevu(val):
+    period = planning_df.set_index('parcours')['période'].get(val, '')
+    return color_map.get(period, '')  # Appliquer la couleur en fonction de la période
+
+# Appliquer le style de couleur sur la colonne "Parcours Prévu"
+styled_planning = planning_df.style.applymap(highlight_parcours_prevu, subset=['parcours'])
+
+# Afficher le tableau stylé
+styled_planning
+
+
+
+
+
         # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
         for parcours, status in parcours_status.items():
