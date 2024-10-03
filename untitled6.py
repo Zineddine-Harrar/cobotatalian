@@ -180,6 +180,7 @@ def main():
 
 
 
+
 # Fonction pour assigner la période en fonction de l'heure de début
 def assign_period(time):
     hour = time.hour
@@ -191,18 +192,17 @@ def assign_period(time):
         return 'Soir'
 
 # Appliquer la fonction pour créer une nouvelle colonne "période" dans details_df
-details_df['période'] = details_df['Début'].apply(assign_period)
+details_df['période'] = details_df['début'].apply(assign_period)
 
 # Ajouter la période à planning_df basé sur les correspondances de parcours
-# Supposons que la colonne "Parcours" dans planning_df correspond à celle de details_df
-planning_df['période'] = planning_df['parcours'].map(details_df.set_index('Parcours')['période'])
+planning_df['période'] = planning_df['parcours'].map(details_df.set_index('parcours')['période'])
+
 # Dictionnaire de couleur pour les périodes
 color_map = {
     'Matin': 'background-color: #AED6F1',  # Bleu clair pour Matin
     'Après-midi': 'background-color: #F9E79F',  # Jaune clair pour Après-midi
     'Soir': 'background-color: #F5B7B1'  # Rose clair pour Soir
 }
-
 
     
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
@@ -233,16 +233,17 @@ def create_parcours_comparison_table(semaine, details_df, planning_df):
                     parcours_status[parcours][day] = "Fait"
 
 
-        # Créer le DataFrame à partir du dictionnaire de statuts
-        rows = []
-        for parcours, status in parcours_status.items():
-            row = {'Parcours Prévu': parcours}
-            row.update(status)
-            rows.append(row)
-        
-        comparison_table = pd.DataFrame(rows)
-        
-        return comparison_table
+   # Créer le DataFrame à partir du dictionnaire de statuts
+    rows = []
+    for parcours, status in parcours_status.items():
+        row = {'Parcours Prévu': parcours}
+        row.update(status)
+        row['Période'] = planning_df[planning_df['parcours'] == parcours]['période'].values[0]  # Ajouter la période
+        rows.append(row)
+
+    comparison_table = pd.DataFrame(rows)
+
+    return comparison_table
 
 
 
