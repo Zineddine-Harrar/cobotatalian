@@ -175,38 +175,8 @@ def main():
     # Nettoyer les doublons dans le dataframe details_df
     details_df1 = clean_duplicates(details_df)
 
-
-
-
-
-
-
-# Fonction pour assigner la période en fonction de l'heure de début
-def assign_period(time):
-    hour = time.hour
-    if 6 <= hour < 14:
-        return 'Matin'
-    elif 14 <= hour < 22:
-        return 'Après-midi'
-    else:
-        return 'Soir'
-
-# Appliquer la fonction pour créer une nouvelle colonne "période" dans details_df
-details_df['période'] = details_df['début'].apply(assign_period)
-
-# Ajouter la période à planning_df basé sur les correspondances de parcours
-planning_df['période'] = planning_df['parcours'].map(details_df.set_index('parcours')['période'])
-
-# Dictionnaire de couleur pour les périodes
-color_map = {
-    'Matin': 'background-color: #AED6F1',  # Bleu clair pour Matin
-    'Après-midi': 'background-color: #F9E79F',  # Jaune clair pour Après-midi
-    'Soir': 'background-color: #F5B7B1'  # Rose clair pour Soir
-}
-
-    
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
-def create_parcours_comparison_table(semaine, details_df, planning_df):
+    def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
         
@@ -230,37 +200,19 @@ def create_parcours_comparison_table(semaine, details_df, planning_df):
             for parcours in parcours_list:
                 parcours_normalized = parcours.strip().lower()
                 if parcours_normalized in actual_routes:
-                    parcours_status[parcours][day] = "Fait" 
+                    parcours_status[parcours][day] = "Fait"
+        
+        # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
         for parcours, status in parcours_status.items():
             row = {'Parcours Prévu': parcours}
             row.update(status)
-            row['Période'] = planning_df[planning_df['parcours'] == parcours]['période'].values[0]  # Ajouter la période
             rows.append(row)
+        
         comparison_table = pd.DataFrame(rows)
+        
         return comparison_table
 
-
-
-# Fonction de style pour la colonne "Parcours Prévu" en fonction de la période
-def highlight_parcours_prevu(val, period):
-    return color_map.get(period, '')
-
-# Appliquer le style à la colonne "Parcours Prévu" en fonction de la période
-def apply_color_to_comparison_table(comparison_table):
-    # Appliquer la couleur à la colonne "Parcours Prévu" basée sur la colonne "Période"
-    styled_comparison_table = comparison_table.style.apply(
-        lambda x: [highlight_parcours_prevu(val, comparison_table.at[i, 'Période']) for i, val in enumerate(x)], 
-        subset=['Parcours Prévu']
-    )
-    
-    # Supprimer la colonne "Période" si tu ne veux pas l'afficher
-    styled_comparison_table = styled_comparison_table.hide_columns(['Période'])
-    
-    return styled_comparison_table
-
-
-    
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
         total_parcours = 49  # Total des parcours prévus sur une semaine (7 jours * 6 parcours par jour)
