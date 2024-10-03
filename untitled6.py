@@ -230,20 +230,15 @@ def create_parcours_comparison_table(semaine, details_df, planning_df):
             for parcours in parcours_list:
                 parcours_normalized = parcours.strip().lower()
                 if parcours_normalized in actual_routes:
-                    parcours_status[parcours][day] = "Fait"
-
-
-   # Créer le DataFrame à partir du dictionnaire de statuts
-    rows = []
-    for parcours, status in parcours_status.items():
-        row = {'Parcours Prévu': parcours}
-        row.update(status)
-        row['Période'] = planning_df[planning_df['parcours'] == parcours]['période'].values[0]  # Ajouter la période
-        rows.append(row)
-
-    comparison_table = pd.DataFrame(rows)
-
-    return comparison_table
+                    parcours_status[parcours][day] = "Fait" 
+        rows = []
+        for parcours, status in parcours_status.items():
+            row = {'Parcours Prévu': parcours}
+            row.update(status)
+            row['Période'] = planning_df[planning_df['parcours'] == parcours]['période'].values[0]  # Ajouter la période
+            rows.append(row)
+        comparison_table = pd.DataFrame(rows)
+        return comparison_table
 
 
 
