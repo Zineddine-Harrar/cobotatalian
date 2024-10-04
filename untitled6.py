@@ -197,7 +197,7 @@ def main():
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
         parcours_list = set(planning_df['parcours'])
         parcours_list.discard(None)
-        comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr + columns=['moyenne'])
+        comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
         
         # Initialiser un dictionnaire pour stocker les statuts des parcours
         parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
@@ -631,45 +631,28 @@ def main():
 
 
 
+        def get_period_color(parcours):
+            if parcours in matin_parcours:
+                return 'background-color: #AED6F1'  # Bleu pour le matin
+            elif parcours in apres_midi_parcours:
+                return 'background-color: #F9E79F'  # Jaune pour l'après-midi
+            elif parcours in soir_parcours:
+                return 'background-color: #F5B7B1'  # Orange pour le soir
+            else:
+                return ''  # Pas de couleur pour les parcours non définis dans les listes
 
         
-        # Dictionnaire de couleur pour les périodes
-        color_map = {
-            'Matin': 'background-color: #AED6F1',  # Bleu clair pour Matin
-            'Après-midi': 'background-color: #F9E79F',  # Jaune clair pour Après-midi
-            'Soir': 'background-color: #F5B7B1'  # Rose clair pour Soir
-        }
-        # Fonction pour assigner la période en fonction des listes de parcours
-        def assign_period_to_parcours(parcours):
-            if parcours in parcours_matin:
-                return 'Matin'
-            elif parcours in parcours_apres_midi:
-                return 'Après-midi'
-            elif parcours in parcours_soir:
-                return 'Soir'
-            return 'Inconnu'
+        def apply_color_to_comparison_table(comparison_table):
+        # Appliquer la couleur à la colonne "Parcours Prévu"
+            styled_comparison_table = comparison_table.style.apply(
+                lambda x: [get_period_color(val) for val in x], subset=['Parcours Prévu'])
+            return styled_comparison_table
 
-        # Appliquer la fonction sur le dataframe pour créer une colonne "Période"
-        planning_df['Période'] = planning_df['parcours'].apply(assign_period_to_parcours)
-        # Fonction de style pour colorer les parcours en fonction de la période
-        def highlight_parcours_prevu(val):
-            period = planning_df.loc[planning_df['parcours'] == val, 'Période'].values[0]
-            return color_map.get(period, '')
+        # Générer le tableau de comparaison pour une semaine spécifique
+        comparison_table = create_parcours_comparison_table(semaine_specifique, details_df, planning_df)
         
-        # Appliquer le style au dataframe
-        def apply_color_to_dataframe(planning_df):
-            # Appliquer la couleur à la colonne "parcours"
-            styled_df = planning_df.style.apply(
-                lambda x: [highlight_parcours_prevu(val) for val in x], 
-                subset=['parcours']
-            )
-            return styled_df
-
-        # Créer un DataFrame avec les parcours colorés
-        styled_df = apply_color_to_dataframe(planning_df)
-
-
-
+        # Appliquer les couleurs selon la période
+        styled_comparison_table = apply_color_to_comparison_table(comparison_table)
 
 
 
