@@ -213,6 +213,38 @@ def main():
         
         return comparison_table
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Listes des parcours pour chaque période
+parcours_matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
+parcours_apres_midi = ['Pt 14d Triplex', 'Porte 1-3d H', 'Porte 9-11d H']
+parcours_soir = ['Triplex 17d H', 'Pt 12-14d H']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
         total_parcours = 49  # Total des parcours prévus sur une semaine (7 jours * 6 parcours par jour)
@@ -324,6 +356,10 @@ def main():
     def filter_data_by_week(data, week_number):
         data['week'] = data['Apparition'].dt.isocalendar().week
         return data[data['week'] == week_number]
+
+
+
+
     # Interface Streamlit
 
     st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
@@ -578,6 +614,54 @@ def main():
 
         def style_header(val):
             return 'background-color: black; color: white;'
+
+
+
+
+
+        
+        # Dictionnaire de couleur pour les périodes
+        color_map = {
+            'Matin': 'background-color: #AED6F1',  # Bleu clair pour Matin
+            'Après-midi': 'background-color: #F9E79F',  # Jaune clair pour Après-midi
+            'Soir': 'background-color: #F5B7B1'  # Rose clair pour Soir
+        }
+        # Fonction pour assigner la période en fonction des listes de parcours
+        def assign_period_to_parcours(parcours):
+            if parcours in parcours_matin:
+                return 'Matin'
+            elif parcours in parcours_apres_midi:
+                return 'Après-midi'
+            elif parcours in parcours_soir:
+                return 'Soir'
+            return 'Inconnu'
+
+        # Appliquer la fonction sur le dataframe pour créer une colonne "Période"
+        planning_df['Période'] = planning_df['parcours'].apply(assign_period_to_parcours)
+        # Fonction de style pour colorer les parcours en fonction de la période
+        def highlight_parcours_prevu(val):
+            period = planning_df.loc[planning_df['parcours'] == val, 'Période'].values[0]
+            return color_map.get(period, '')
+        
+        # Appliquer le style au dataframe
+        def apply_color_to_dataframe(planning_df):
+            # Appliquer la couleur à la colonne "parcours"
+            styled_df = planning_df.style.apply(
+                lambda x: [highlight_parcours_prevu(val) for val in x], 
+                subset=['parcours']
+            )
+            return styled_df
+
+        # Créer un DataFrame avec les parcours colorés
+        styled_df = apply_color_to_dataframe(planning_df)
+
+
+
+
+
+
+
+
 
         # Appliquer le style sur tout le DataFrame
         styled_table = weekly_comparison_table.style.applymap(style_cell)
