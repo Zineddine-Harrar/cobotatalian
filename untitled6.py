@@ -197,7 +197,7 @@ def main():
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
         parcours_list = set(planning_df['parcours'])
         parcours_list.discard(None)
-        comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
+        comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr+ columns=['moyenne'])
         
         # Initialiser un dictionnaire pour stocker les statuts des parcours
         parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
