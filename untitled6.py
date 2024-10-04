@@ -96,6 +96,19 @@ def main():
             background-color: #FF1313 !important;
             color: #CACFD2 !important;
         }
+        .dataframe tbody td[data-val='Matin'] {
+            background-color: #AED6F1 !important;
+            color: black !important;
+        }
+        .dataframe tbody td[data-val='Après-Midi'] {
+            background-color: #F9E79F !important;
+            color: black !important;
+            
+        .dataframe tbody td[data-val='Soir'] {
+            background-color: #F5B7B1 !important;
+            color: black !important;
+        }
+  
         .dataframe tbody td:first-child {
             background-color: #000 !important;
             color: #fff !important;
