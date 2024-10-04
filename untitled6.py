@@ -223,9 +223,7 @@ def main():
 
 
 
-    matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
-    apres_midi = ['Pt 14d Triplex', 'Porte 1-3d H', 'Porte 9-11d H']
-    soir = ['Triplex 17d H', 'Pt 12-14d H']
+
     
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
