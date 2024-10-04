@@ -226,10 +226,10 @@ def main():
 
 
 
-# Listes des parcours pour chaque période
-parcours_matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
-parcours_apres_midi = ['Pt 14d Triplex', 'Porte 1-3d H', 'Porte 9-11d H']
-parcours_soir = ['Triplex 17d H', 'Pt 12-14d H']
+    # Listes des parcours pour chaque période
+    parcours_matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
+    parcours_apres_midi = ['Pt 14d Triplex', 'Porte 1-3d H', 'Porte 9-11d H']
+    parcours_soir = ['Triplex 17d H', 'Pt 12-14d H']
 
 
 
