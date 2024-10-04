@@ -215,16 +215,10 @@ def main():
 
 
 
+        matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
+        apres_midi = ['Pt 14d Triplex', 'Porte 1-3d H', 'Porte 9-11d H']
+        soir = ['Triplex 17d H', 'Pt 12-14d H']
 
-
-
-
-
-
-
-
-
-    
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
         total_parcours = 49  # Total des parcours prévus sur une semaine (7 jours * 6 parcours par jour)
@@ -589,28 +583,15 @@ def main():
 
 
 
-        def get_period(hour):
-            if 6 <= hour < 14:
-                return 'matin'
-            elif 14 <= hour < 22:
-                return 'apres_midi'
+        def style_parcours_prevu(val):
+            if val in matin:
+                return 'background-color: #4169E1; color: white;'  # Bleu royal
+            elif val in apres_midi:
+                return 'background-color: #FFD700; color: black;'  # Jaune or
+            elif val in soir:
+                return 'background-color: #FF8C00; color: black;'  # Orange foncé
             else:
-                return 'soir'
-        
-        def style_parcours_prevu(val, row_index, details_df):
-            parcours = val
-            debut_time = details_df.loc[details_df['parcours'] == parcours, 'début'].iloc[0].hour if not details_df[details_df['parcours'] == parcours].empty else None
-            
-            if debut_time is not None:
-                period = get_period(debut_time)
-                if period == 'matin':
-                    return 'background-color: #4169E1; color: white;'  # Bleu royal
-                elif period == 'apres_midi':
-                    return 'background-color: #FFD700; color: black;'  # Jaune or
-                elif period == 'soir':
-                    return 'background-color: #FF8C00; color: black;'  # Orange foncé
-            
-            return 'background-color: black; color: white;'  # Style par défaut
+                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
         
         def style_status(val):
             if val == 'Fait':
@@ -619,12 +600,8 @@ def main():
                 return 'background-color: #FF1313; color: #CACFD2;'
             else:
                 return ''
-
-                # Appliquer le style sur la colonne "Parcours Prévu"
-        styled_table = weekly_comparison_table.style.applymap(
-            lambda x: style_parcours_prevu(x, weekly_comparison_table.index, details_df),
-            subset=['Parcours Prévu']
-        )
+        # Appliquer le style sur la colonne "Parcours Prévu"
+        styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
         
         # Appliquer le style sur les autres colonnes pour le statut
         for col in weekly_comparison_table.columns:
@@ -633,7 +610,6 @@ def main():
         
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
-
 
 
 
