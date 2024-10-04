@@ -96,19 +96,6 @@ def main():
             background-color: #FF1313 !important;
             color: #CACFD2 !important;
         }
-        .dataframe tbody td[data-val='Matin'] {
-            background-color: #AED6F1 !important;
-            color: black !important;
-        }
-        .dataframe tbody td[data-val='Après-Midi'] {
-            background-color: #F9E79F !important;
-            color: black !important;
-            
-        .dataframe tbody td[data-val='Soir'] {
-            background-color: #F5B7B1 !important;
-            color: black !important;
-        }
-  
         .dataframe tbody td:first-child {
             background-color: #000 !important;
             color: #fff !important;
@@ -236,28 +223,10 @@ def main():
 
 
 
-
-
-
-    # Listes des parcours pour chaque période
-    parcours_matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
-    parcours_apres_midi = ['Pt 14d Triplex', 'Porte 1-3d H', 'Porte 9-11d H']
-    parcours_soir = ['Triplex 17d H', 'Pt 12-14d H']
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
+    apres_midi = ['Pt 14d Triplex', 'Porte 1-3d H', 'Porte 9-11d H']
+    soir = ['Triplex 17d H', 'Pt 12-14d H']
+    
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
         total_parcours = 49  # Total des parcours prévus sur une semaine (7 jours * 6 parcours par jour)
@@ -369,10 +338,6 @@ def main():
     def filter_data_by_week(data, week_number):
         data['week'] = data['Apparition'].dt.isocalendar().week
         return data[data['week'] == week_number]
-
-
-
-
     # Interface Streamlit
 
     st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
@@ -616,8 +581,26 @@ def main():
             st.subheader('Taux de réalisation des parcours')
             st.plotly_chart(fig_completion)
 
-        # Appliquer le style conditionnel
-        def style_cell(val):
+
+
+
+
+
+
+
+
+
+        def style_parcours_prevu(val):
+            if val in matin:
+                return 'background-color: #4169E1; color: white;'  # Bleu royal
+            elif val in apres_midi:
+                return 'background-color: #FFD700; color: black;'  # Jaune or
+            elif val in soir:
+                return 'background-color: #FF8C00; color: black;'  # Orange foncé
+            else:
+                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
+
+        def style_status(val):
             if val == 'Fait':
                 return 'background-color: #13FF1A; color: black;'
             elif val == 'Pas fait':
@@ -625,47 +608,23 @@ def main():
             else:
                 return ''
 
-        def style_header(val):
-            return 'background-color: black; color: white;'
-
-
-
-
-        def get_period_color(parcours):
-            if parcours in matin_parcours:
-                return 'background-color: #AED6F1'  # Bleu pour le matin
-            elif parcours in apres_midi_parcours:
-                return 'background-color: #F9E79F'  # Jaune pour l'après-midi
-            elif parcours in soir_parcours:
-                return 'background-color: #F5B7B1'  # Orange pour le soir
-            else:
-                return ''  # Pas de couleur pour les parcours non définis dans les listes
-
-        
-        def apply_color_to_comparison_table(comparison_table):
-        # Appliquer la couleur à la colonne "Parcours Prévu"
-            styled_comparison_table = comparison_table.style.apply(
-                lambda x: [get_period_color(val) for val in x], subset=['Parcours Prévu'])
-            return styled_comparison_table
-
-        # Générer le tableau de comparaison pour une semaine spécifique
-        comparison_table = create_parcours_comparison_table(semaine_specifique, details_df, planning_df)
-        
-        # Appliquer les couleurs selon la période
-        styled_comparison_table = apply_color_to_comparison_table(comparison_table)
-
-
-
-
-
-
-        # Appliquer le style sur tout le DataFrame
-        styled_table = weekly_comparison_table.style.applymap(style_cell)
-    
         # Appliquer le style sur la colonne "Parcours Prévu"
-        styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
+        styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
+        
+        # Appliquer le style sur les autres colonnes pour le statut
+        for col in weekly_comparison_table.columns:
+            if col != 'Parcours Prévu':
+                styled_table = styled_table.applymap(style_status, subset=[col])
+        
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
+
+
+
+
+
+
+        
 
         # Afficher le tableau de suivi par parcours
         st.subheader('Tableau de Suivi des Parcours')
