@@ -212,9 +212,9 @@ def main():
         comparison_table = pd.DataFrame(rows)
         
         # Calculer le taux de réalisation pour chaque parcours
-        comparison_table['Taux de réalisation'] = comparison_table.iloc[:, 1:].apply(
-            lambda row: ((row == 'Fait').sum() / len(row)) * 100, axis=1
-        ).round(2)
+        comparison_table['Taux de réalisation'] = comparison_table.iloc[:, 1:-1].apply(
+            lambda row: (row == 'Fait').mean() * 100, axis=1
+        )
         
         return comparison_table
 
@@ -636,6 +636,21 @@ def main():
 
         
         # Afficher le tableau de suivi par parcours
+        col1, col2 = st.columns([3, 1])  # Ajustez les ratios selon vos besoins
+        with col1:
+            st.dataframe(styled_table, width=1500)
+        with col2:
+            st.markdown(create_legend(), unsafe_allow_html=True)
+
+        st.dataframe(styled_table, width=2000)
+        with st.expander("Voir la légende des couleurs"):
+            st.markdown(create_legend(), unsafe_allow_html=True)
+            
+        st.dataframe(styled_table, width=2000)
+        st.help("Légende des couleurs : Bleu = Matin, Jaune = Après-midi, Orange = Soir")
+
+
+    
         st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(styled_table, width=2000)
 
