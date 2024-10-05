@@ -652,19 +652,24 @@ def main():
             """
             return legend_html
         
-
+        st.markdown("""
+            <style>
+            .streamlit-expanderHeader {
+                background-color: #1E3A8A;
+                color: white;
+            }
+            .streamlit-expanderContent {
+                background-color: #1E3A8A;
+                color: white;
+            }
+            </style>
+        """, unsafe_allow_html=True)
 
         st.subheader('Tableau de Suivi des Parcours')
         with st.expander("Voir la légende des couleurs des parcours"):
             st.write("Les couleurs dans la colonne 'Parcours Prévu' indiquent la période de la journée :")
             st.markdown(create_legend(), unsafe_allow_html=True)
         st.dataframe(styled_table, width=2000)
-
-        
-        # Ajouter la légende juste après le tableau
-        #st.markdown(create_legend(), unsafe_allow_html=True)
-    
-        #st.dataframe(styled_table, width=2000)
 
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
