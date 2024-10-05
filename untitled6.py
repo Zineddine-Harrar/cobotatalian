@@ -645,14 +645,15 @@ def main():
         st.dataframe(styled_table, width=2000)
         with st.expander("Voir la légende des couleurs"):
             st.markdown(create_legend(), unsafe_allow_html=True)
-            
+
+        st.subheader('Tableau de Suivi des Parcours')
+
         st.dataframe(styled_table, width=2000)
         st.help("Légende des couleurs : Bleu = Matin, Jaune = Après-midi, Orange = Soir")
 
 
     
-        st.subheader('Tableau de Suivi des Parcours')
-        st.dataframe(styled_table, width=2000)
+        #st.dataframe(styled_table, width=2000)
 
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
