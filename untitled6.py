@@ -656,14 +656,23 @@ def main():
         # Créer un conteneur personnalisé pour l'expander
         st.markdown("""
             <style>
-            .custom-expander {
-                background-color: #1E3A8A;
-                color: white;
-                padding: 10px;
-                border-radius: 5px;
-                margin-bottom: 10px;
-            }
-            </style>
+                .streamlit-expanderHeader {
+                    background-color: #1E3A8A !important;
+                    color: white !important;
+                    border-radius: 5px !important;
+                    padding: 10px !important;
+                }
+                .streamlit-expanderContent {
+                    background-color: #1E3A8A !important;
+                    color: white !important;
+                    border-radius: 0 0 5px 5px !important;
+                    padding: 10px !important;
+                }
+                div[data-testid="stExpander"] {
+                    border: none !important;
+                    box-shadow: none !important;
+                }
+                </style>
         """, unsafe_allow_html=True)
         
         # Utiliser le conteneur personnalisé
