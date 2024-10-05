@@ -633,6 +633,7 @@ def main():
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
+
         def create_legend():
             legend_html = """
             <div style="display: flex; justify-content: space-around; padding: 10px; background-color: black; color: white;">
@@ -652,23 +653,28 @@ def main():
             """
             return legend_html
         
+        # Créer un conteneur personnalisé pour l'expander
         st.markdown("""
             <style>
-            .streamlit-expanderHeader {
+            .custom-expander {
                 background-color: #1E3A8A;
                 color: white;
-            }
-            .streamlit-expanderContent {
-                background-color: #1E3A8A;
-                color: white;
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 10px;
             }
             </style>
         """, unsafe_allow_html=True)
-
-        st.subheader('Tableau de Suivi des Parcours')
+        
+        # Utiliser le conteneur personnalisé
+        st.markdown('<div class="custom-expander">', unsafe_allow_html=True)
         with st.expander("Voir la légende des couleurs des parcours"):
             st.write("Les couleurs dans la colonne 'Parcours Prévu' indiquent la période de la journée :")
             st.markdown(create_legend(), unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Afficher le tableau
+        st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(styled_table, width=2000)
 
         completion_rates_df = completion_rates.reset_index()
