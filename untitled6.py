@@ -652,14 +652,6 @@ def main():
             """
             return legend_html
         
-        # Afficher le tableau de suivi par parcours
-        col1, col2 = st.columns([3, 1])  # Ajustez les ratios selon vos besoins
-        with col1:
-            st.dataframe(styled_table, width=1500)
-        with col2:
-            st.markdown(create_legend(), unsafe_allow_html=True)
-
-        st.dataframe(styled_table, width=2000)
         with st.expander("Voir la légende des couleurs"):
             st.markdown(create_legend(), unsafe_allow_html=True)
 
