@@ -201,7 +201,14 @@ def main():
                 parcours_normalized = parcours.strip().lower()
                 if parcours_normalized in actual_routes:
                     parcours_status[parcours][day] = "Fait"
-        
+            
+    
+            # Calculer le taux de réalisation pour chaque parcours
+        def calculate_completion_rate(row):
+            total_days = len(days_of_week_fr)
+            completed_days = sum(1 for day in days_of_week_fr if row[day] == "Fait")
+            return (completed_days / total_days) * 100 if total_days > 0 else 0
+            
         # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
         for parcours, status in parcours_status.items():
@@ -211,8 +218,10 @@ def main():
         
         comparison_table = pd.DataFrame(rows)
         
+        # Ajouter la colonne de taux de réalisation
+        comparison_table['Taux de réalisation'] = comparison_table.apply(calculate_completion_rate, axis=1)
+        
         return comparison_table
-
 
 
         
@@ -602,17 +611,22 @@ def main():
                 return 'background-color: #FF1313; color: #CACFD2;'
             else:
                 return ''
+                
         # Appliquer le style sur la colonne "Parcours Prévu"
         styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
         
-        # Appliquer le style sur les autres colonnes pour le statut
-        for col in weekly_comparison_table.columns:
-            if col != 'Parcours Prévu':
-                styled_table = styled_table.applymap(style_status, subset=[col])
+        # Appliquer le style sur les colonnes de jours pour le statut
+        for col in days_of_week_fr:
+            styled_table = styled_table.applymap(style_status, subset=[col])
+        
+        # Formater la colonne "Taux de réalisation" en pourcentage
+        styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
+        
+        # Appliquer une coloration conditionnelle à la colonne "Taux de réalisation"
+        styled_table = styled_table.background_gradient(cmap='RdYlGn', subset=['Taux de réalisation'], vmin=0, vmax=100)
         
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
-
 
 
         
