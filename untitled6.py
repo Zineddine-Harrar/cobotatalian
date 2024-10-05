@@ -634,9 +634,6 @@ def main():
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
 
-        # Afficher le DataFrame brut (à supprimer ou commenter)
-        st.write("Contenu du DataFrame weekly_comparison_table:")
-        st.write(weekly_comparison_table)
         
         # Afficher le tableau de suivi par parcours
         st.subheader('Tableau de Suivi des Parcours')
