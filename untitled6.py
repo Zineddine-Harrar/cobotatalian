@@ -620,7 +620,7 @@ def main():
             else:
                 return 'background-color: #FF1313; color: white;'
         
-                def style_taux_realisation(val):
+        def style_taux_realisation(val):
             if pd.isna(val):
                 return ''
             elif val >= 90:
