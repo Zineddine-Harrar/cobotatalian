@@ -592,7 +592,7 @@ def main():
 
 
 
-         def style_parcours_prevu(val):
+        def style_parcours_prevu(val):
             if val in matin:
                 return 'background-color: #4169E1; color: white;'  # Bleu royal
             elif val in apres_midi:
@@ -609,16 +609,6 @@ def main():
                 return 'background-color: #FF1313; color: #CACFD2;'
             else:
                 return ''
-        
-        def style_taux_realisation(val):
-            if pd.isna(val):
-                return ''
-            elif val >= 90:
-                return 'background-color: #13FF1A; color: black;'
-            elif val >= 50:
-                return 'background-color: #FFD700; color: black;'
-            else:
-                return 'background-color: #FF1313; color: white;'
         
         def style_taux_realisation(val):
             if pd.isna(val):
