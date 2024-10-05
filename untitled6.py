@@ -202,13 +202,6 @@ def main():
                 if parcours_normalized in actual_routes:
                     parcours_status[parcours][day] = "Fait"
             
-    
-            # Calculer le taux de réalisation pour chaque parcours
-        def calculate_completion_rate(row):
-            total_days = len(days_of_week_fr)
-            completed_days = sum(1 for day in days_of_week_fr if row[day] == "Fait")
-            return (completed_days / total_days) * 100 if total_days > 0 else 0
-            
         # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
         for parcours, status in parcours_status.items():
@@ -218,8 +211,10 @@ def main():
         
         comparison_table = pd.DataFrame(rows)
         
-        # Ajouter la colonne de taux de réalisation
-        comparison_table['Taux de réalisation'] = comparison_table.apply(calculate_completion_rate, axis=1)
+        # Calculer le taux de réalisation
+        comparison_table['Taux de réalisation'] = comparison_table.iloc[:, 1:].apply(
+            lambda row: (row == 'Fait').mean() * 100, axis=1
+        )
         
         return comparison_table
 
@@ -616,7 +611,8 @@ def main():
         styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
         
         # Appliquer le style sur les colonnes de jours pour le statut
-        for col in days_of_week_fr:
+        day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
+        for col in day_columns:
             styled_table = styled_table.applymap(style_status, subset=[col])
         
         # Formater la colonne "Taux de réalisation" en pourcentage
@@ -628,13 +624,15 @@ def main():
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
-
         
 
         # Afficher le tableau de suivi par parcours
         st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(styled_table, width=2000)
 
+        # Afficher le contenu brut du DataFrame pour vérification
+        st.subheader("Contenu brut du DataFrame")
+        st.write(weekly_comparison_table)
     
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
