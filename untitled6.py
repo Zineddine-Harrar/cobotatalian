@@ -653,34 +653,13 @@ def main():
             """
             return legend_html
         
-        # Créer un conteneur personnalisé pour l'expander
-        st.markdown("""
-            <style>
-                .streamlit-expanderHeader {
-                    background-color: #1E3A8A !important;
-                    color: white !important;
-                    border-radius: 5px !important;
-                    padding: 10px !important;
-                }
-                .streamlit-expanderContent {
-                    background-color: #1E3A8A !important;
-                    color: white !important;
-                    border-radius: 0 0 5px 5px !important;
-                    padding: 10px !important;
-                }
-                div[data-testid="stExpander"] {
-                    border: none !important;
-                    box-shadow: none !important;
-                }
-                </style>
-        """, unsafe_allow_html=True)
+
         
         # Utiliser le conteneur personnalisé
         st.markdown('<div class="custom-expander">', unsafe_allow_html=True)
         with st.expander("Voir la légende des couleurs des parcours"):
             st.write("Les couleurs dans la colonne 'Parcours Prévu' indiquent la période de la journée :")
             st.markdown(create_legend(), unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
         
         # Afficher le tableau
         st.subheader('Tableau de Suivi des Parcours')
