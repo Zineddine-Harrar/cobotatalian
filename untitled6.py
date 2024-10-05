@@ -212,7 +212,7 @@ def main():
         comparison_table = pd.DataFrame(rows)
         
        # Calculer le taux de réalisation pour chaque parcours
-        comparison_table['Taux de réalisation'] = comparison_table.iloc[:, 1:-1].apply(
+        comparison_table['Taux de réalisation'] = comparison_table.iloc[:, 1:].apply(
             lambda row: (row == 'Fait').mean() * 100, axis=1
         )
         
