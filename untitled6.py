@@ -211,6 +211,11 @@ def main():
         
         comparison_table = pd.DataFrame(rows)
         
+        # Calculer le taux de réalisation pour chaque parcours
+        comparison_table['Taux de réalisation'] = comparison_table.apply(
+            lambda row: (row.iloc[1:] == 'Fait').mean() * 100, axis=1
+        )
+        
         return comparison_table
 
 
@@ -584,7 +589,7 @@ def main():
 
 
 
-        def style_parcours_prevu(val):
+         def style_parcours_prevu(val):
             if val in matin:
                 return 'background-color: #4169E1; color: white;'  # Bleu royal
             elif val in apres_midi:
@@ -601,19 +606,33 @@ def main():
                 return 'background-color: #FF1313; color: #CACFD2;'
             else:
                 return ''
-                 
+        
+        def style_taux_realisation(val):
+            if pd.isna(val):
+                return ''
+            elif val >= 90:
+                return 'background-color: #13FF1A; color: black;'
+            elif val >= 50:
+                return 'background-color: #FFD700; color: black;'
+            else:
+                return 'background-color: #FF1313; color: white;'
         
         # Appliquer le style sur la colonne "Parcours Prévu"
         styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
         
-        # Appliquer le style sur les autres colonnes pour le statut
-        for col in weekly_comparison_table.columns:
-            if col != 'Parcours Prévu':
-                styled_table = styled_table.applymap(style_status, subset=[col])
+        # Appliquer le style sur les colonnes de jours pour le statut
+        day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
+        for col in day_columns:
+            styled_table = styled_table.applymap(style_status, subset=[col])
+        
+        # Appliquer le style sur la colonne "Taux de réalisation"
+        styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
+        
+        # Formater la colonne "Taux de réalisation" en pourcentage
+        styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
         
         # Appliquer le style sur les en-têtes de colonne
-        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
-        
+        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])       
 
         # Afficher le tableau de suivi par parcours
         st.subheader('Tableau de Suivi des Parcours')
