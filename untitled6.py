@@ -211,9 +211,9 @@ def main():
         
         comparison_table = pd.DataFrame(rows)
         
-        # Calculer le taux de réalisation pour chaque parcours
-        comparison_table['Taux de réalisation'] = comparison_table.apply(
-            lambda row: (row.iloc[1:] == 'Fait').mean() * 100, axis=1
+       # Calculer le taux de réalisation pour chaque parcours
+        comparison_table['Taux de réalisation'] = comparison_table.iloc[:, 1:-1].apply(
+            lambda row: (row == 'Fait').mean() * 100, axis=1
         )
         
         return comparison_table
@@ -373,7 +373,10 @@ def main():
 
         # Créer le tableau de suivi par parcours pour la semaine spécifiée
         weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-    
+        st.subheader("Vérification du DataFrame")
+        st.write("Colonnes du DataFrame :", weekly_comparison_table.columns)
+        st.write("Aperçu du DataFrame :")
+        st.dataframe(weekly_comparison_table)
 
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
@@ -617,6 +620,16 @@ def main():
             else:
                 return 'background-color: #FF1313; color: white;'
         
+                def style_taux_realisation(val):
+            if pd.isna(val):
+                return ''
+            elif val >= 90:
+                return 'background-color: #13FF1A; color: black;'
+            elif val >= 50:
+                return 'background-color: #FFD700; color: black;'
+            else:
+                return 'background-color: #FF1313; color: white;'
+        
         # Appliquer le style sur la colonne "Parcours Prévu"
         styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
         
@@ -632,8 +645,11 @@ def main():
         styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
         
         # Appliquer le style sur les en-têtes de colonne
-        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])       
+        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
+
+
+        
         # Afficher le tableau de suivi par parcours
         st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(styled_table, width=2000)
