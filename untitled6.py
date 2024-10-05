@@ -633,7 +633,24 @@ def main():
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
-
+        def create_legend():
+            legend_html = """
+            <div style="display: flex; justify-content: space-around; padding: 10px; background-color: black; color: white;">
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; background-color: #4169E1; margin-right: 5px;"></div>
+                    <span>Matin</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; background-color: #FFD700; margin-right: 5px;"></div>
+                    <span>Après-midi</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; background-color: #FF8C00; margin-right: 5px;"></div>
+                    <span>Soir</span>
+                </div>
+            </div>
+            """
+            return legend_html
         
         # Afficher le tableau de suivi par parcours
         col1, col2 = st.columns([3, 1])  # Ajustez les ratios selon vos besoins
