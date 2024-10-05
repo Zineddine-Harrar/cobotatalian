@@ -652,14 +652,12 @@ def main():
             """
             return legend_html
         
-        with st.expander("Voir la légende des couleurs"):
-            st.markdown(create_legend(), unsafe_allow_html=True)
+
 
         st.subheader('Tableau de Suivi des Parcours')
-
+        with st.expander("Voir la légende des couleurs"):
+            st.markdown(create_legend(), unsafe_allow_html=True)
         st.dataframe(styled_table, width=2000)
-        st.help("Légende des couleurs : Bleu = Matin, Jaune = Après-midi, Orange = Soir")
-
 
     
         #st.dataframe(styled_table, width=2000)
