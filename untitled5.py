@@ -215,9 +215,29 @@ def main():
             rows.append(row)
         
         comparison_table = pd.DataFrame(rows)
+       # Calculer les taux de réalisation pour chaque parcours
+        completion_rates, _ = calculate_completion_rates(weekly_details)
+    
+        # Créer un DataFrame à partir des taux de réalisation
+        completion_rates_df = completion_rates.reset_index()
+        completion_rates_df.columns = ['parcours', 'taux_completion']
+    
+        # Fusionner le tableau de comparaison avec les taux de réalisation
+        comparison_table = pd.merge(comparison_table, completion_rates_df, 
+                                    left_on='Parcours Prévu', right_on='parcours', how='left')
+    
+        # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
+        comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
+    
+        # Nettoyer le DataFrame en supprimant les colonnes inutiles
+        comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
         
         return comparison_table
-    
+
+        matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
+        apres_midi = ['Pt 14d Triplex', 'Porte 1-3d H', 'Porte 9-11d H']
+        soir = ['Triplex 17d H', 'Pt 12-14d H']
+        
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
         total_parcours = 49  # Total des parcours prévus sur une semaine (7 jours * 6 parcours par jour)
@@ -534,27 +554,80 @@ def main():
             st.subheader('Taux de réalisation des parcours')
             st.plotly_chart(fig_completion)
 
-        # Appliquer le style conditionnel
-        def style_cell(val):
+        def style_parcours_prevu(val):
+            if val in matin:
+                return 'background-color: #4169E1; color: white;'  # Bleu royal
+            elif val in apres_midi:
+                return 'background-color: #FFD700; color: black;'  # Jaune or
+            elif val in soir:
+                return 'background-color: #FF8C00; color: black;'  # Orange foncé
+            else:
+                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
+        
+        def style_status(val):
             if val == 'Fait':
                 return 'background-color: #13FF1A; color: black;'
             elif val == 'Pas fait':
                 return 'background-color: #FF1313; color: #CACFD2;'
             else:
                 return ''
-
-        def style_header(val):
-            return 'background-color: black; color: white;'
-
-        # Appliquer le style sur tout le DataFrame
-        styled_table = weekly_comparison_table.style.applymap(style_cell)
-    
+        
+        def style_taux_realisation(val):
+            if pd.isna(val):
+                return ''
+            elif val >= 100:
+                return 'background-color: #13FF1A; color: black;'
+            elif val >= 50:
+                return 'background-color: #FFD700; color: black;'
+            else:
+                return 'background-color: #FF1313; color: white;'
+        
         # Appliquer le style sur la colonne "Parcours Prévu"
-        styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
+        styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
+        
+        # Appliquer le style sur les colonnes de jours pour le statut
+        day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
+        for col in day_columns:
+            styled_table = styled_table.applymap(style_status, subset=[col])
+        
+        # Appliquer le style sur la colonne "Taux de réalisation"
+        styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
+        
+        # Formater la colonne "Taux de réalisation" en pourcentage
+        styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
+        
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
-        # Afficher le tableau de suivi par parcours
+
+        def create_legend():
+            legend_html = """
+            <div style="display: flex; justify-content: space-around; padding: 10px; background-color: black; color: white;">
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; background-color: #4169E1; margin-right: 5px;"></div>
+                    <span>Matin</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; background-color: #FFD700; margin-right: 5px;"></div>
+                    <span>Après-midi</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; background-color: #FF8C00; margin-right: 5px;"></div>
+                    <span>Soir</span>
+                </div>
+            </div>
+            """
+            return legend_html
+        
+
+        
+        # Utiliser le conteneur personnalisé
+        st.markdown('<div class="custom-expander">', unsafe_allow_html=True)
+        with st.expander("Voir la légende des couleurs des parcours"):
+            st.write("Les couleurs dans la colonne 'Parcours Prévu' indiquent la période de la journée :")
+            st.markdown(create_legend(), unsafe_allow_html=True)
+        
+        # Afficher le tableau
         st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(styled_table, width=2000)
 
