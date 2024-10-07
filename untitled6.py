@@ -255,7 +255,7 @@ def main():
         
         # Calculer le taux de réalisation
         total_parcours = len(completion_rates)
-        taux_realisation = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
+        taux_realisation = (parcours_realises / 7) * 100 
     
         return completion_rates, taux_realisation
 
