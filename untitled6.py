@@ -179,43 +179,55 @@ def main():
     def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
-        
+    
         # Initialiser le tableau de suivi
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
         parcours_list = set(planning_df['parcours'])
         parcours_list.discard(None)
         comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
-        
+    
         # Initialiser un dictionnaire pour stocker les statuts des parcours
         parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
         
         for day in days_of_week_fr:
             # Parcours prévus pour le jour
             planned_routes = planning_df[(planning_df['jour_fr'] == day) & (planning_df['semaine'] == semaine)]['parcours'].str.strip().str.lower().tolist()
-            
+        
             # Parcours réalisés pour le jour
             actual_routes = weekly_details[weekly_details['jour_fr'] == day]['parcours'].str.strip().str.lower().tolist()
-            
+        
             # Comparer les parcours prévus et réalisés
             for parcours in parcours_list:
                 parcours_normalized = parcours.strip().lower()
                 if parcours_normalized in actual_routes:
                     parcours_status[parcours][day] = "Fait"
-            
+    
         # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
         for parcours, status in parcours_status.items():
             row = {'Parcours Prévu': parcours}
             row.update(status)
             rows.append(row)
-        
+    
         comparison_table = pd.DataFrame(rows)
-        
-        # Calculer le taux de réalisation pour chaque parcours
-        comparison_table['Taux de réalisation'] = comparison_table.iloc[:, 1:-1].apply(
-            lambda row: (row == 'Fait').mean() * 100, axis=1
-        )
-        
+    
+        # Calculer les taux de réalisation pour chaque parcours
+        completion_rates, _ = calculate_completion_rates(weekly_details)
+    
+        # Créer un DataFrame à partir des taux de réalisation
+        completion_rates_df = completion_rates.reset_index()
+        completion_rates_df.columns = ['parcours', 'taux_completion']
+    
+        # Fusionner le tableau de comparaison avec les taux de réalisation
+        comparison_table = pd.merge(comparison_table, completion_rates_df, 
+                                    left_on='Parcours Prévu', right_on='parcours', how='left')
+    
+        # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
+        comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
+    
+        # Nettoyer le DataFrame en supprimant les colonnes inutiles
+        comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
+    
         return comparison_table
 
 
