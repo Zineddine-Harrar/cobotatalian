@@ -175,6 +175,7 @@ def main():
     # Nettoyer les doublons dans le dataframe details_df
     details_df1 = clean_duplicates(details_df)
 
+    # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
     def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
@@ -187,10 +188,7 @@ def main():
     
         # Initialiser un dictionnaire pour stocker les statuts des parcours
         parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
-    
-        total_parcours = 0
-        parcours_faits = 0
-    
+        
         for day in days_of_week_fr:
             # Parcours prévus pour le jour
             planned_routes = planning_df[(planning_df['jour_fr'] == day) & (planning_df['semaine'] == semaine)]['parcours'].str.strip().str.lower().tolist()
@@ -198,14 +196,11 @@ def main():
             # Parcours réalisés pour le jour
             actual_routes = weekly_details[weekly_details['jour_fr'] == day]['parcours'].str.strip().str.lower().tolist()
         
-            total_parcours += len(planned_routes)
-        
             # Comparer les parcours prévus et réalisés
             for parcours in parcours_list:
                 parcours_normalized = parcours.strip().lower()
                 if parcours_normalized in actual_routes:
                     parcours_status[parcours][day] = "Fait"
-                    parcours_faits += 1
     
         # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
@@ -216,13 +211,25 @@ def main():
     
         comparison_table = pd.DataFrame(rows)
     
-        # Calculer le taux de réalisation hebdomadaire
-        taux_realisation_hebdomadaire = (parcours_faits / total_parcours * 100) if total_parcours > 0 else 0
+        # Calculer les taux de réalisation pour chaque parcours
+        completion_rates, _ = calculate_completion_rates(weekly_details)
     
-        # Ajouter le taux de réalisation hebdomadaire à chaque ligne
-        comparison_table['Taux de réalisation'] = taux_realisation_hebdomadaire
+        # Créer un DataFrame à partir des taux de réalisation
+        completion_rates_df = completion_rates.reset_index()
+        completion_rates_df.columns = ['parcours', 'taux_completion']
+    
+        # Fusionner le tableau de comparaison avec les taux de réalisation
+        comparison_table = pd.merge(comparison_table, completion_rates_df, 
+                                    left_on='Parcours Prévu', right_on='parcours', how='left')
+    
+        # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
+        comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
+    
+        # Nettoyer le DataFrame en supprimant les colonnes inutiles
+        comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
     
         return comparison_table
+
 
         
     matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
@@ -376,7 +383,7 @@ def main():
         # Sélection de la semaine
         semaine = selected_week
 
-        # Dans la partie principale du code où vous affichez le tableau
+        # Créer le tableau de suivi par parcours pour la semaine spécifiée
         weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
 
         # Calculer le taux de suivi à partir du tableau de suivi
@@ -621,19 +628,20 @@ def main():
             else:
                 return 'background-color: #FF1313; color: white;'
         
-        # Appliquer le style sur le tableau
+        # Appliquer le style sur la colonne "Parcours Prévu"
         styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
-
+        
         # Appliquer le style sur les colonnes de jours pour le statut
         day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
         for col in day_columns:
             styled_table = styled_table.applymap(style_status, subset=[col])
-
+        
         # Appliquer le style sur la colonne "Taux de réalisation"
         styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
-
+        
         # Formater la colonne "Taux de réalisation" en pourcentage
         styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
+        
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
