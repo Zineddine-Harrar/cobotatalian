@@ -175,7 +175,6 @@ def main():
     # Nettoyer les doublons dans le dataframe details_df
     details_df1 = clean_duplicates(details_df)
 
-    # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
     def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
@@ -188,7 +187,10 @@ def main():
     
         # Initialiser un dictionnaire pour stocker les statuts des parcours
         parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
-        
+    
+        total_parcours = 0
+        parcours_faits = 0
+    
         for day in days_of_week_fr:
             # Parcours prévus pour le jour
             planned_routes = planning_df[(planning_df['jour_fr'] == day) & (planning_df['semaine'] == semaine)]['parcours'].str.strip().str.lower().tolist()
@@ -196,11 +198,14 @@ def main():
             # Parcours réalisés pour le jour
             actual_routes = weekly_details[weekly_details['jour_fr'] == day]['parcours'].str.strip().str.lower().tolist()
         
+            total_parcours += len(planned_routes)
+        
             # Comparer les parcours prévus et réalisés
             for parcours in parcours_list:
                 parcours_normalized = parcours.strip().lower()
                 if parcours_normalized in actual_routes:
                     parcours_status[parcours][day] = "Fait"
+                    parcours_faits += 1
     
         # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
@@ -211,25 +216,13 @@ def main():
     
         comparison_table = pd.DataFrame(rows)
     
-        # Calculer les taux de réalisation pour chaque parcours
-        completion_rates, _ = calculate_completion_rates(weekly_details)
+        # Calculer le taux de réalisation hebdomadaire
+        taux_realisation_hebdomadaire = (parcours_faits / total_parcours * 100) if total_parcours > 0 else 0
     
-        # Créer un DataFrame à partir des taux de réalisation
-        completion_rates_df = completion_rates.reset_index()
-        completion_rates_df.columns = ['parcours', 'taux_completion']
-    
-        # Fusionner le tableau de comparaison avec les taux de réalisation
-        comparison_table = pd.merge(comparison_table, completion_rates_df, 
-                                    left_on='Parcours Prévu', right_on='parcours', how='left')
-    
-        # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
-        comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
-    
-        # Nettoyer le DataFrame en supprimant les colonnes inutiles
-        comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
+        # Ajouter le taux de réalisation hebdomadaire à chaque ligne
+        comparison_table['Taux de réalisation'] = taux_realisation_hebdomadaire
     
         return comparison_table
-
 
         
     matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
