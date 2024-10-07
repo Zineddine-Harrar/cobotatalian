@@ -376,7 +376,7 @@ def main():
         # Sélection de la semaine
         semaine = selected_week
 
-        # Créer le tableau de suivi par parcours pour la semaine spécifiée
+        # Dans la partie principale du code où vous affichez le tableau
         weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
 
         # Calculer le taux de suivi à partir du tableau de suivi
@@ -621,20 +621,19 @@ def main():
             else:
                 return 'background-color: #FF1313; color: white;'
         
-        # Appliquer le style sur la colonne "Parcours Prévu"
+        # Appliquer le style sur le tableau
         styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
-        
+
         # Appliquer le style sur les colonnes de jours pour le statut
         day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
         for col in day_columns:
             styled_table = styled_table.applymap(style_status, subset=[col])
-        
+
         # Appliquer le style sur la colonne "Taux de réalisation"
         styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
-        
+
         # Formater la colonne "Taux de réalisation" en pourcentage
         styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
-        
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
