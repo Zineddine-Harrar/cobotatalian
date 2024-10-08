@@ -564,22 +564,34 @@ def main():
                 return 'background-color: #FFD700; color: black;'
             else:
                 return 'background-color: #FF1313; color: white;'
+
         
-        # Appliquer le style sur la colonne "Parcours Prévu"
+        
+        # Ajoutez cette fonction à votre code existant
+        def style_parcours_prevu(val):
+            matin = ['T D centre', 'L centre']
+            apres_midi = ['L novotel', 'L brioche', 'L air france']
+            soir = ['T F af', 'T F brioche']
+        
+            if val in matin:
+                return 'background-color: #4169E1; color: white;'  # Bleu royal pour le matin
+            elif val in apres_midi:
+                return 'background-color: #FFD700; color: black;'  # Jaune or pour l'après-midi
+            elif val in soir:
+                return 'background-color: #FF8C00; color: black;'  # Orange foncé pour le soir
+            else:
+                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
+        
+        # Ensuite, utilisez cette fonction dans la définition de styled_table
         styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
         
-        # Appliquer le style sur les colonnes de jours pour le statut
+        # Le reste de votre code pour le style reste inchangé
         day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
         for col in day_columns:
             styled_table = styled_table.applymap(style_status, subset=[col])
         
-        # Appliquer le style sur la colonne "Taux de réalisation"
         styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
-        
-        # Formater la colonne "Taux de réalisation" en pourcentage
         styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
-        
-        # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
 
