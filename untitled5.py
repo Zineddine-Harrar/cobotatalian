@@ -180,59 +180,54 @@ def main():
     # Nettoyer les doublons dans le dataframe details_df
     details_df1 = clean_duplicates(details_df)
 
-    # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
-    def create_parcours_comparison_table(semaine, details_df1, planning_df):
+    def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
-        
+    
         # Initialiser le tableau de suivi
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
         parcours_list = set(planning_df['parcours'])
         parcours_list.discard(None)
         comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
-        
-        # Initialiser un dictionnaire pour stocker les statuts des parcours
-        parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
-        
+    
+        # Initialiser un dictionnaire pour stocker les statuts et les taux de réalisation des parcours
+        parcours_status = {parcours: {day: {"status": "Pas fait", "taux": 0} for day in days_of_week_fr} for parcours in parcours_list}
+    
         for day in days_of_week_fr:
             # Parcours prévus pour le jour
             planned_routes = planning_df[(planning_df['jour_fr'] == day) & (planning_df['semaine'] == semaine)]['parcours'].str.strip().str.lower().tolist()
-            
+        
             # Parcours réalisés pour le jour
-            actual_routes = weekly_details[weekly_details['jour_fr'] == day]['parcours'].str.strip().str.lower().tolist()
-            
+            actual_routes = weekly_details[weekly_details['jour_fr'] == day]
+        
             # Comparer les parcours prévus et réalisés
             for parcours in parcours_list:
                 parcours_normalized = parcours.strip().lower()
-                if parcours_normalized in actual_routes:
-                    parcours_status[parcours][day] = "Fait"
-        
+                matching_route = actual_routes[actual_routes['parcours'].str.strip().str.lower() == parcours_normalized]
+                if not matching_route.empty:
+                    parcours_status[parcours][day]["status"] = "Fait"
+                    parcours_status[parcours][day]["taux"] = matching_route['terminerà_[%]'].values[0]
+    
         # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
         for parcours, status in parcours_status.items():
             row = {'Parcours Prévu': parcours}
-            row.update(status)
+            for day in days_of_week_fr:
+                row[day] = status[day]["status"]
+            
+            # Calculer le taux de réalisation moyen pour la semaine
+            taux_realisation = sum(status[day]["taux"] for day in days_of_week_fr) / 7
+            row['Taux de réalisation'] = taux_realisation
+            
             rows.append(row)
         
         comparison_table = pd.DataFrame(rows)
-       # Calculer les taux de réalisation pour chaque parcours
-        completion_rates, _ = calculate_completion_rates(weekly_details)
-    
-        # Créer un DataFrame à partir des taux de réalisation
-        completion_rates_df = completion_rates.reset_index()
-        completion_rates_df.columns = ['parcours', 'taux_completion']
-    
-        # Fusionner le tableau de comparaison avec les taux de réalisation
-        comparison_table = pd.merge(comparison_table, completion_rates_df, 
-                                    left_on='Parcours Prévu', right_on='parcours', how='left')
-    
-        # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
-        comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
-    
-        # Nettoyer le DataFrame en supprimant les colonnes inutiles
-        comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
         
         return comparison_table
+
+    # Fonction pour calculer le taux de réalisation global de la semaine
+    def calculate_global_realization_rate(comparison_table):
+        return comparison_table['Taux de réalisation'].mean()
 
         
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
