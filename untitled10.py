@@ -232,9 +232,9 @@ def main():
 
 
         
-    matin = ['Coursives_F1_Fusion', 'Coursives_F2_Fusion']
+    matin = ['Coursive_F1_Fusion', 'Coursives_F2_Fusion']
     apres_midi = ['Correspondance_F1_K1']
-    soir = ['Correspondance_F2', 'Porte_K2_CAGE']
+    soir = ['Correspondance_F2', 'K1_K2_Cage_CorrespondanceF2']
 
     testcomp = create_parcours_comparison_table(28, details_df, planning_df)
 
@@ -461,8 +461,8 @@ def main():
                 return 'background-color: #FFD700; color: black;'  # Jaune or
             elif val in soir:
                 return 'background-color: #FF8C00; color: black;'  # Orange foncé
-            #else:
-                #return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
+            else:
+                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
         
         def style_status(val):
             if val == 'Fait':
