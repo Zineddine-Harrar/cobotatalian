@@ -109,7 +109,7 @@ def main():
     )
 
     # Charger les fichiers CSV
-    planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
+    planning_df = pd.read_csv('PLANNING RQUARTZ T2F (1).csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('DATASET/T2F/07-10-2024.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
 
     # Nettoyer les colonnes dans details_df
