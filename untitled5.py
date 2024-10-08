@@ -239,19 +239,32 @@ def main():
         
         return taux_suivi
 
-    # Fonction pour calculer le taux de complétion hebdomadaire
     def calculate_completion_rates(details_df, threshold=100):
-        # Calculer le taux de complétion pour chaque parcours
-        completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
+        # Assurez-vous que la colonne 'jour_fr' est présente dans details_df
+        if 'jour_fr' not in details_df.columns:
+            raise ValueError("La colonne 'jour_fr' est manquante dans le DataFrame")
     
-        # Calculer le nombre de parcours réalisés (>= 100%)
-        parcours_realises = (completion_rates >= threshold).sum()
-        
-        # Calculer le taux de réalisation
-        total_parcours = len(completion_rates)
-        taux_realisation = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
+        # Liste de tous les jours de la semaine
+        all_days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
     
-        return completion_rates, taux_realisation
+        # Initialiser un dictionnaire pour stocker les taux de réalisation par jour
+        daily_rates = {day: 0 for day in all_days}
+    
+        # Calculer le taux de réalisation pour chaque jour
+        for day in all_days:
+            day_data = details_df[details_df['jour_fr'] == day]
+            if not day_data.empty:
+                parcours_realises = (day_data['terminerà_[%]'] >= threshold).sum()
+                total_parcours = len(day_data)
+                daily_rates[day] = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
+    
+        # Calculer le taux de réalisation global sur les 7 jours
+        taux_realisation_global = sum(daily_rates.values()) / 7
+    
+        # Calculer le taux de réalisation moyen des parcours effectués
+        taux_realisation_moyen = details_df['terminerà_[%]'].mean()
+    
+        return taux_realisation_global, taux_realisation_moyen, daily_rates
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -383,7 +396,7 @@ def main():
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
         weekly_details = details_df1[details_df1['semaine'] == semaine]
-        completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
+        taux_realisation_global, taux_realisation_moyen, daily_rates = calculate_completion_rates(weekly_details)
 
 
     
@@ -510,7 +523,7 @@ def main():
         # Créer la jauge du taux de complétion
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=weekly_completion_rate,
+            value=taux_realisation_global,
             title={'text': "Taux de réalisation des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
@@ -523,7 +536,7 @@ def main():
                 'threshold': {
                     'line': {'color': "white", 'width': 4},
                     'thickness': 0.75,
-                    'value': weekly_completion_rate
+                    'value': taux_realisation_global
                 }
             }
         ))
