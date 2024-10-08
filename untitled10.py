@@ -232,9 +232,9 @@ def main():
 
 
         
-    matin = ['F14 Pt9 H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
-    apres_midi = ['Pt 14d Triplex', 'Porte 1-3d H', 'Porte 9-11d H']
-    soir = ['Triplex 17d H', 'Pt 12-14d H']
+    matin = ['Coursives_F1_Fusion', 'Coursives_F2_Fusion']
+    apres_midi = ['Correspondance_F1_K1']
+    soir = ['Correspondance_F2', 'Porte_K2_CAGE']
 
     testcomp = create_parcours_comparison_table(28, details_df, planning_df)
 
