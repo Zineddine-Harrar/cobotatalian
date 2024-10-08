@@ -461,8 +461,8 @@ def main():
                 return 'background-color: #FFD700; color: black;'  # Jaune or
             elif val in soir:
                 return 'background-color: #FF8C00; color: black;'  # Orange foncé
-            else:
-                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
+            #else:
+                #return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
         
         def style_status(val):
             if val == 'Fait':
