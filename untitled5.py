@@ -248,11 +248,11 @@ def main():
         return taux_suivi
 
     # Fonction pour calculer le taux de complétion hebdomadaire
-    def calculate_completion_rates(details_df, threshold=90):
+    def calculate_completion_rates(details_df, threshold=100):
         # Calculer le taux de complétion pour chaque parcours
         completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
     
-        # Calculer le nombre de parcours réalisés (>= 90%)
+        # Calculer le nombre de parcours réalisés (>= 100%)
         parcours_realises = (completion_rates >= threshold).sum()
         
         # Calculer le taux de réalisation
@@ -646,8 +646,8 @@ def main():
                           labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
                           template='plotly_dark')
 
-        # Ajouter une ligne horizontale à 90%
-        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+        # Ajouter une ligne horizontale à 100%
+        fig_hist.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (100%)")
 
         # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
         fig_hist.update_layout(
@@ -1076,8 +1076,8 @@ def main():
                           template='plotly_dark',
                           category_orders={"parcours": ordre_parcours})
 
-        # Ajouter une ligne horizontale à 90%
-        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+        # Ajouter une ligne horizontale à 100%
+        fig_hist.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (100%)")
 
         # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours et fixer l'échelle de 0 à 100%
         fig_hist.update_layout(
@@ -1109,8 +1109,8 @@ def main():
                                  labels={'Taux de réalisation': 'Taux de réalisation (%)'},
                                  template='plotly_dark')
 
-        # Ajouter une ligne horizontale à 90%
-        fig_comparative.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+        # Ajouter une ligne horizontale à 100%
+        fig_comparative.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (100%)")
 
         # Ajuster la mise en page
         fig_comparative.update_layout(
