@@ -252,7 +252,7 @@ def main():
     def calculate_weekly_completion_rate(details_df, semaine):
         weekly_details = details_df[details_df['semaine'] == semaine]
         completion_rates = weekly_details.groupby('cleaning_plan')['task_completion_(%)'].mean()
-        completed_routes = (completion_rates >= 90).sum()
+        completed_routes = (completion_rates >= 100).sum()
         total_routes = len(completion_rates)
         weekly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
         return completion_rates, weekly_completion_rate
@@ -260,7 +260,7 @@ def main():
     completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df, 28)
     print(weekly_completion_rate)
     # Fonction pour calculer le taux de complétion
-    def calculate_completion_rates(details_df, threshold=90):
+    def calculate_completion_rates(details_df, threshold=100):
         completion_rates = details_df.groupby('cleaning_plan')['task_completion_(%)'].mean()
         parcours_realises = (completion_rates >= threshold).sum()
         total_parcours = len(completion_rates)
@@ -540,8 +540,8 @@ def main():
                           title='Taux de réalisation par Parcours',
                           labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de Complétion (%)'},
                           template='plotly_dark')
-        # Ajouter une ligne horizontale à 90%
-        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+        # Ajouter une ligne horizontale à 100%
+        fig_hist.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (100%)")
          # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
         fig_hist.update_layout(
             xaxis_tickangle=-45,
@@ -725,7 +725,7 @@ def main():
                           title=f'Taux de réalisation par parcours (Mois de {mois_dict[selected_month]})',
                           labels={'cleaning_plan': 'Parcours', 'task_completion_(%)': 'Taux de réalisation (%)'},
                           template='plotly_dark')
-        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+        fig_hist.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (100%)")
         fig_hist.update_layout(xaxis_tickangle=-45, xaxis_title="", yaxis=dict(range=[0, 100]))
         st.plotly_chart(fig_hist)
 
@@ -746,7 +746,7 @@ def main():
                                  title='Comparatif des taux de réalisation des parcours par mois',
                                  labels={'Taux de réalisation': 'Taux de réalisation (%)'},
                                  template='plotly_dark')
-        fig_comparative.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
+        fig_comparative.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (100%)")
         fig_comparative.update_layout(xaxis_title="", yaxis=dict(range=[0, 100]))
         st.plotly_chart(fig_comparative)
 
