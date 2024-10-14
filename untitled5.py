@@ -578,17 +578,19 @@ def main():
             else:
                 return 'background-color: #FF1313; color: white;'
 
+
+        def style_parcours_prevu(val):
+            # Appliquer un style uniforme pour tous les parcours
+            return 'background-color: #4169E1; color: white;'  # Bleu royal pour tous les parcours
         
-        
-        # Le reste de votre code pour le style reste inchangé
-        day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
-        for col in day_columns:
-            styled_table = styled_table.applymap(style_status, subset=[col])
-        
-        styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
-        styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
-        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
-    
+        # Utilisation de la fonction simplifiée dans la création du styled_table
+        styled_table = weekly_comparison_table.style\
+            .applymap(style_parcours_prevu, subset=['Parcours Prévu'])\
+            .applymap(style_status, subset=[col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']])\
+            .applymap(style_taux_realisation, subset=['Taux de réalisation'])\
+            .format({'Taux de réalisation': '{:.2f}%'})\
+            .set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
+
         
         # Afficher le tableau
         st.subheader('Tableau de Suivi des Parcours')
