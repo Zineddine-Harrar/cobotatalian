@@ -113,7 +113,7 @@ def main():
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON (1).csv', delimiter=';', encoding='ISO-8859-1')
-    details_df = pd.read_csv('DATASET/IMON/07-10-2024-.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
+    details_df = pd.read_csv('DATASET/IMON/13-10-2024-.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
     
     # Nettoyer les colonnes dans details_df
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
@@ -121,7 +121,7 @@ def main():
 
     # Convertir les colonnes "début" et "fin" en format datetime
     details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M', errors='coerce')
-    details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M', errors='coerce')
+    details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
     print(details_df['début'])
     # Extraire le jour de la semaine et la date de début
     details_df['jour'] = details_df['début'].dt.day_name()
@@ -326,7 +326,7 @@ def main():
         return weekly_cost, hourly_cost, total_cost, utilization_rate
     description_evenements = pd.read_excel("Description des evenements.xlsx")
     # Load the dataset with appropriate header row
-    file_path = "DATASET/ALERTE/IMON/Alerte IMON 07-10.xlsx"
+    file_path = "DATASET/ALERTE/IMON/Alerte IMON 13-10.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
     description_evenements = pd.read_excel("Description des evenements.xlsx")
     # Rename columns for easier access
