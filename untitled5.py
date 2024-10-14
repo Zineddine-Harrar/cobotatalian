@@ -580,24 +580,6 @@ def main():
 
         
         
-        # Ajoutez cette fonction à votre code existant
-        def style_parcours_prevu(val):
-            matin = ['T D centre', 'L centre']
-            apres_midi = ['L novotel', 'L brioche', 'L air france']
-            soir = ['T F af', 'T F brioche']
-        
-            if val in matin:
-                return 'background-color: #4169E1; color: white;'  # Bleu royal pour le matin
-            elif val in apres_midi:
-                return 'background-color: #FFD700; color: black;'  # Jaune or pour l'après-midi
-            elif val in soir:
-                return 'background-color: #FF8C00; color: black;'  # Orange foncé pour le soir
-            else:
-                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
-        
-        # Ensuite, utilisez cette fonction dans la définition de styled_table
-        styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
-        
         # Le reste de votre code pour le style reste inchangé
         day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
         for col in day_columns:
@@ -606,34 +588,7 @@ def main():
         styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
         styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
-
-
-        def create_legend():
-            legend_html = """
-            <div style="display: flex; justify-content: space-around; padding: 10px; background-color: black; color: white;">
-                <div style="display: flex; align-items: center;">
-                    <div style="width: 20px; height: 20px; background-color: #4169E1; margin-right: 5px;"></div>
-                    <span>Matin</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <div style="width: 20px; height: 20px; background-color: #FFD700; margin-right: 5px;"></div>
-                    <span>Après-midi</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <div style="width: 20px; height: 20px; background-color: #FF8C00; margin-right: 5px;"></div>
-                    <span>Soir</span>
-                </div>
-            </div>
-            """
-            return legend_html
-        
-
-        
-        # Utiliser le conteneur personnalisé
-        st.markdown('<div class="custom-expander">', unsafe_allow_html=True)
-        with st.expander("Voir la légende des couleurs des parcours"):
-            st.write("Les couleurs dans la colonne 'Parcours Prévu' indiquent la période de la journée :")
-            st.markdown(create_legend(), unsafe_allow_html=True)
+    
         
         # Afficher le tableau
         st.subheader('Tableau de Suivi des Parcours')
