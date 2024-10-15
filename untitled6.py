@@ -116,7 +116,7 @@ def main():
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
     details_df.columns = details_df.columns.str.replace(' ', '_').str.lower()
 
-    details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
+    details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M', errors='coerce')
     details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
     
         # Extraire le jour de la semaine et la date de début
