@@ -109,7 +109,7 @@ def main():
     )
 
     # Charger les fichiers CSV
-    planning_df = pd.read_csv('PLANNING RQUARTZ T2F (1).csv', delimiter=';', encoding='ISO-8859-1')
+    planning_df = pd.read_csv('PLANNING RQUARTZ T2F.csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('DATASET/T2F/13-10-2024.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
 
     # Nettoyer les colonnes dans details_df
@@ -157,7 +157,7 @@ def main():
     # Fonction pour nettoyer les doublons
     def clean_duplicates(details_df):
         # Convertir les colonnes "début" et "fin" en format datetime
-        details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M', errors='coerce')
+        details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
         details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
     
         # Extraire la date de début
@@ -179,59 +179,40 @@ def main():
     def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
-    
+        
         # Initialiser le tableau de suivi
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
         parcours_list = set(planning_df['parcours'])
         parcours_list.discard(None)
         comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
-    
+        
         # Initialiser un dictionnaire pour stocker les statuts des parcours
         parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
         
         for day in days_of_week_fr:
             # Parcours prévus pour le jour
             planned_routes = planning_df[(planning_df['jour_fr'] == day) & (planning_df['semaine'] == semaine)]['parcours'].str.strip().str.lower().tolist()
-        
+            
             # Parcours réalisés pour le jour
             actual_routes = weekly_details[weekly_details['jour_fr'] == day]['parcours'].str.strip().str.lower().tolist()
-        
+            
             # Comparer les parcours prévus et réalisés
             for parcours in parcours_list:
                 parcours_normalized = parcours.strip().lower()
                 if parcours_normalized in actual_routes:
                     parcours_status[parcours][day] = "Fait"
-    
+        
         # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
         for parcours, status in parcours_status.items():
             row = {'Parcours Prévu': parcours}
             row.update(status)
             rows.append(row)
-    
-        comparison_table = pd.DataFrame(rows)
-    
-        # Calculer les taux de réalisation
-        completion_rates, taux_moyen_global = calculate_completion_rates(details_df, planning_df, semaine)
-    
-        # Fusionner le tableau de comparaison avec les taux de réalisation
-        comparison_table = pd.merge(comparison_table, completion_rates, 
-                                    left_on='Parcours Prévu', right_on='parcours', how='left')
-    
-        # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
-        comparison_table['Taux de réalisation'] = comparison_table['taux_realisation']
-    
-        # Nettoyer le DataFrame en supprimant les colonnes inutiles
-        comparison_table = comparison_table.drop(['parcours', 'taux_realisation'], axis=1)
-    
-        return comparison_table, taux_moyen_global
-
         
-    matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
-    apres_midi = ['Porte 9-11d H']
-    soir = ['Pt 17 Triplex V']
+        comparison_table = pd.DataFrame(rows)
+        
+        return comparison_table
 
-    
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
         total_parcours = 49  # Total des parcours prévus sur une semaine (7 jours * 6 parcours par jour)
@@ -241,31 +222,18 @@ def main():
         
         return taux_suivi
 
-    def calculate_completion_rates(details_df, planning_df, semaine, threshold=90):
-        # Filtrer les données pour la semaine spécifiée
-        weekly_details = details_df[details_df['semaine'] == semaine]
-        weekly_planning = planning_df[planning_df['semaine'] == semaine]
+    def calculate_completion_rates(details_df, threshold=90):
+        # Calculer le taux de complétion pour chaque parcours
+        completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
     
-        # Obtenir la liste de tous les parcours prévus pour la semaine
-        parcours_prevus = weekly_planning['parcours'].unique()
+        # Calculer le nombre de parcours réalisés (>= 90%)
+        parcours_realises = (completion_rates >= threshold).sum()
         
-        # Initialiser un dictionnaire pour stocker les taux de réalisation hebdomadaires
-        taux_realisation_hebdo = {parcours: 0 for parcours in parcours_prevus}
+        # Calculer le taux de réalisation
+        total_parcours = len(completion_rates)
+        taux_realisation = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
     
-        # Calculer le taux de réalisation hebdomadaire pour chaque parcours
-        for parcours in parcours_prevus:
-            parcours_realises = weekly_details[(weekly_details['parcours'] == parcours) & (weekly_details['terminerà_[%]'] >= threshold)]
-            taux_realisation_hebdo[parcours] = (len(parcours_realises) / 7) * 100  # 7 jours dans la semaine
-    
-        # Créer un DataFrame avec les taux de réalisation hebdomadaires
-        completion_rates = pd.DataFrame.from_dict(taux_realisation_hebdo, orient='index', columns=['taux_realisation'])
-        completion_rates.index.name = 'parcours'
-        completion_rates = completion_rates.reset_index()
-    
-        # Calculer la moyenne des taux de réalisation pour la jauge
-        taux_moyen_global = weekly_details['terminerà_[%]'].mean()
-    
-        return completion_rates, taux_moyen_global
+        return completion_rates, taux_realisation
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -392,14 +360,14 @@ def main():
         semaine = selected_week
 
         # Créer le tableau de suivi par parcours pour la semaine spécifiée
-        weekly_comparison_table, taux_moyen_global = create_parcours_comparison_table(semaine, details_df1, planning_df)
+        weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+    
 
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
 
         weekly_details = details_df1[details_df1['semaine'] == semaine]
-        completion_rates, taux_moyen_global = calculate_completion_rates(details_df1, planning_df, semaine)
-
+        completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
 
 
     
@@ -563,11 +531,11 @@ def main():
         # Créer la jauge du taux de complétion
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=taux_moyen_global,
-            title={'text': "Taux moyen de réalisation des parcours"},
+            value=weekly_completion_rate,
+            title={'text': "Taux de réalisation des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
-                'bar': {'color': "white"},
+                'bar': {'color': "white"},  # Couleur de l'indicateur
                 'steps': [
                     {'range': [0, 40], 'color': "red"},
                     {'range': [40, 80], 'color': "orange"},
@@ -576,7 +544,7 @@ def main():
                 'threshold': {
                     'line': {'color': "white", 'width': 4},
                     'thickness': 0.75,
-                    'value': taux_moyen_global
+                    'value': weekly_completion_rate
                 }
             }
         ))
@@ -599,83 +567,31 @@ def main():
             st.subheader('Taux de réalisation des parcours')
             st.plotly_chart(fig_completion)
 
-
-
-
-
-
-
-
-
-
-
-        def style_parcours_prevu(val):
-            if val in matin:
-                return 'background-color: #4169E1; color: white;'  # Bleu royal
-            elif val in apres_midi:
-                return 'background-color: #FFD700; color: black;'  # Jaune or
-            elif val in soir:
-                return 'background-color: #FF8C00; color: black;'  # Orange foncé
-            else:
-                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
-        
-        def style_status(val):
+        # Appliquer le style conditionnel
+        def style_cell(val):
             if val == 'Fait':
                 return 'background-color: #13FF1A; color: black;'
             elif val == 'Pas fait':
                 return 'background-color: #FF1313; color: #CACFD2;'
             else:
                 return ''
-        
-        def style_taux_realisation(val):
-            if pd.isna(val):
-                return ''
-            elif val >= 85:  # Très bon taux de réalisation hebdomadaire
-                return 'background-color: #13FF1A; color: black;'
-            elif val >= 60:  # Taux de réalisation acceptable
-                return 'background-color: #FFD700; color: black;'
-            else:  # Taux de réalisation faible
-                return 'background-color: #FF1313; color: white;'
-        
-        styled_table = weekly_comparison_table.style\
-            .applymap(style_parcours_prevu, subset=['Parcours Prévu'])\
-            .applymap(style_status, subset=[col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']])\
-            .applymap(style_taux_realisation, subset=['Taux de réalisation'])\
-            .format({'Taux de réalisation': '{:.2f}%'})
-        
 
+        def style_header(val):
+            return 'background-color: black; color: white;'
 
-        def create_legend():
-            legend_html = """
-            <div style="display: flex; justify-content: space-around; padding: 10px; background-color: black; color: white;">
-                <div style="display: flex; align-items: center;">
-                    <div style="width: 20px; height: 20px; background-color: #4169E1; margin-right: 5px;"></div>
-                    <span>Matin</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <div style="width: 20px; height: 20px; background-color: #FFD700; margin-right: 5px;"></div>
-                    <span>Après-midi</span>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <div style="width: 20px; height: 20px; background-color: #FF8C00; margin-right: 5px;"></div>
-                    <span>Soir</span>
-                </div>
-            </div>
-            """
-            return legend_html
-        
+        # Appliquer le style sur tout le DataFrame
+        styled_table = weekly_comparison_table.style.applymap(style_cell)
+    
+        # Appliquer le style sur la colonne "Parcours Prévu"
+        styled_table = styled_table.applymap(lambda x: 'background-color: black; color: white;', subset=['Parcours Prévu'])
+        # Appliquer le style sur les en-têtes de colonne
+        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
-        
-        # Utiliser le conteneur personnalisé
-        st.markdown('<div class="custom-expander">', unsafe_allow_html=True)
-        with st.expander("Voir la légende des couleurs des parcours"):
-            st.write("Les couleurs dans la colonne 'Parcours Prévu' indiquent la période de la journée :")
-            st.markdown(create_legend(), unsafe_allow_html=True)
-        
-        # Afficher le tableau
+        # Afficher le tableau de suivi par parcours
         st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(styled_table, width=2000)
 
+    
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['parcours', 'taux_completion']
@@ -690,8 +606,8 @@ def main():
                           labels={'parcours': 'Parcours', 'taux_completion': 'Taux de réalisation (%)'},
                           template='plotly_dark')
 
-        # Ajouter une ligne horizontale à 100%
-        fig_hist.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (100%)")
+        # Ajouter une ligne horizontale à 90%
+        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
 
         # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours
         fig_hist.update_layout(
@@ -1115,8 +1031,8 @@ def main():
                           template='plotly_dark',
                           category_orders={"parcours": ordre_parcours})
 
-        # Ajouter une ligne horizontale à 100%
-        fig_hist.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (100%)")
+        # Ajouter une ligne horizontale à 90%
+        fig_hist.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
 
         # Ajuster la mise en page pour une meilleure lisibilité des noms de parcours et fixer l'échelle de 0 à 100%
         fig_hist.update_layout(
@@ -1148,8 +1064,8 @@ def main():
                                  labels={'Taux de réalisation': 'Taux de réalisation (%)'},
                                  template='plotly_dark')
 
-        # Ajouter une ligne horizontale à 100%
-        fig_comparative.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (100%)")
+        # Ajouter une ligne horizontale à 90%
+        fig_comparative.add_hline(y=90, line_dash="dash", line_color="red", annotation_text="Seuil de réalisation (90%)")
 
         # Ajuster la mise en page
         fig_comparative.update_layout(
