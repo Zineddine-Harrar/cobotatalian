@@ -10,11 +10,9 @@ import openpyxl
 import io
 from supabase import create_client, Client
 from streamlit.runtime.scriptrunner import RerunException
-import base64
-from github import Github
 
 def main():
-    
+
     st.markdown(
         """
         <style>
@@ -110,20 +108,18 @@ def main():
         unsafe_allow_html=True
     )
 
-
     # Charger les fichiers CSV
-    planning_df = pd.read_csv('PLANNING RQUARTZ IMON (1).csv', delimiter=';', encoding='ISO-8859-1')
+    planning_df = pd.read_csv('PLANNING RQUARTZ T2F (1).csv', delimiter=';', encoding='ISO-8859-1')
     details_df = pd.read_csv('DATASET/T2F/13-10-2024.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
-    
+
     # Nettoyer les colonnes dans details_df
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
     details_df.columns = details_df.columns.str.replace(' ', '_').str.lower()
 
-    # Convertir les colonnes "début" et "fin" en format datetime
     details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M', errors='coerce')
     details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
-    print(details_df['début'])
-    # Extraire le jour de la semaine et la date de début
+    
+        # Extraire le jour de la semaine et la date de début
     details_df['jour'] = details_df['début'].dt.day_name()
     details_df['date'] = details_df['début'].dt.date
 
@@ -142,7 +138,7 @@ def main():
     }
     details_df['jour_fr'] = details_df['jour'].map(day_translation)
 
-    # Convertir les colonnes pertinentes en format numérique
+# Convertir les colonnes pertinentes en format numérique
     numeric_columns = ['durée[mn]', 'surfacepropre_[mq]', 'vitesse_moyenne[km/h]', 'productivitéhoraire_[mq/h]']
     for col in numeric_columns:
         details_df[col] = pd.to_numeric(details_df[col].astype(str).str.replace(',', '.'), errors='coerce')
@@ -158,12 +154,11 @@ def main():
         return planning_df
 
     planning_df = add_weeks_to_planning_df(planning_df)
-
     # Fonction pour nettoyer les doublons
     def clean_duplicates(details_df):
         # Convertir les colonnes "début" et "fin" en format datetime
         details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M', errors='coerce')
-        details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M', errors='coerce')
+        details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
     
         # Extraire la date de début
         details_df['date'] = details_df['début'].dt.date
@@ -180,6 +175,7 @@ def main():
     # Nettoyer les doublons dans le dataframe details_df
     details_df1 = clean_duplicates(details_df)
 
+    # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
     def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
@@ -190,46 +186,57 @@ def main():
         parcours_list.discard(None)
         comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
     
-        # Initialiser un dictionnaire pour stocker les statuts et les taux de réalisation des parcours
-        parcours_status = {parcours: {day: {"status": "Pas fait", "taux": 0} for day in days_of_week_fr} for parcours in parcours_list}
-    
+        # Initialiser un dictionnaire pour stocker les statuts des parcours
+        parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
+        
         for day in days_of_week_fr:
             # Parcours prévus pour le jour
             planned_routes = planning_df[(planning_df['jour_fr'] == day) & (planning_df['semaine'] == semaine)]['parcours'].str.strip().str.lower().tolist()
         
             # Parcours réalisés pour le jour
-            actual_routes = weekly_details[weekly_details['jour_fr'] == day]
+            actual_routes = weekly_details[weekly_details['jour_fr'] == day]['parcours'].str.strip().str.lower().tolist()
         
             # Comparer les parcours prévus et réalisés
             for parcours in parcours_list:
                 parcours_normalized = parcours.strip().lower()
-                matching_route = actual_routes[actual_routes['parcours'].str.strip().str.lower() == parcours_normalized]
-                if not matching_route.empty:
-                    parcours_status[parcours][day]["status"] = "Fait"
-                    parcours_status[parcours][day]["taux"] = matching_route['terminerà_[%]'].values[0]
+                if parcours_normalized in actual_routes:
+                    parcours_status[parcours][day] = "Fait"
     
         # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
         for parcours, status in parcours_status.items():
             row = {'Parcours Prévu': parcours}
-            for day in days_of_week_fr:
-                row[day] = status[day]["status"]
-            
-            # Calculer le taux de réalisation moyen pour la semaine
-            taux_realisation = sum(status[day]["taux"] for day in days_of_week_fr) / 7
-            row['Taux de réalisation'] = taux_realisation
-            
+            row.update(status)
             rows.append(row)
-        
+    
         comparison_table = pd.DataFrame(rows)
-        
+    
+        # Calculer les taux de réalisation pour chaque parcours
+        completion_rates, _ = calculate_completion_rates(weekly_details)
+    
+        # Créer un DataFrame à partir des taux de réalisation
+        completion_rates_df = completion_rates.reset_index()
+        completion_rates_df.columns = ['parcours', 'taux_completion']
+    
+        # Fusionner le tableau de comparaison avec les taux de réalisation
+        comparison_table = pd.merge(comparison_table, completion_rates_df, 
+                                    left_on='Parcours Prévu', right_on='parcours', how='left')
+    
+        # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
+        comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
+    
+        # Nettoyer le DataFrame en supprimant les colonnes inutiles
+        comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
+    
         return comparison_table
 
-    # Fonction pour calculer le taux de réalisation global de la semaine
-    def calculate_global_realization_rate(comparison_table):
-        return comparison_table['Taux de réalisation'].mean()
 
         
+    matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
+    apres_midi = ['Porte 9-11d H']
+    soir = ['Pt 17 Triplex V']
+
+    
     # Fonction pour calculer le taux de suivi à partir du tableau de suivi
     def calculate_taux_suivi_from_table(comparison_table):
         total_parcours = 49  # Total des parcours prévus sur une semaine (7 jours * 6 parcours par jour)
@@ -239,7 +246,6 @@ def main():
         
         return taux_suivi
 
-    # Fonction pour calculer le taux de complétion hebdomadaire
     def calculate_completion_rates(details_df, threshold=100):
         # Calculer le taux de complétion pour chaque parcours
         completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
@@ -249,7 +255,7 @@ def main():
         
         # Calculer le taux de réalisation
         total_parcours = len(completion_rates)
-        taux_realisation = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
+        taux_realisation = (parcours_realises / 7) * 100 
     
         return completion_rates, taux_realisation
 
@@ -265,7 +271,7 @@ def main():
         productivite_moyenne = weekly_details['productivitéhoraire_[mq/h]'].mean()
         
         return heures_cumulees, surface_nettoyee, vitesse_moyenne, productivite_moyenne
-    # Fonction pour calculer les indicateurs hebdomadaires
+        
     def calculate_monthly_indicators(details_df, mois):
         # Filtrer les données pour la semaine spécifiée
         monthly_details = details_df[details_df['mois'] == mois]
@@ -279,22 +285,23 @@ def main():
         productivite_moyenne_mois = monthly_details['productivitéhoraire_[mq/h]'].mean()
         
         return heures_cumulees_mois, surface_nettoyee_mois, vitesse_moyenne_mois, productivite_moyenne_mois
+        
     def calculate_average_resolution_time(df):
         df['Resolution Time'] = (df['Retour'] - df['Apparition']).dt.total_seconds() / 60
         avg_resolution_time = df.groupby('Description')['Resolution Time'].mean().reset_index()
         avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
         return avg_resolution_time
-    def create_pie_chart(alert_summary, text_color='white'):
+    def create_pie_chart(alert_summary):
         fig_pie = px.pie(alert_summary, values='Alert Count', names='Description', 
                          title='Répartition des évènements',
                          template='plotly_dark',
                          hole=0.3)
-        fig_pie.update_traces(textposition='inside', textinfo='percent+label', textfont_color=text_color)
+        fig_pie.update_traces(textposition='inside', textinfo='percent+label', textfont_color='white')
         return fig_pie
 
     # Variables pour le calcul du taux d'utilisation
-    working_hours_per_day = 3  # Nombre d'heures de travail prévues par jour
-    working_days_per_week = 5  # Nombre de jours de travail prévus par semaine
+    working_hours_per_day = 6  # Nombre d'heures de travail prévues par jour
+    working_days_per_week = 7  # Nombre de jours de travail prévus par semaine
 
     def calculate_weekly_hourly_cost(heures_cumulees, monthly_cost=1600, weeks_per_month=4):
         # Coût hebdomadaire
@@ -311,7 +318,7 @@ def main():
         utilization_rate = (heures_cumulees / planned_weekly_hours) * 100 if planned_weekly_hours > 0 else 0
 
         return weekly_cost, hourly_cost, total_cost, utilization_rate
-    description_evenements = pd.read_excel("Description des evenements.xlsx")
+        
     # Load the dataset with appropriate header row
     file_path = "DATASET/ALERTE/T2F/Alerte T2F  13-10.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
@@ -343,7 +350,7 @@ def main():
         return data[data['week'] == week_number]
     # Interface Streamlit
 
-    st.title('Indicateurs de Suivi des Parcours du RQUARTZ IMON')
+    st.title('Indicateurs de Suivi des Parcours du RQUARTZ T2F')
 
     # Créer un dictionnaire pour mapper chaque semaine à la date de début de la semaine
     def get_week_start_dates(year):
@@ -358,7 +365,8 @@ def main():
     week_start_dates = get_week_start_dates(2024)
     week_options = {week: date for week, date in week_start_dates.items()}
 
-            
+    # Pour RQUARTZ T2F
+    
     if 'period_selection' not in st.session_state:
         st.session_state['period_selection'] = "Semaine"
 
@@ -369,7 +377,6 @@ def main():
     )
 
     st.session_state['period_selection'] = period_selection
-    
     if period_selection == "Semaine":
         selected_week = st.selectbox("Sélectionnez le numéro de la semaine", options=list(week_options.keys()), format_func=lambda x: f"Semaine {x} ({week_options[x].strftime('%d/%m/%Y')})")
 
@@ -378,10 +385,10 @@ def main():
 
         # Créer le tableau de suivi par parcours pour la semaine spécifiée
         weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-    
 
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
+
         weekly_details = details_df1[details_df1['semaine'] == semaine]
         completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
 
@@ -446,37 +453,74 @@ def main():
         # Afficher les KPI côte à côte
         st.markdown("## **Indicateurs Hebdomadaires**")
 
-        # Créer une disposition en grille de 3x2
         col1, col2, col3 = st.columns(3)
         col4, col5, col6 = st.columns(3)
-
-        # Fonction helper pour créer un conteneur métrique
-        def metric_container(label, value, delta=None):
-            return f"""
-            <div class="metric-container">
-                <div class="metric-label">{label}</div>
-                <div class="metric-value">{value}</div>
-                {f'<div class="metric-delta">{delta}</div>' if delta else ''}
-            </div>
-            """
-
         with col1:
-            st.markdown(metric_container("Heures cumulées", f"{heures_cumulees:.2f} heures"), unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Heures cumulées</div>
+                    <div class="metric-value">{heures_cumulees:.2f} heures</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
         with col2:
-            st.markdown(metric_container("Surfaces nettoyées cumulées", f"{surface_nettoyee:.2f} m²"), unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Surfaces nettoyées cumulées</div>
+                    <div class="metric-value">{surface_nettoyee:.2f} m²</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
         with col3:
-            st.markdown(metric_container("Productivité moyenne", f"{productivite_moyenne:.2f} m²/h"), unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Productivité moyenne</div>
+                    <div class="metric-value">{productivite_moyenne:.2f} m²/h</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
         with col4:
-            st.markdown(metric_container("Vitesse moyenne", f"{vitesse_moyenne:.2f} km/h"), unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Vitesse moyenne</div>
+                    <div class="metric-value">{vitesse_moyenne:.2f} km/h</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
         with col5:
-            st.markdown(metric_container("Coût total", f"{total_cost:.2f} €", f"Coût/h: {hourly_cost:.2f} €"), unsafe_allow_html=True)
-
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Coût total</div>
+                    <div class="metric-value">{total_cost:.2f} €</div>
+                    <div class="metric-delta">Coût/h: {hourly_cost:.2f} €</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
         with col6:
-            st.markdown(metric_container("Taux d'utilisation", f"{utilization_rate:.2f} %"), unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div class="metric-container">
+                    <div class="metric-label">Taux d'utilisation</div>
+                    <div class="metric-value">{utilization_rate:.2f} %</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            
+            )
     
 
         # Créer la jauge du taux de suivi
@@ -547,6 +591,25 @@ def main():
             st.plotly_chart(fig_completion)
 
 
+
+
+
+
+
+
+
+
+
+        def style_parcours_prevu(val):
+            if val in matin:
+                return 'background-color: #4169E1; color: white;'  # Bleu royal
+            elif val in apres_midi:
+                return 'background-color: #FFD700; color: black;'  # Jaune or
+            elif val in soir:
+                return 'background-color: #FF8C00; color: black;'  # Orange foncé
+            else:
+                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
+        
         def style_status(val):
             if val == 'Fait':
                 return 'background-color: #13FF1A; color: black;'
@@ -565,30 +628,21 @@ def main():
             else:
                 return 'background-color: #FF1313; color: white;'
         
-        def style_parcours_prevu(val):
-            matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
-            apres_midi = ['Porte 9-11d H']
-            soir = ['Pt 17 Triplex V']
-        
-            if val in matin:
-                return 'background-color: #4169E1; color: white;'  # Bleu royal pour le matin
-            elif val in apres_midi:
-                return 'background-color: #FFD700; color: black;'  # Jaune or pour l'après-midi
-            elif val in soir:
-                return 'background-color: #FF8C00; color: black;'  # Orange foncé pour le soir
-            else:
-                return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
-        
-        # Ensuite, utilisez cette fonction dans la définition de styled_table
+        # Appliquer le style sur la colonne "Parcours Prévu"
         styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
         
-        # Le reste de votre code pour le style reste inchangé
+        # Appliquer le style sur les colonnes de jours pour le statut
         day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
         for col in day_columns:
             styled_table = styled_table.applymap(style_status, subset=[col])
         
+        # Appliquer le style sur la colonne "Taux de réalisation"
         styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
+        
+        # Formater la colonne "Taux de réalisation" en pourcentage
         styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
+        
+        # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
 
@@ -623,12 +677,11 @@ def main():
         st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(styled_table, width=2000)
 
-        st.subheader('Taux de réalisation par parcours')
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['parcours', 'taux_completion']
 
-        
+        st.subheader('Taux de réalisation par parcours')
         # Créer l'histogramme des taux de complétion par parcours
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
@@ -695,12 +748,11 @@ def main():
     elif period_selection == "Mois":
         mois_dict = {1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin", 7: "Juillet", 8: "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"}
         # Sélection du mois
-        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: mois_dict[x],key="month_selector")
+        selected_month = st.selectbox("Sélectionnez le mois", options=range(1, 13), format_func=lambda x: mois_dict[x])
         mois = selected_month
         details_df['mois'] = details_df['début'].dt.month
         # Filtrer les données pour le mois sélectionné
         details_df1['mois'] = details_df1['début'].dt.month
-        
         monthly_details = details_df1[details_df1['mois'] == selected_month]
         # Calculer le taux de suivi pour le mois
         taux_suivi_moyen_mois = 0
@@ -714,7 +766,6 @@ def main():
         # Calculer le taux de réalisation pour le mois
         completion_rates, taux_realisation_moyen_mois = calculate_completion_rates(monthly_details)
         
-
         # Calcul des KPI mensuels
         heures_cumulees_mois, surface_nettoyee_mois, vitesse_moyenne_mois, productivite_moyenne_mois = calculate_monthly_indicators(details_df, mois)
         
@@ -723,12 +774,12 @@ def main():
         heures_prevues_par_jour = 3  # Ajustez selon vos besoins
         heures_prevues_mois = jours_dans_le_mois * heures_prevues_par_jour
         taux_utilisation_mois = (heures_cumulees_mois / heures_prevues_mois) * 100
-         # Calculer le coût mensuel
+        # Calculer le coût mensuel
         monthly_cost = 1600  # Coût mensuel fixe
         hourly_cost_month = monthly_cost / heures_cumulees_mois if heures_cumulees_mois > 0 else 0
-
         # Assurez-vous que cette ligne est présente et correcte
         filtered_alarm_details_df = alarm_details_df[alarm_details_df['mois'] == selected_month]
+
         # Fonction pour catégoriser les heures
         def categorize_hour(hour):
             if 6 <= hour < 22:
@@ -745,8 +796,7 @@ def main():
         # Créer un sélecteur pour filtrer par catégorie
         categorie_filter = st.selectbox(
             "Filtrer par période",
-            options=['Tous', 'Journée', 'Nuit'],
-            key="month_period_filter"
+            options=['Tous', 'Journée', 'Nuit']
         )
 
         # Filtrer les données en fonction de la sélection
@@ -755,7 +805,7 @@ def main():
         else:
             filtered_data = filtered_alarm_details_df
 
-
+       
         # Calculer le nombre total d'alertes pour le mois
         total_alerts_month = len(filtered_data)
 
@@ -772,6 +822,7 @@ def main():
         avg_resolution_time.columns = ['Description', 'Avg Resolution Time (min)']
 
         alert_summary = pd.merge(alert_count_by_description, avg_resolution_time, on='Description')
+
 
 
         # Affichage des KPI pour le mois
@@ -867,8 +918,6 @@ def main():
                 """,
                 unsafe_allow_html=True
             )
-
-        
         # Créer la jauge du taux de suivi
         fig_suivi = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -973,10 +1022,9 @@ def main():
             st.plotly_chart(fig_pie)
 
 
-
        
 
-        # Create the monthly alerts comparison chart
+         # Create the monthly alerts comparison chart
         st.subheader("Comparaison du nombre d'événements signalés par mois")
 
         # Create a DataFrame with all months
@@ -1043,14 +1091,14 @@ def main():
 
         # Définir l'ordre des parcours
         ordre_parcours = [
-            'T D centre',
-            'L centre',
-            'L novotel',
-            'L brioche',
-            'L air france',
-            'T F af',
-            'T F brioche'
-
+            'Porte 1-3d H',
+            'Pt 3-5d Triplex',
+            'Triplex 6d F14',
+            'F14 Pt9 H',
+            'Porte 9-11d H',
+            'Pt 12-14d H',
+            'Pt 14d Triplex',
+            'Triplex 17d H'
         ]
 
         # Créer l'histogramme des taux de complétion par parcours
@@ -1114,23 +1162,17 @@ def main():
         # Afficher l'histogramme comparatif dans Streamlit
         st.subheader("Comparatif des taux de réalisation par mois")
         st.plotly_chart(fig_comparative, use_container_width=True)
-
     if 'current_app' not in st.session_state:
         st.session_state.current_app = "RQUARTZ T2F"
 
     st.subheader("Actions correctives")
 
     # Connexion à Supabase avec les informations de connexion
-    url = "https://jienhfjzykyjwpihuvcl.supabase.co"  # Remplace par l'URL de ton projet Supabase
-    key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppZW5oZmp6eWt5andwaWh1dmNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU5NTE0NjYsImV4cCI6MjA0MTUyNzQ2Nn0.uRexXku6cZCo4qPT_coXJtL3s31-lh_P9J469FhLxvk"  # Remplace par ta clé API
+    url = "https://cibuocdmnwhrjtspfqvj.supabase.co"  # Remplace par l'URL de ton projet Supabase
+    key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpYnVvY2Rtbndocmp0c3BmcXZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU1NDY1NjMsImV4cCI6MjA0MTEyMjU2M30.jchld2jauPI45JGMIxru5MnDRq9uOHgkEdXEa-qUK6A"  # Remplace par ta clé API
     supabase: Client = create_client(url, key)
-    # Remplacez par votre token et le nom du dépôt
-    GITHUB_TOKEN = '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'
-    REPO_NAME = 'Zineddine-Harrar/storagecobot'  # Nom du dépôt privé
-    BRANCH_NAME = 'main'  # Nom de la branche par défaut
-    
-    
-    # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
+
+   # Fonction pour charger les actions correctives depuis Supabase sans changer les noms des colonnes
     def load_actions_correctives():
         try:
             response = supabase.table('actions_correctives').select('*').execute()
@@ -1155,33 +1197,29 @@ def main():
     def save_actions_correctives(df):
         try:
             for index, row in df.iterrows():
-                # Convertir les dates si elles ne sont pas déjà en format datetime
-                if isinstance(row['date_ajout'], str):
-                    row['date_ajout'] = pd.to_datetime(row['date_ajout'], errors='coerce').date()
-                if isinstance(row['delai_intervention'], str):
-                    row['delai_intervention'] = pd.to_datetime(row['delai_intervention'], errors='coerce').date()
-
-                # Préparer les données à sauvegarder
                 data_to_save = {
                     'action_corrective': row['action_corrective'],
-                    'date_ajout': row['date_ajout'].strftime('%Y-%m-%d') if pd.notna(row['date_ajout']) else None,
-                    'delai_intervention': row['delai_intervention'].strftime('%Y-%m-%d') if pd.notna(row['delai_intervention']) else None,
+                    'date_ajout': row['date_ajout'].strftime('%Y-%m-%d'),
+                    'delai_intervention': row['delai_intervention'].strftime('%Y-%m-%d'),
                     'responsable_action': row['responsable_action'],
                     'statut': row['statut'],
                     'commentaires': row['commentaires']
                 }
 
+                # Convertir l'ID en entier si nécessaire
                 if 'id' in row and pd.notna(row['id']):
                     data_to_save['id'] = int(row['id'])  # Convertir l'ID en entier
+
+                    # Faire une mise à jour avec l'ID
                     supabase.table('actions_correctives').update(data_to_save).eq('id', data_to_save['id']).execute()
                 else:
+                    # Insertion sans l'ID (la base de données générera l'ID)
                     supabase.table('actions_correctives').insert(data_to_save).execute()
 
             return True
         except Exception as e:
             st.error(f"Erreur lors de la sauvegarde des données : {e}")
             return False
-
 
 
     # Fonction pour convertir les colonnes de date en datetime avant de les utiliser dans le data_editor
@@ -1194,7 +1232,7 @@ def main():
         except Exception as e:
             st.error(f"Erreur lors de la conversion des colonnes de date : {e}")
             return df
-    
+
     # Initialiser le state si nécessaire
     if 'actions_correctives_T2F' not in st.session_state:
         st.session_state.actions_correctives_T2F = load_actions_correctives()
@@ -1253,7 +1291,7 @@ def main():
             width=2000,
             key='data_editor_T2F'
         )
-    
+
         if st.button("Sauvegarder les modifications", key='save_T2F'):
             st.session_state.actions_correctives_T2F = edited_df
             if save_actions_correctives(edited_df):
@@ -1271,7 +1309,7 @@ def main():
        reload_page()
 
 
-
     
 if __name__ == '__main__':
     main()
+   
