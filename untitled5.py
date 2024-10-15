@@ -120,8 +120,8 @@ def main():
     details_df.columns = details_df.columns.str.replace(' ', '_').str.lower()
 
     # Convertir les colonnes "début" et "fin" en format datetime
-    details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
-    details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
+    details_df['début'] = pd.to_datetime(details_df['début'], format='%d/%m/%Y %H:%M', errors='coerce')
+    details_df['fin'] = pd.to_datetime(details_df['fin'], format='%d/%m/%Y %H:%M', errors='coerce')
     print(details_df['début'])
     # Extraire le jour de la semaine et la date de début
     details_df['jour'] = details_df['début'].dt.day_name()
@@ -239,32 +239,19 @@ def main():
         
         return taux_suivi
 
+    # Fonction pour calculer le taux de complétion hebdomadaire
     def calculate_completion_rates(details_df, threshold=100):
-        # Assurez-vous que la colonne 'jour_fr' est présente dans details_df
-        if 'jour_fr' not in details_df.columns:
-            raise ValueError("La colonne 'jour_fr' est manquante dans le DataFrame")
+        # Calculer le taux de complétion pour chaque parcours
+        completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
     
-        # Liste de tous les jours de la semaine
-        all_days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+        # Calculer le nombre de parcours réalisés (>= 100%)
+        parcours_realises = (completion_rates >= threshold).sum()
+        
+        # Calculer le taux de réalisation
+        total_parcours = len(completion_rates)
+        taux_realisation = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
     
-        # Initialiser un dictionnaire pour stocker les taux de réalisation par jour
-        daily_rates = {day: 0 for day in all_days}
-    
-        # Calculer le taux de réalisation pour chaque jour
-        for day in all_days:
-            day_data = details_df[details_df['jour_fr'] == day]
-            if not day_data.empty:
-                parcours_realises = (day_data['terminerà_[%]'] >= threshold).sum()
-                total_parcours = len(day_data)
-                daily_rates[day] = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
-    
-        # Calculer le taux de réalisation global sur les 7 jours
-        taux_realisation_global = sum(daily_rates.values()) / 7
-    
-        # Calculer le taux de réalisation moyen des parcours effectués
-        taux_realisation_moyen = details_df['terminerà_[%]'].mean()
-    
-        return taux_realisation_global, taux_realisation_moyen, daily_rates
+        return completion_rates, taux_realisation
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -396,7 +383,7 @@ def main():
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
         weekly_details = details_df1[details_df1['semaine'] == semaine]
-        taux_realisation_global, taux_realisation_moyen, daily_rates = calculate_completion_rates(weekly_details)
+        completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
 
 
     
@@ -523,7 +510,7 @@ def main():
         # Créer la jauge du taux de complétion
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=taux_realisation_global,
+            value=weekly_completion_rate,
             title={'text': "Taux de réalisation des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
@@ -536,7 +523,7 @@ def main():
                 'threshold': {
                     'line': {'color': "white", 'width': 4},
                     'thickness': 0.75,
-                    'value': taux_realisation_global
+                    'value': weekly_completion_rate
                 }
             }
         ))
@@ -577,20 +564,51 @@ def main():
                 return 'background-color: #FFD700; color: black;'
             else:
                 return 'background-color: #FF1313; color: white;'
-
-
-        def style_parcours_prevu(val):
-            # Appliquer un style uniforme pour tous les parcours
-            return 'background-color: #4169E1; color: white;'  # Bleu royal pour tous les parcours
         
-        # Utilisation de la fonction simplifiée dans la création du styled_table
-        styled_table = weekly_comparison_table.style\
-            .applymap(style_parcours_prevu, subset=['Parcours Prévu'])\
-            .applymap(style_status, subset=[col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']])\
-            .applymap(style_taux_realisation, subset=['Taux de réalisation'])\
-            .format({'Taux de réalisation': '{:.2f}%'})\
-            .set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
+        # Appliquer le style sur la colonne "Parcours Prévu"
+        styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
+        
+        # Appliquer le style sur les colonnes de jours pour le statut
+        day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
+        for col in day_columns:
+            styled_table = styled_table.applymap(style_status, subset=[col])
+        
+        # Appliquer le style sur la colonne "Taux de réalisation"
+        styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
+        
+        # Formater la colonne "Taux de réalisation" en pourcentage
+        styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
+        
+        # Appliquer le style sur les en-têtes de colonne
+        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
+
+        def create_legend():
+            legend_html = """
+            <div style="display: flex; justify-content: space-around; padding: 10px; background-color: black; color: white;">
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; background-color: #4169E1; margin-right: 5px;"></div>
+                    <span>Matin</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; background-color: #FFD700; margin-right: 5px;"></div>
+                    <span>Après-midi</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 20px; height: 20px; background-color: #FF8C00; margin-right: 5px;"></div>
+                    <span>Soir</span>
+                </div>
+            </div>
+            """
+            return legend_html
+        
+
+        
+        # Utiliser le conteneur personnalisé
+        st.markdown('<div class="custom-expander">', unsafe_allow_html=True)
+        with st.expander("Voir la légende des couleurs des parcours"):
+            st.write("Les couleurs dans la colonne 'Parcours Prévu' indiquent la période de la journée :")
+            st.markdown(create_legend(), unsafe_allow_html=True)
         
         # Afficher le tableau
         st.subheader('Tableau de Suivi des Parcours')
