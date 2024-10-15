@@ -246,26 +246,31 @@ def main():
         
         return taux_suivi
 
-    def calculate_completion_rates(details_df, planning_df, semaine, threshold=90):
+    def calculate_completion_rates(details_df, planning_df, semaine, threshold=100):
     # Filtrer les données pour la semaine spécifiée
     weekly_details = details_df[details_df['semaine'] == semaine]
     weekly_planning = planning_df[planning_df['semaine'] == semaine]
 
     # Obtenir la liste de tous les parcours prévus pour la semaine
     parcours_prevus = weekly_planning['parcours'].unique()
-    total_parcours_prevus = len(parcours_prevus) * 7  # 7 jours dans la semaine
+    
+    # Initialiser un dictionnaire pour stocker les taux de réalisation hebdomadaires
+    taux_realisation_hebdo = {parcours: 0 for parcours in parcours_prevus}
 
-    # Compter les parcours réalisés (>= seuil%)
-    parcours_realises = weekly_details[weekly_details['terminerà_[%]'] >= threshold]
-    total_parcours_realises = len(parcours_realises)
+    # Calculer le taux de réalisation hebdomadaire pour chaque parcours
+    for parcours in parcours_prevus:
+        parcours_realises = weekly_details[(weekly_details['parcours'] == parcours) & (weekly_details['terminerà_[%]'] >= threshold)]
+        taux_realisation_hebdo[parcours] = (len(parcours_realises) / 7) * 100  # 7 jours dans la semaine
 
-    # Calculer le taux de réalisation global pour la semaine
-    taux_realisation = (total_parcours_realises / total_parcours_prevus) * 100 if total_parcours_prevus > 0 else 0
+    # Créer un DataFrame avec les taux de réalisation hebdomadaires
+    completion_rates = pd.DataFrame.from_dict(taux_realisation_hebdo, orient='index', columns=['taux_realisation'])
+    completion_rates.index.name = 'parcours'
+    completion_rates = completion_rates.reset_index()
 
-    # Calculer les taux de réalisation individuels pour chaque parcours
-    completion_rates = weekly_details.groupby('parcours')['terminerà_[%]'].mean()
+    # Calculer la moyenne des taux de réalisation pour la jauge
+    taux_moyen_global = weekly_details['terminerà_[%]'].mean()
 
-    return completion_rates, taux_realisation
+    return completion_rates, taux_moyen_global
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -393,12 +398,13 @@ def main():
 
         # Créer le tableau de suivi par parcours pour la semaine spécifiée
         weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
+        weekly_comparison_table = pd.merge(weekly_comparison_table, completion_rates, on='parcours', how='left')
 
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
 
         weekly_details = details_df1[details_df1['semaine'] == semaine]
-        completion_rates, weekly_completion_rate = calculate_completion_rates(details_df1, planning_df, semaine)
+        completion_rates, taux_moyen_global = calculate_completion_rates(details_df1, planning_df, semaine)
 
 
 
@@ -563,8 +569,8 @@ def main():
         # Créer la jauge du taux de complétion
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=weekly_completion_rate,
-            title={'text': "Taux de réalisation des parcours"},
+            value=taux_moyen_global,
+            title={'text': "Taux moyen de réalisation des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
                 'bar': {'color': "white"},
@@ -576,7 +582,7 @@ def main():
                 'threshold': {
                     'line': {'color': "white", 'width': 4},
                     'thickness': 0.75,
-                    'value': weekly_completion_rate
+                    'value': taux_moyen_global
                 }
             }
         ))
@@ -630,29 +636,19 @@ def main():
         def style_taux_realisation(val):
             if pd.isna(val):
                 return ''
-            elif val >= 90:
+            elif val >= 85:  # Très bon taux de réalisation hebdomadaire
                 return 'background-color: #13FF1A; color: black;'
-            elif val >= 50:
+            elif val >= 60:  # Taux de réalisation acceptable
                 return 'background-color: #FFD700; color: black;'
-            else:
+            else:  # Taux de réalisation faible
                 return 'background-color: #FF1313; color: white;'
         
-        # Appliquer le style sur la colonne "Parcours Prévu"
-        styled_table = weekly_comparison_table.style.applymap(style_parcours_prevu, subset=['Parcours Prévu'])
+        styled_table = weekly_comparison_table.style\
+            .applymap(style_parcours_prevu, subset=['Parcours Prévu'])\
+            .applymap(style_status, subset=[col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']])\
+            .applymap(style_taux_realisation, subset=['Taux de réalisation'])\
+            .format({'Taux de réalisation': '{:.2f}%'})
         
-        # Appliquer le style sur les colonnes de jours pour le statut
-        day_columns = [col for col in weekly_comparison_table.columns if col not in ['Parcours Prévu', 'Taux de réalisation']]
-        for col in day_columns:
-            styled_table = styled_table.applymap(style_status, subset=[col])
-        
-        # Appliquer le style sur la colonne "Taux de réalisation"
-        styled_table = styled_table.applymap(style_taux_realisation, subset=['Taux de réalisation'])
-        
-        # Formater la colonne "Taux de réalisation" en pourcentage
-        styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
-        
-        # Appliquer le style sur les en-têtes de colonne
-        styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
 
         def create_legend():
