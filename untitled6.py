@@ -246,11 +246,11 @@ def main():
         
         return taux_suivi
 
-    def calculate_completion_rates(details_df, threshold=100):
+    def calculate_completion_rates(details_df, threshold=90):
         # Calculer le taux de complétion pour chaque parcours
         completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
     
-        # Calculer le nombre de parcours réalisés (>= 100%)
+        # Calculer le nombre de parcours réalisés (>= 90%)
         parcours_realises = (completion_rates >= threshold).sum()
         
         # Calculer le taux de réalisation
@@ -621,7 +621,7 @@ def main():
         def style_taux_realisation(val):
             if pd.isna(val):
                 return ''
-            elif val >= 100:
+            elif val >= 90:
                 return 'background-color: #13FF1A; color: black;'
             elif val >= 50:
                 return 'background-color: #FFD700; color: black;'
