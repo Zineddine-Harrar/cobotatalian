@@ -246,18 +246,26 @@ def main():
         
         return taux_suivi
 
-    def calculate_completion_rates(details_df, threshold=100):
-        # Calculer le taux de complétion pour chaque parcours
-        completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
-    
-        # Calculer le nombre de parcours réalisés (>= 100%)
-        parcours_realises = (completion_rates >= threshold).sum()
-        
-        # Calculer le taux de réalisation
-        total_parcours = len(completion_rates)
-        taux_realisation = (parcours_realises / 7) * 100 
-    
-        return completion_rates, taux_realisation
+    def calculate_completion_rates(details_df, planning_df, semaine, threshold=90):
+    # Filtrer les données pour la semaine spécifiée
+    weekly_details = details_df[details_df['semaine'] == semaine]
+    weekly_planning = planning_df[planning_df['semaine'] == semaine]
+
+    # Obtenir la liste de tous les parcours prévus pour la semaine
+    parcours_prevus = weekly_planning['parcours'].unique()
+    total_parcours_prevus = len(parcours_prevus) * 7  # 7 jours dans la semaine
+
+    # Compter les parcours réalisés (>= seuil%)
+    parcours_realises = weekly_details[weekly_details['terminerà_[%]'] >= threshold]
+    total_parcours_realises = len(parcours_realises)
+
+    # Calculer le taux de réalisation global pour la semaine
+    taux_realisation = (total_parcours_realises / total_parcours_prevus) * 100 if total_parcours_prevus > 0 else 0
+
+    # Calculer les taux de réalisation individuels pour chaque parcours
+    completion_rates = weekly_details.groupby('parcours')['terminerà_[%]'].mean()
+
+    return completion_rates, taux_realisation
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -390,7 +398,8 @@ def main():
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
 
         weekly_details = details_df1[details_df1['semaine'] == semaine]
-        completion_rates, weekly_completion_rate = calculate_completion_rates(weekly_details)
+        completion_rates, weekly_completion_rate = calculate_completion_rates(details_df1, planning_df, semaine)
+
 
 
     
@@ -558,7 +567,7 @@ def main():
             title={'text': "Taux de réalisation des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
-                'bar': {'color': "white"},  # Couleur de l'indicateur
+                'bar': {'color': "white"},
                 'steps': [
                     {'range': [0, 40], 'color': "red"},
                     {'range': [40, 80], 'color': "orange"},
@@ -621,7 +630,7 @@ def main():
         def style_taux_realisation(val):
             if pd.isna(val):
                 return ''
-            elif val >= 100:
+            elif val >= 90:
                 return 'background-color: #13FF1A; color: black;'
             elif val >= 50:
                 return 'background-color: #FFD700; color: black;'
