@@ -247,30 +247,30 @@ def main():
         return taux_suivi
 
     def calculate_completion_rates(details_df, planning_df, semaine, threshold=100):
-    # Filtrer les données pour la semaine spécifiée
-    weekly_details = details_df[details_df['semaine'] == semaine]
-    weekly_planning = planning_df[planning_df['semaine'] == semaine]
-
-    # Obtenir la liste de tous les parcours prévus pour la semaine
-    parcours_prevus = weekly_planning['parcours'].unique()
+        # Filtrer les données pour la semaine spécifiée
+        weekly_details = details_df[details_df['semaine'] == semaine]
+        weekly_planning = planning_df[planning_df['semaine'] == semaine]
     
-    # Initialiser un dictionnaire pour stocker les taux de réalisation hebdomadaires
-    taux_realisation_hebdo = {parcours: 0 for parcours in parcours_prevus}
-
-    # Calculer le taux de réalisation hebdomadaire pour chaque parcours
-    for parcours in parcours_prevus:
-        parcours_realises = weekly_details[(weekly_details['parcours'] == parcours) & (weekly_details['terminerà_[%]'] >= threshold)]
-        taux_realisation_hebdo[parcours] = (len(parcours_realises) / 7) * 100  # 7 jours dans la semaine
-
-    # Créer un DataFrame avec les taux de réalisation hebdomadaires
-    completion_rates = pd.DataFrame.from_dict(taux_realisation_hebdo, orient='index', columns=['taux_realisation'])
-    completion_rates.index.name = 'parcours'
-    completion_rates = completion_rates.reset_index()
-
-    # Calculer la moyenne des taux de réalisation pour la jauge
-    taux_moyen_global = weekly_details['terminerà_[%]'].mean()
-
-    return completion_rates, taux_moyen_global
+        # Obtenir la liste de tous les parcours prévus pour la semaine
+        parcours_prevus = weekly_planning['parcours'].unique()
+        
+        # Initialiser un dictionnaire pour stocker les taux de réalisation hebdomadaires
+        taux_realisation_hebdo = {parcours: 0 for parcours in parcours_prevus}
+    
+        # Calculer le taux de réalisation hebdomadaire pour chaque parcours
+        for parcours in parcours_prevus:
+            parcours_realises = weekly_details[(weekly_details['parcours'] == parcours) & (weekly_details['terminerà_[%]'] >= threshold)]
+            taux_realisation_hebdo[parcours] = (len(parcours_realises) / 7) * 100  # 7 jours dans la semaine
+    
+        # Créer un DataFrame avec les taux de réalisation hebdomadaires
+        completion_rates = pd.DataFrame.from_dict(taux_realisation_hebdo, orient='index', columns=['taux_realisation'])
+        completion_rates.index.name = 'parcours'
+        completion_rates = completion_rates.reset_index()
+    
+        # Calculer la moyenne des taux de réalisation pour la jauge
+        taux_moyen_global = weekly_details['terminerà_[%]'].mean()
+    
+        return completion_rates, taux_moyen_global
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
