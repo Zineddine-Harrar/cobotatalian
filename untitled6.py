@@ -211,25 +211,20 @@ def main():
     
         comparison_table = pd.DataFrame(rows)
     
-        # Calculer les taux de réalisation pour chaque parcours
-        completion_rates, _ = calculate_completion_rates(weekly_details)
-    
-        # Créer un DataFrame à partir des taux de réalisation
-        completion_rates_df = completion_rates.reset_index()
-        completion_rates_df.columns = ['parcours', 'taux_completion']
+        # Calculer les taux de réalisation
+        completion_rates, taux_moyen_global = calculate_completion_rates(details_df, planning_df, semaine)
     
         # Fusionner le tableau de comparaison avec les taux de réalisation
-        comparison_table = pd.merge(comparison_table, completion_rates_df, 
+        comparison_table = pd.merge(comparison_table, completion_rates, 
                                     left_on='Parcours Prévu', right_on='parcours', how='left')
     
         # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
-        comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
+        comparison_table['Taux de réalisation'] = comparison_table['taux_realisation']
     
         # Nettoyer le DataFrame en supprimant les colonnes inutiles
-        comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
+        comparison_table = comparison_table.drop(['parcours', 'taux_realisation'], axis=1)
     
-        return comparison_table
-
+        return comparison_table, taux_moyen_global
 
         
     matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
@@ -246,7 +241,7 @@ def main():
         
         return taux_suivi
 
-    def calculate_completion_rates(details_df, planning_df, semaine, threshold=100):
+    def calculate_completion_rates(details_df, planning_df, semaine, threshold=90):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
         weekly_planning = planning_df[planning_df['semaine'] == semaine]
@@ -397,8 +392,7 @@ def main():
         semaine = selected_week
 
         # Créer le tableau de suivi par parcours pour la semaine spécifiée
-        weekly_comparison_table = create_parcours_comparison_table(semaine, details_df1, planning_df)
-        weekly_comparison_table = pd.merge(weekly_comparison_table, completion_rates, on='parcours', how='left')
+        weekly_comparison_table, taux_moyen_global = create_parcours_comparison_table(semaine, details_df1, planning_df)
 
         # Calculer le taux de suivi à partir du tableau de suivi
         taux_suivi = calculate_taux_suivi_from_table(weekly_comparison_table)
