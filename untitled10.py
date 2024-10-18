@@ -182,7 +182,7 @@ def main():
     # Fonction pour nettoyer les doublons
     def clean_duplicates(details_df):
         # Convertir les colonnes "début" et "fin" en format datetime
-        details_df['task_start_time'] = pd.to_datetime(details_df['task_start_time'], format='%d/%m/%Y %H:%M', errors='coerce')
+        details_df['task_start_time'] = pd.to_datetime(details_df['task_start_time'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
     
         # Extraire la date de début
         details_df['date'] = details_df['task_start_time'].dt.date
