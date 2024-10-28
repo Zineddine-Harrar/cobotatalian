@@ -141,8 +141,32 @@ def main():
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
     details_df.columns = details_df.columns.str.replace(' ', '_').str.lower()
 
-    # Convertir la colonne task_start_time en type datetime
-    details_df['task_start_time'] = pd.to_datetime(details_df['task_start_time'])
+        # Gestion améliorée de la conversion des dates
+    try:
+            # Première tentative : format standard
+        details_df['task_start_time'] = pd.to_datetime(
+            details_df['task_start_time'],
+            format='mixed',  # Permet de détecter automatiquement le format pour chaque ligne
+            dayfirst=True    # Important pour le format européen (jour/mois/année)
+        )
+    except Exception as e:
+        st.warning(f"Premier essai de conversion de date échoué, tentative avec format alternatif... ({str(e)})")
+        try:
+            # Deuxième tentative : format européen explicite
+            details_df['task_start_time'] = pd.to_datetime(
+                details_df['task_start_time'],
+                format='%d/%m/%Y %H:%M:%S',
+                errors='coerce'  # Remplace les valeurs non conformes par NaT
+            )
+        except Exception as e:
+            st.error(f"Erreur lors de la conversion des dates : {str(e)}")
+            st.write("Exemple de date dans le fichier :", details_df['task_start_time'].iloc[0])
+            return
+
+        # Vérifier les valeurs NaT (Not a Time) après conversion
+        nat_count = details_df['task_start_time'].isna().sum()
+        if nat_count > 0:
+            st.warning(f"{nat_count} dates n'ont pas pu être converties correctement.")
 
     # Utiliser l'accessor .dt pour obtenir le nom du jour
     details_df['jour'] = details_df['task_start_time'].dt.day_name()
