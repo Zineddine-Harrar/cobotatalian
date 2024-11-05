@@ -113,7 +113,7 @@ def main():
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('PLANNING RQUARTZ IMON (1).csv', delimiter=';', encoding='ISO-8859-1')
-    details_df = pd.read_csv('DATASET/IMON/13-10-2024-.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
+    details_df = pd.read_csv('DATASET/IMON/05-11-2024.csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
     
     # Nettoyer les colonnes dans details_df
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
@@ -313,7 +313,7 @@ def main():
         return weekly_cost, hourly_cost, total_cost, utilization_rate
     description_evenements = pd.read_excel("Description des evenements.xlsx")
     # Load the dataset with appropriate header row
-    file_path = "DATASET/ALERTE/IMON/Alerte IMON 13-10.xlsx"
+    file_path = "DATASET/ALERTE/IMON/Alerte IMON 05-11.xlsx"
     alarm_details_df = pd.read_excel(file_path, header=4)
     description_evenements = pd.read_excel("Description des evenements.xlsx")
     # Rename columns for easier access
