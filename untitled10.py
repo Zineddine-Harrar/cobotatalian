@@ -155,7 +155,7 @@ def main():
             # Deuxième tentative : format européen explicite
             details_df['task_start_time'] = pd.to_datetime(
                 details_df['task_start_time'],
-                format='%d/%m/%Y %H:%M:%S',
+                format='%d/%m/%Y %H:%M',
                 errors='coerce'  # Remplace les valeurs non conformes par NaT
             )
         except Exception as e:
