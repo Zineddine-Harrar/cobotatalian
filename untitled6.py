@@ -697,11 +697,16 @@ def main():
         st.dataframe(
             data=styled_table,
             width=2000,
-            column_config={day: st.column_config.Column(
-                "help": lambda x, p=parcours, d=day: tooltips.loc[
-                    (tooltips['parcours'] == p) & (tooltips['jour'] == d), 'tooltip'
-                ].iloc[0] if x == "Fait" else None
-            ) for day in ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']}
+            column_config={
+                day: st.column_config.Column(
+                    help=lambda x: tooltips.loc[
+                        (tooltips['parcours'] == x.name) & 
+                        (tooltips['jour'] == day), 
+                        'tooltip'
+                    ].iloc[0] if x == "Fait" else None
+                ) 
+                for day in ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+            }
         )
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
