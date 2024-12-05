@@ -182,14 +182,16 @@ def main():
         weekly_details = details_df[details_df['semaine'] == semaine]
         
         # Créer une table de correspondance pour les tooltips
-        tooltips = pd.DataFrame(columns=['parcours', 'jour', 'tooltip'])
+        tooltips_data = []
         
         for _, row in weekly_details.iterrows():
-            tooltips = tooltips.append({
+            tooltips_data.append({
                 'parcours': row['parcours'],
                 'jour': row['jour_fr'],
                 'tooltip': f"Début: {row['début'].strftime('%H:%M')}, Taux: {row['terminerà_[%]']:.1f}%"
-            }, ignore_index=True)
+            })
+        
+        tooltips = pd.DataFrame(tooltips_data)
     
         # Créer le tableau comme avant
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
