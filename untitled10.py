@@ -275,10 +275,8 @@ def main():
     # Fonction pour calculer le taux de complétion hebdomadaire
     def calculate_weekly_completion_rate(details_df, semaine):
         weekly_details = details_df[details_df['semaine'] == semaine]
-        completion_rates = weekly_details.groupby('cleaning_plan')['task_completion_(%)'].mean()
-        completed_routes = (completion_rates >= 100).sum()
-        total_routes = len(completion_rates)
-        weekly_completion_rate = (completed_routes / total_routes) * 100 if total_routes > 0 else 0
+        completion_rates = weekly_details.groupby('cleaning_plan')['task_completion_(%)'].sum() / 7
+        weekly_completion_rate = completion_rates.mean()
         return completion_rates, weekly_completion_rate
 
     completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df, 28)
