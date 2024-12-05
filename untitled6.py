@@ -212,15 +212,16 @@ def main():
         comparison_table = pd.DataFrame(rows)
     
         # Calculer les taux de réalisation pour chaque parcours
+        weekly_details = details_df[details_df['semaine'] == semaine]
         completion_rates, _ = calculate_completion_rates(weekly_details)
-    
+        
         # Créer un DataFrame à partir des taux de réalisation
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
-    
+        
         # Fusionner le tableau de comparaison avec les taux de réalisation
         comparison_table = pd.merge(comparison_table, completion_rates_df, 
-                                    left_on='Parcours Prévu', right_on='parcours', how='left')
+                                  left_on='Parcours Prévu', right_on='parcours', how='left')
     
         # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
         comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
@@ -229,6 +230,7 @@ def main():
         comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
     
         return comparison_table
+
 
         
     matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
@@ -1336,4 +1338,3 @@ def main():
     
 if __name__ == '__main__':
     main()
-   
