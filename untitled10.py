@@ -275,30 +275,35 @@ def main():
     # Fonction pour calculer le taux de complétion hebdomadaire
     def calculate_weekly_completion_rate(details_df, semaine):
         weekly_details = details_df[details_df['semaine'] == semaine]
-        
         completion_rates = pd.Series()
+        
         for parcours in weekly_details['cleaning_plan'].unique():
             parcours_data = weekly_details[weekly_details['cleaning_plan'] == parcours]
-            if not parcours_data.empty:
-                completion_rates[parcours] = parcours_data['task_completion_(%)'].iloc[0] / 7
-            else:
-                completion_rates[parcours] = 0
+            weekly_taux = 0
+            for jour in ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']:
+                jour_data = parcours_data[parcours_data['jour_fr'] == jour]
+                if not jour_data.empty:
+                    weekly_taux += jour_data['task_completion_(%)'].values[0]
+            completion_rates[parcours] = weekly_taux / 7
                 
         weekly_completion_rate = completion_rates.mean()
-        
         return completion_rates, weekly_completion_rate
+
+    
     # Fonction pour calculer le taux de complétion
     def calculate_completion_rates(details_df):
         completion_rates = pd.Series()
+        
         for parcours in details_df['cleaning_plan'].unique():
             parcours_data = details_df[details_df['cleaning_plan'] == parcours]
-            if not parcours_data.empty:
-                completion_rates[parcours] = parcours_data['task_completion_(%)'].iloc[0] / 7
-            else:
-                completion_rates[parcours] = 0
+            weekly_taux = 0
+            for jour in ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']:
+                jour_data = parcours_data[parcours_data['jour_fr'] == jour]
+                if not jour_data.empty:
+                    weekly_taux += jour_data['task_completion_(%)'].values[0]
+            completion_rates[parcours] = weekly_taux / 7
                 
         weekly_completion_rate = completion_rates.mean()
-        
         return completion_rates, weekly_completion_rate
     
     # Fonction pour calculer les indicateurs mensuels
