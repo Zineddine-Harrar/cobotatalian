@@ -212,16 +212,15 @@ def main():
         comparison_table = pd.DataFrame(rows)
     
         # Calculer les taux de réalisation pour chaque parcours
-        weekly_details = details_df[details_df['semaine'] == semaine]
         completion_rates, _ = calculate_completion_rates(weekly_details)
-        
+    
         # Créer un DataFrame à partir des taux de réalisation
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
-        
+    
         # Fusionner le tableau de comparaison avec les taux de réalisation
         comparison_table = pd.merge(comparison_table, completion_rates_df, 
-                                  left_on='Parcours Prévu', right_on='parcours', how='left')
+                                    left_on='Parcours Prévu', right_on='parcours', how='left')
     
         # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
         comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
@@ -248,43 +247,17 @@ def main():
         return taux_suivi
 
     def calculate_completion_rates(details_df, threshold=90):
-        # Créer un dictionnaire pour stocker les compteurs pour chaque parcours
-        parcours_counters = {}
+        # Calculer le taux de complétion pour chaque parcours
+        completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
+    
+        # Calculer le nombre de parcours réalisés (>= 90%)
+        parcours_realises = (completion_rates >= threshold).sum()
         
-        # Pour chaque parcours unique dans les données
-        for parcours in details_df['parcours'].unique():
-            # Filtrer les données pour ce parcours
-            parcours_data = details_df[details_df['parcours'] == parcours]
-            
-            # Debug: Afficher les données pour ce parcours
-            print(f"\nParcours: {parcours}")
-            print("Données brutes:")
-            print(parcours_data[['jour_fr', 'terminerà_[%]']])
-            
-            # Compter uniquement les jours où le parcours a été réalisé avec succès (>= threshold)
-            successful_days = parcours_data[parcours_data['terminerà_[%]'] >= threshold]
-            
-            print(f"Jours réussis (>= {threshold}%):")
-            print(successful_days[['jour_fr', 'terminerà_[%]']])
-            
-            # Nombre de jours réussis
-            nb_successful_days = len(successful_days)
-            print(f"Nombre de jours réussis: {nb_successful_days}")
-            
-            # Calculer le taux de réalisation sur 7 jours
-            taux_realisation = (nb_successful_days / 7) * 100
-            print(f"Taux de réalisation: {taux_realisation:.2f}%")
-            
-            parcours_counters[parcours] = taux_realisation
-        
-        # Créer un Series pandas avec les taux de réalisation
-        completion_rates = pd.Series(parcours_counters)
-        completion_rates.index.name = 'parcours'
-        
-        # Calculer le taux de réalisation moyen pour la semaine
-        weekly_completion_rate = completion_rates.mean()
-        
-        return completion_rates, weekly_completion_rate
+        # Calculer le taux de réalisation
+        total_parcours = len(completion_rates)
+        taux_realisation = (parcours_realises / 7) * 100 
+    
+        return completion_rates, taux_realisation
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
