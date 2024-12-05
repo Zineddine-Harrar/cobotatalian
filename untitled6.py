@@ -178,66 +178,67 @@ def main():
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
     
     def create_parcours_comparison_table(semaine, details_df, planning_df):
-    # Filtrer les données pour la semaine spécifiée
-    weekly_details = details_df[details_df['semaine'] == semaine]
-    
-    # Initialiser le tableau de suivi
-    days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-    parcours_list = set(planning_df['parcours'])
-    parcours_list.discard(None)
-    
-    # Préparer les colonnes du tableau avec les tooltips
-    columns = ['Parcours Prévu'] + days_of_week_fr + ['Taux de réalisation', '_tooltips']
-    comparison_table = pd.DataFrame(columns=columns)
-    
-    # Dictionnaire pour stocker les tooltips
-    tooltips = {day: {} for day in days_of_week_fr}
-    
-    rows = []
-    for parcours in parcours_list:
-        row = {'Parcours Prévu': parcours}
-        row_tooltips = {}
+        # Filtrer les données pour la semaine spécifiée
+        weekly_details = details_df[details_df['semaine'] == semaine]
         
-        for day in days_of_week_fr:
-            daily_data = weekly_details[
-                (weekly_details['jour_fr'] == day) & 
-                (weekly_details['parcours'].str.strip().str.lower() == parcours.strip().lower())
-            ]
+        # Initialiser le tableau de suivi
+        days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+        parcours_list = set(planning_df['parcours'])
+        parcours_list.discard(None)
+        
+        # Préparer les colonnes du tableau avec les tooltips
+        columns = ['Parcours Prévu'] + days_of_week_fr + ['Taux de réalisation', '_tooltips']
+        comparison_table = pd.DataFrame(columns=columns)
+        
+        # Dictionnaire pour stocker les tooltips
+        tooltips = {day: {} for day in days_of_week_fr}
+        
+        rows = []
+        for parcours in parcours_list:
+            row = {'Parcours Prévu': parcours}
+            row_tooltips = {}
             
-            if not daily_data.empty:
-                row[day] = "Fait"
-                heure_debut = daily_data['début'].iloc[0].strftime('%H:%M')
-                taux = daily_data['terminerà_[%]'].iloc[0]
-                row_tooltips[day] = f"Début: {heure_debut}, Taux: {taux:.1f}%"
-            else:
-                row[day] = "Pas fait"
-                row_tooltips[day] = ""
+            for day in days_of_week_fr:
+                daily_data = weekly_details[
+                    (weekly_details['jour_fr'] == day) & 
+                    (weekly_details['parcours'].str.strip().str.lower() == parcours.strip().lower())
+                ]
+                
+                if not daily_data.empty:
+                    row[day] = "Fait"
+                    heure_debut = daily_data['début'].iloc[0].strftime('%H:%M')
+                    taux = daily_data['terminerà_[%]'].iloc[0]
+                    row_tooltips[day] = f"Début: {heure_debut}, Taux: {taux:.1f}%"
+                else:
+                    row[day] = "Pas fait"
+                    row_tooltips[day] = ""
+            
+            row['_tooltips'] = row_tooltips
+            rows.append(row)
         
-        row['_tooltips'] = row_tooltips
-        rows.append(row)
-    
-    comparison_table = pd.DataFrame(rows)
-    
-    # Calculer les taux de réalisation
-    weekly_details = details_df[details_df['semaine'] == semaine]
-    completion_rates, _ = calculate_completion_rates(weekly_details)
-    
-    completion_rates_df = completion_rates.reset_index()
-    completion_rates_df.columns = ['parcours', 'taux_completion']
-    
-    # Fusionner avec les taux de réalisation
-    comparison_table = pd.merge(
-        comparison_table, 
-        completion_rates_df,
-        left_on='Parcours Prévu',
-        right_on='parcours',
-        how='left'
-    )
-    
-    comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
-    comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
-    
-    return comparison_table
+        comparison_table = pd.DataFrame(rows)
+        
+        # Calculer les taux de réalisation
+        weekly_details = details_df[details_df['semaine'] == semaine]
+        completion_rates, _ = calculate_completion_rates(weekly_details)
+        
+        completion_rates_df = completion_rates.reset_index()
+        completion_rates_df.columns = ['parcours', 'taux_completion']
+        
+        # Fusionner avec les taux de réalisation
+        comparison_table = pd.merge(
+            comparison_table, 
+            completion_rates_df,
+            left_on='Parcours Prévu',
+            right_on='parcours',
+            how='left'
+        )
+        
+        comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
+        comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
+        
+        return comparison_table
+
         
     matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
     apres_midi = ['Porte 9-11d H']
