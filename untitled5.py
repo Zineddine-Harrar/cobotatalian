@@ -240,18 +240,28 @@ def main():
         return taux_suivi
 
     # Fonction pour calculer le taux de complétion hebdomadaire
-    def calculate_completion_rates(details_df, threshold=100):
-        # Calculer le taux de complétion pour chaque parcours
-        completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
-    
-        # Calculer le nombre de parcours réalisés (>= 100%)
-        parcours_realises = (completion_rates >= threshold).sum()
+    def calculate_completion_rates(details_df):
+        parcours_counters = {}
         
-        # Calculer le taux de réalisation
-        total_parcours = len(completion_rates)
-        taux_realisation = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
-    
-        return completion_rates, taux_realisation
+        for parcours in details_df['parcours'].unique():
+            parcours_data = details_df[details_df['parcours'] == parcours]
+            
+            print(f"\nParcours: {parcours}")
+            print("Données brutes:")
+            print(parcours_data[['jour_fr', 'terminerà_[%]']])
+            
+            taux_realisation = parcours_data['terminerà_[%]'].sum() / 7
+            
+            print(f"Taux de réalisation: {taux_realisation:.2f}%")
+            
+            parcours_counters[parcours] = taux_realisation
+        
+        completion_rates = pd.Series(parcours_counters)
+        completion_rates.index.name = 'parcours'
+        
+        weekly_completion_rate = completion_rates.mean()
+        
+        return completion_rates, weekly_completion_rate
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
