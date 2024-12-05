@@ -566,9 +566,9 @@ def main():
                 return 'background-color: #FF1313; color: white;'
         
         def style_parcours_prevu(val):
-            matin = ['T D centre', 'L centre']
-            apres_midi = ['L novotel', 'L brioche', 'L air france']
-            soir = ['T F af', 'T F brioche']
+            matin = ['T D centre', 'L centre','L novotel', 'L brioche', 'L air france','T F af', 'T F brioche','Parcours 5']
+            apres_midi = []
+            soir = []
         
             if val in matin:
                 return 'background-color: #4169E1; color: white;'  # Bleu royal pour le matin
