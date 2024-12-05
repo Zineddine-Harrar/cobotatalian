@@ -176,66 +176,68 @@ def main():
     details_df1 = clean_duplicates(details_df)
 
     # Fonction pour créer le tableau de suivi par parcours pour une semaine spécifique
+    
     def create_parcours_comparison_table(semaine, details_df, planning_df):
-        # Filtrer les données pour la semaine spécifiée
-        weekly_details = details_df[details_df['semaine'] == semaine]
+    # Filtrer les données pour la semaine spécifiée
+    weekly_details = details_df[details_df['semaine'] == semaine]
+    
+    # Initialiser le tableau de suivi
+    days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    parcours_list = set(planning_df['parcours'])
+    parcours_list.discard(None)
+    
+    # Préparer les colonnes du tableau avec les tooltips
+    columns = ['Parcours Prévu'] + days_of_week_fr + ['Taux de réalisation', '_tooltips']
+    comparison_table = pd.DataFrame(columns=columns)
+    
+    # Dictionnaire pour stocker les tooltips
+    tooltips = {day: {} for day in days_of_week_fr}
+    
+    rows = []
+    for parcours in parcours_list:
+        row = {'Parcours Prévu': parcours}
+        row_tooltips = {}
         
-        # Initialiser le tableau de suivi
-        days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-        parcours_list = set(planning_df['parcours'])
-        parcours_list.discard(None)
-        comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
-        
-        # Initialiser un dictionnaire pour stocker les statuts des parcours
-        parcours_status = {parcours: {day: {"status": "Pas fait", "info": ""} for day in days_of_week_fr} 
-                          for parcours in parcours_list}
-        
-        # Parcourir les jours et les parcours
         for day in days_of_week_fr:
-            # Parcours prévus pour le jour
-            planned_routes = planning_df[(planning_df['jour_fr'] == day) & 
-                                       (planning_df['semaine'] == semaine)]['parcours'].str.strip().str.lower().tolist()
+            daily_data = weekly_details[
+                (weekly_details['jour_fr'] == day) & 
+                (weekly_details['parcours'].str.strip().str.lower() == parcours.strip().lower())
+            ]
             
-            # Parcours réalisés pour le jour
-            daily_data = weekly_details[weekly_details['jour_fr'] == day]
-            
-            for parcours in parcours_list:
-                parcours_data = daily_data[daily_data['parcours'].str.strip().str.lower() == parcours.strip().lower()]
-                if not parcours_data.empty:
-                    heure_debut = parcours_data['début'].iloc[0].strftime('%H:%M')
-                    taux = parcours_data['terminerà_[%]'].iloc[0]
-                    parcours_status[parcours][day] = {
-                        "status": "Fait",
-                        "info": f"Début: {heure_debut}, Taux: {taux:.1f}%"
-                    }
+            if not daily_data.empty:
+                row[day] = "Fait"
+                heure_debut = daily_data['début'].iloc[0].strftime('%H:%M')
+                taux = daily_data['terminerà_[%]'].iloc[0]
+                row_tooltips[day] = f"Début: {heure_debut}, Taux: {taux:.1f}%"
+            else:
+                row[day] = "Pas fait"
+                row_tooltips[day] = ""
         
-        # Créer le DataFrame
-        rows = []
-        for parcours, status in parcours_status.items():
-            row = {'Parcours Prévu': parcours}
-            for day in days_of_week_fr:
-                if status[day]["status"] == "Fait":
-                    row[day] = status[day]["info"]  # Utiliser l'info complète pour le tooltip
-                else:
-                    row[day] = "Pas fait"
-            rows.append(row)
-        
-        comparison_table = pd.DataFrame(rows)
-        
-        # Calculer les taux de réalisation
-        completion_rates, _ = calculate_completion_rates(weekly_details)
-        completion_rates_df = completion_rates.reset_index()
-        completion_rates_df.columns = ['parcours', 'taux_completion']
-        
-        # Fusionner avec les taux de réalisation
-        comparison_table = pd.merge(comparison_table, completion_rates_df, 
-                                  left_on='Parcours Prévu', right_on='parcours', how='left')
-        comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
-        comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
-        
-        return comparison_table
-
-
+        row['_tooltips'] = row_tooltips
+        rows.append(row)
+    
+    comparison_table = pd.DataFrame(rows)
+    
+    # Calculer les taux de réalisation
+    weekly_details = details_df[details_df['semaine'] == semaine]
+    completion_rates, _ = calculate_completion_rates(weekly_details)
+    
+    completion_rates_df = completion_rates.reset_index()
+    completion_rates_df.columns = ['parcours', 'taux_completion']
+    
+    # Fusionner avec les taux de réalisation
+    comparison_table = pd.merge(
+        comparison_table, 
+        completion_rates_df,
+        left_on='Parcours Prévu',
+        right_on='parcours',
+        how='left'
+    )
+    
+    comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
+    comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
+    
+    return comparison_table
         
     matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
     apres_midi = ['Porte 9-11d H']
@@ -698,7 +700,18 @@ def main():
         
         # Afficher le tableau
         st.subheader('Tableau de Suivi des Parcours')
-        st.dataframe(styled_table, width=2000)
+        st.dataframe(
+            styled_table, 
+            width=2000,
+            column_config={
+                **{
+                    day: st.column_config.Column(
+                        help=lambda x, d=day: x['_tooltips'][d] if x['_tooltips'] and d in x['_tooltips'] else None
+                    )
+                    for day in ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+                }
+            }
+        )
 
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
