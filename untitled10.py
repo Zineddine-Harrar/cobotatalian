@@ -275,16 +275,30 @@ def main():
     # Fonction pour calculer le taux de complétion hebdomadaire
     def calculate_weekly_completion_rate(details_df, semaine):
         weekly_details = details_df[details_df['semaine'] == semaine]
-        completion_rates = weekly_details.groupby('cleaning_plan')['task_completion_(%)'].sum() / 7
+        
+        completion_rates = pd.Series()
+        for parcours in weekly_details['cleaning_plan'].unique():
+            parcours_data = weekly_details[weekly_details['cleaning_plan'] == parcours]
+            if not parcours_data.empty:
+                completion_rates[parcours] = parcours_data['task_completion_(%)'].iloc[0] / 7
+            else:
+                completion_rates[parcours] = 0
+                
         weekly_completion_rate = completion_rates.mean()
+        
         return completion_rates, weekly_completion_rate
-
-    completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df, 28)
-    print(weekly_completion_rate)
     # Fonction pour calculer le taux de complétion
-    def calculate_completion_rates(details_df, threshold=90):
-        completion_rates = details_df.groupby('cleaning_plan')['task_completion_(%)'].sum() / 7
+    def calculate_completion_rates(details_df):
+        completion_rates = pd.Series()
+        for parcours in details_df['cleaning_plan'].unique():
+            parcours_data = details_df[details_df['cleaning_plan'] == parcours]
+            if not parcours_data.empty:
+                completion_rates[parcours] = parcours_data['task_completion_(%)'].iloc[0] / 7
+            else:
+                completion_rates[parcours] = 0
+                
         weekly_completion_rate = completion_rates.mean()
+        
         return completion_rates, weekly_completion_rate
     
     # Fonction pour calculer les indicateurs mensuels
