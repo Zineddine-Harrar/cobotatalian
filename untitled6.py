@@ -247,7 +247,7 @@ def main():
         
         return taux_suivi
 
-    def calculate_completion_rates(details_df, threshold=90):
+        def calculate_completion_rates(details_df, threshold=90):
         # Créer un dictionnaire pour stocker les compteurs pour chaque parcours
         parcours_counters = {}
         
@@ -256,11 +256,24 @@ def main():
             # Filtrer les données pour ce parcours
             parcours_data = details_df[details_df['parcours'] == parcours]
             
-            # Compter uniquement les jours où le parcours a été réalisé avec succès (>= threshold)
-            successful_days = len(parcours_data[parcours_data['terminerà_[%]'] >= threshold])
+            # Debug: Afficher les données pour ce parcours
+            print(f"\nParcours: {parcours}")
+            print("Données brutes:")
+            print(parcours_data[['jour_fr', 'terminerà_[%]']])
             
-            # Calculer le taux de réalisation sur 7 jours, peu importe le nombre de jours effectués
-            taux_realisation = (successful_days / 7) * 100
+            # Compter uniquement les jours où le parcours a été réalisé avec succès (>= threshold)
+            successful_days = parcours_data[parcours_data['terminerà_[%]'] >= threshold]
+            
+            print(f"Jours réussis (>= {threshold}%):")
+            print(successful_days[['jour_fr', 'terminerà_[%]']])
+            
+            # Nombre de jours réussis
+            nb_successful_days = len(successful_days)
+            print(f"Nombre de jours réussis: {nb_successful_days}")
+            
+            # Calculer le taux de réalisation sur 7 jours
+            taux_realisation = (nb_successful_days / 7) * 100
+            print(f"Taux de réalisation: {taux_realisation:.2f}%")
             
             parcours_counters[parcours] = taux_realisation
         
@@ -272,7 +285,6 @@ def main():
         weekly_completion_rate = completion_rates.mean()
         
         return completion_rates, weekly_completion_rate
-
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
         # Filtrer les données pour la semaine spécifiée
