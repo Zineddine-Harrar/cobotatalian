@@ -284,13 +284,29 @@ def main():
     completion_rates, weekly_completion_rate = calculate_weekly_completion_rate(details_df, 28)
     print(weekly_completion_rate)
     # Fonction pour calculer le taux de complétion
-    def calculate_completion_rates(details_df, threshold=100):
-        completion_rates = details_df.groupby('cleaning_plan')['task_completion_(%)'].mean()
-        parcours_realises = (completion_rates >= threshold).sum()
-        total_parcours = len(completion_rates)
-        taux_realisation = (parcours_realises / total_parcours) * 100 if total_parcours > 0 else 0
-        return completion_rates, taux_realisation
 
+    def calculate_completion_rates(details_df):
+        parcours_counters = {}
+        
+        for parcours in details_df['parcours'].unique():
+            parcours_data = details_df[details_df['cleaning_plan'] == cleaning_plan]
+            
+            print(f"\nParcours: {cleaning_plan}")
+            print("Données brutes:")
+            print(parcours_data[['jour_fr', 'task_completion_(%)]']])
+            
+            taux_realisation = parcours_data['task_completion_(%)'].sum() / 7
+            
+            print(f"Taux de réalisation: {taux_realisation:.2f}%")
+            
+            parcours_counters[cleaning_plan] = taux_realisation
+        
+        completion_rates = pd.Series(parcours_counters)
+        completion_rates.index.name = 'cleaning_plan'
+        
+        weekly_completion_rate = completion_rates.mean()
+        
+        return completion_rates, weekly_completion_rate
     # Fonction pour calculer les indicateurs mensuels
     def calculate_monthly_indicators(details_df, mois):
         monthly_details = details_df[details_df['mois'] == mois]
