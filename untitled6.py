@@ -181,33 +181,37 @@ def main():
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
         
-        # Initialiser le tableau de suivi
+        # Créer une table de correspondance pour les tooltips
+        tooltips = pd.DataFrame(columns=['parcours', 'jour', 'tooltip'])
+        
+        for _, row in weekly_details.iterrows():
+            tooltips = tooltips.append({
+                'parcours': row['parcours'],
+                'jour': row['jour_fr'],
+                'tooltip': f"Début: {row['début'].strftime('%H:%M')}, Taux: {row['terminerà_[%]']:.1f}%"
+            }, ignore_index=True)
+    
+        # Créer le tableau comme avant
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
         parcours_list = set(planning_df['parcours'])
         parcours_list.discard(None)
+        comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
+        
+        parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
+        
+        for day in days_of_week_fr:
+            daily_data = weekly_details[weekly_details['jour_fr'] == day]
+            for parcours in parcours_list:
+                parcours_data = daily_data[daily_data['parcours'].str.strip().str.lower() == parcours.strip().str.lower()]
+                if not parcours_data.empty:
+                    parcours_status[parcours][day] = "Fait"
         
         rows = []
-        for parcours in parcours_list:
+        for parcours, status in parcours_status.items():
             row = {'Parcours Prévu': parcours}
-            
-            for day in days_of_week_fr:
-                # Récupérer les données pour ce parcours et ce jour
-                day_data = weekly_details[
-                    (weekly_details['jour_fr'] == day) & 
-                    (weekly_details['parcours'].str.strip().str.lower() == parcours.strip().lower())
-                ]
-                
-                if not day_data.empty:
-                    heure_debut = day_data['début'].iloc[0].strftime('%H:%M')
-                    taux = day_data['terminerà_[%]'].iloc[0]
-                    # Stocker les informations dans la cellule avec le tooltip
-                    row[day] = f"Fait::Début: {heure_debut}, Taux: {taux:.1f}%"
-                else:
-                    row[day] = "Pas fait"
-            
+            row.update(status)
             rows.append(row)
         
-        # Créer le DataFrame
         comparison_table = pd.DataFrame(rows)
         
         # Calculer les taux de réalisation
@@ -215,18 +219,13 @@ def main():
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
         
-        # Fusionner avec les taux de réalisation
-        comparison_table = pd.merge(
-            comparison_table, 
-            completion_rates_df,
-            left_on='Parcours Prévu',
-            right_on='parcours',
-            how='left'
-        )
+        comparison_table = pd.merge(comparison_table, completion_rates_df, 
+                                  left_on='Parcours Prévu', right_on='parcours', how='left')
         comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
         comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
         
-        return comparison_table       
+        return comparison_table, tooltips
+
     matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
     apres_midi = ['Porte 9-11d H']
     soir = ['Pt 17 Triplex V']
@@ -664,6 +663,7 @@ def main():
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
+        comparison_table, tooltips = create_parcours_comparison_table(semaine, details_df1, planning_df)
 
         def create_legend():
             legend_html = """
@@ -695,10 +695,12 @@ def main():
         # Afficher le tableau
         st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(
-            styled_table,
+            data=styled_table,
             width=2000,
             column_config={day: st.column_config.Column(
-                help=lambda x: x.split('::')[1] if '::' in str(x) else None
+                "help": lambda x, p=parcours, d=day: tooltips.loc[
+                    (tooltips['parcours'] == p) & (tooltips['jour'] == d), 'tooltip'
+                ].iloc[0] if x == "Fait" else None
             ) for day in ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']}
         )
         completion_rates_df = completion_rates.reset_index()
