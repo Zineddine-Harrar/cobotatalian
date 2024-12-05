@@ -180,58 +180,53 @@ def main():
     def create_parcours_comparison_table(semaine, details_df, planning_df):
         # Filtrer les données pour la semaine spécifiée
         weekly_details = details_df[details_df['semaine'] == semaine]
-    
+        
         # Initialiser le tableau de suivi
         days_of_week_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
         parcours_list = set(planning_df['parcours'])
         parcours_list.discard(None)
-        comparison_table = pd.DataFrame(columns=['Parcours Prévu'] + days_of_week_fr)
-    
-        # Initialiser un dictionnaire pour stocker les statuts des parcours
-        parcours_status = {parcours: {day: "Pas fait" for day in days_of_week_fr} for parcours in parcours_list}
         
-        for day in days_of_week_fr:
-            # Parcours prévus pour le jour
-            planned_routes = planning_df[(planning_df['jour_fr'] == day) & (planning_df['semaine'] == semaine)]['parcours'].str.strip().str.lower().tolist()
-        
-            # Parcours réalisés pour le jour
-            actual_routes = weekly_details[weekly_details['jour_fr'] == day]['parcours'].str.strip().str.lower().tolist()
-        
-            # Comparer les parcours prévus et réalisés
-            for parcours in parcours_list:
-                parcours_normalized = parcours.strip().lower()
-                if parcours_normalized in actual_routes:
-                    parcours_status[parcours][day] = "Fait"
-    
-        # Créer le DataFrame à partir du dictionnaire de statuts
         rows = []
-        for parcours, status in parcours_status.items():
+        for parcours in parcours_list:
             row = {'Parcours Prévu': parcours}
-            row.update(status)
+            
+            for day in days_of_week_fr:
+                # Récupérer les données pour ce parcours et ce jour
+                day_data = weekly_details[
+                    (weekly_details['jour_fr'] == day) & 
+                    (weekly_details['parcours'].str.strip().str.lower() == parcours.strip().lower())
+                ]
+                
+                if not day_data.empty:
+                    heure_debut = day_data['début'].iloc[0].strftime('%H:%M')
+                    taux = day_data['terminerà_[%]'].iloc[0]
+                    # Stocker les informations dans la cellule avec le tooltip
+                    row[day] = f"Fait::Début: {heure_debut}, Taux: {taux:.1f}%"
+                else:
+                    row[day] = "Pas fait"
+            
             rows.append(row)
-    
-        comparison_table = pd.DataFrame(rows)
-    
-        # Calculer les taux de réalisation pour chaque parcours
-        weekly_details = details_df[details_df['semaine'] == semaine]
-        completion_rates, _ = calculate_completion_rates(weekly_details)
         
-        # Créer un DataFrame à partir des taux de réalisation
+        # Créer le DataFrame
+        comparison_table = pd.DataFrame(rows)
+        
+        # Calculer les taux de réalisation
+        completion_rates, _ = calculate_completion_rates(weekly_details)
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
         
-        # Fusionner le tableau de comparaison avec les taux de réalisation
-        comparison_table = pd.merge(comparison_table, completion_rates_df, 
-                                  left_on='Parcours Prévu', right_on='parcours', how='left')
-    
-        # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
+        # Fusionner avec les taux de réalisation
+        comparison_table = pd.merge(
+            comparison_table, 
+            completion_rates_df,
+            left_on='Parcours Prévu',
+            right_on='parcours',
+            how='left'
+        )
         comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
-    
-        # Nettoyer le DataFrame en supprimant les colonnes inutiles
         comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
-    
-        return comparison_table
-       
+        
+        return comparison_table       
     matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
     apres_midi = ['Porte 9-11d H']
     soir = ['Pt 17 Triplex V']
@@ -636,12 +631,11 @@ def main():
                 return 'background-color: black; color: white;'  # Style par défaut pour les autres parcours
         
         def style_status(val):
-            if val == 'Fait':
+            if isinstance(val, str) and val.startswith('Fait'):
                 return 'background-color: #13FF1A; color: black;'
             elif val == 'Pas fait':
                 return 'background-color: #FF1313; color: #CACFD2;'
-            else:
-                return ''
+            return ''
                 
         def style_taux_realisation(val):
             if pd.isna(val):
@@ -700,8 +694,13 @@ def main():
         
         # Afficher le tableau
         st.subheader('Tableau de Suivi des Parcours')
-        st.dataframe(styled_table,width=2000 )
-
+        st.dataframe(
+            styled_table,
+            width=2000,
+            column_config={day: st.column_config.Column(
+                help=lambda x: x.split('::')[1] if '::' in str(x) else None
+            ) for day in ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']}
+        )
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['parcours', 'taux_completion']
