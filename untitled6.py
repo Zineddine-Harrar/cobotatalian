@@ -231,6 +231,8 @@ def main():
     
         return comparison_table
 
+
+        
     matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
     apres_midi = ['Porte 9-11d H']
     soir = ['Pt 17 Triplex V']
@@ -283,6 +285,7 @@ def main():
         weekly_completion_rate = completion_rates.mean()
         
         return completion_rates, weekly_completion_rate
+
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
         # Filtrer les données pour la semaine spécifiée
@@ -578,8 +581,8 @@ def main():
         # Créer la jauge du taux de complétion
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=weekly_completion_rate,  # Utilise le taux hebdomadaire moyen
-            title={'text': "Taux de réalisation moyen des parcours"},
+            value=weekly_completion_rate,
+            title={'text': "Taux de réalisation des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
                 'bar': {'color': "white"},  # Couleur de l'indicateur
@@ -641,7 +644,7 @@ def main():
                 return 'background-color: #FF1313; color: #CACFD2;'
             else:
                 return ''
-                
+        
         def style_taux_realisation(val):
             if pd.isna(val):
                 return ''
@@ -665,11 +668,11 @@ def main():
         
         # Formater la colonne "Taux de réalisation" en pourcentage
         styled_table = styled_table.format({'Taux de réalisation': '{:.2f}%'})
-
+        
         # Appliquer le style sur les en-têtes de colonne
         styled_table = styled_table.set_table_styles([{'selector': 'thead th', 'props': [('background-color', 'black'), ('color', 'white')]}])
 
-        
+
         def create_legend():
             legend_html = """
             <div style="display: flex; justify-content: space-around; padding: 10px; background-color: black; color: white;">
@@ -696,16 +699,11 @@ def main():
         with st.expander("Voir la légende des couleurs des parcours"):
             st.write("Les couleurs dans la colonne 'Parcours Prévu' indiquent la période de la journée :")
             st.markdown(create_legend(), unsafe_allow_html=True)
-        # Configuration des colonnes avec tooltips
-        column_config = {}
-        for day in ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']:
-            column_config[day] = st.column_config.Column(
-                help=lambda x, d=day: tooltips.get(f"{x.name}_{d}") if x == "Fait" else None
-            )
+        
         # Afficher le tableau
         st.subheader('Tableau de Suivi des Parcours')
         st.dataframe(styled_table, width=2000)
-        
+
         completion_rates_df = completion_rates.reset_index()
         # Renommer les colonnes pour supprimer les caractères spéciaux
         completion_rates_df.columns = ['parcours', 'taux_completion']
