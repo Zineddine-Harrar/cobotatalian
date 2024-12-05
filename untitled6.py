@@ -213,14 +213,14 @@ def main():
     
         # Calculer les taux de réalisation pour chaque parcours
         completion_rates, _ = calculate_completion_rates(weekly_details)
-        
+    
         # Créer un DataFrame à partir des taux de réalisation
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
-        
+    
         # Fusionner le tableau de comparaison avec les taux de réalisation
         comparison_table = pd.merge(comparison_table, completion_rates_df, 
-                                  left_on='Parcours Prévu', right_on='parcours', how='left')
+                                    left_on='Parcours Prévu', right_on='parcours', how='left')
     
         # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
         comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
@@ -229,7 +229,6 @@ def main():
         comparison_table = comparison_table.drop(['parcours', 'taux_completion'], axis=1)
     
         return comparison_table
-
 
         
     matin = ['F14 Pt9 H', 'Porte 1-3d H' ,'Pt 12-14d H','Pt 14d Triplex', 'Triplex 17d H', 'Triplex 6d F14', 'Pt 3-5d Triplex']
@@ -284,7 +283,6 @@ def main():
         weekly_completion_rate = completion_rates.mean()
         
         return completion_rates, weekly_completion_rate
-
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
         # Filtrer les données pour la semaine spécifiée
@@ -580,8 +578,8 @@ def main():
         # Créer la jauge du taux de complétion
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=weekly_completion_rate,
-            title={'text': "Taux de réalisation des parcours"},
+            value=weekly_completion_rate,  # Utilise le taux hebdomadaire moyen
+            title={'text': "Taux de réalisation moyen des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
                 'bar': {'color': "white"},  # Couleur de l'indicateur
