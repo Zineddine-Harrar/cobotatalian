@@ -257,7 +257,6 @@ def main():
             print("Données brutes:")
             print(parcours_data[['jour_fr', 'terminerà_[%]']])
             
-            # Calculer la somme des taux de réalisation et diviser par 7 jours
             taux_realisation = parcours_data['terminerà_[%]'].sum() / 7
             
             print(f"Taux de réalisation: {taux_realisation:.2f}%")
