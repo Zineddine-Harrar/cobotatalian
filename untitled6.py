@@ -212,15 +212,16 @@ def main():
         comparison_table = pd.DataFrame(rows)
     
         # Calculer les taux de réalisation pour chaque parcours
+        weekly_details = details_df[details_df['semaine'] == semaine]
         completion_rates, _ = calculate_completion_rates(weekly_details)
-    
+        
         # Créer un DataFrame à partir des taux de réalisation
         completion_rates_df = completion_rates.reset_index()
         completion_rates_df.columns = ['parcours', 'taux_completion']
-    
+        
         # Fusionner le tableau de comparaison avec les taux de réalisation
         comparison_table = pd.merge(comparison_table, completion_rates_df, 
-                                    left_on='Parcours Prévu', right_on='parcours', how='left')
+                                  left_on='Parcours Prévu', right_on='parcours', how='left')
     
         # Remplacer la colonne 'Taux de réalisation' par les nouvelles valeurs
         comparison_table['Taux de réalisation'] = comparison_table['taux_completion']
@@ -247,17 +248,19 @@ def main():
         return taux_suivi
 
     def calculate_completion_rates(details_df, threshold=90):
-        # Calculer le taux de complétion pour chaque parcours
-        completion_rates = details_df.groupby('parcours')['terminerà_[%]'].mean()
-    
-        # Calculer le nombre de parcours réalisés (>= 90%)
-        parcours_realises = (completion_rates >= threshold).sum()
+        parcours_counters = {}
         
-        # Calculer le taux de réalisation
-        total_parcours = len(completion_rates)
-        taux_realisation = (parcours_realises / 7) * 100 
-    
-        return completion_rates, taux_realisation
+        for parcours in details_df['parcours'].unique():
+            parcours_data = details_df[details_df['parcours'] == parcours]
+            jours_realises = len(parcours_data[parcours_data['terminerà_[%]'] >= threshold])
+            taux_realisation = (jours_realises / 7) * 100
+            parcours_counters[parcours] = taux_realisation
+        
+        completion_rates = pd.Series(parcours_counters)
+        completion_rates.index.name = 'parcours'
+        weekly_completion_rate = completion_rates.mean()
+        
+        return completion_rates, weekly_completion_rate
 
     # Fonction pour calculer les indicateurs hebdomadaires
     def calculate_weekly_indicators(details_df, semaine):
@@ -554,8 +557,8 @@ def main():
         # Créer la jauge du taux de complétion
         fig_completion = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=weekly_completion_rate,
-            title={'text': "Taux de réalisation des parcours"},
+            value=weekly_completion_rate,  # Utilise le taux hebdomadaire moyen
+            title={'text': "Taux de réalisation moyen des parcours"},
             gauge={
                 'axis': {'range': [None, 100]},
                 'bar': {'color': "white"},  # Couleur de l'indicateur
