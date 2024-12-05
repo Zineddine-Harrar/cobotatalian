@@ -247,7 +247,7 @@ def main():
         
         return taux_suivi
 
-        def calculate_completion_rates(details_df, threshold=90):
+    def calculate_completion_rates(details_df, threshold=90):
         # Créer un dictionnaire pour stocker les compteurs pour chaque parcours
         parcours_counters = {}
         
