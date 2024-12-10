@@ -135,7 +135,7 @@ def main():
 
     # Charger les fichiers CSV
     planning_df = pd.read_csv('ECOBOT40 (1).csv', delimiter=';', encoding='ISO-8859-1')
-    details_df = pd.read_csv('DATASET/ECOBOT40/ecobot40_données1Trimestre3(03-12).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
+    details_df = pd.read_csv('DATASET/ECOBOT40/ecobot40_données1Trimestre3(10-12).csv', encoding='ISO-8859-1', delimiter=';', on_bad_lines='skip')
 
     # Nettoyer les colonnes dans details_df0
     details_df.columns = details_df.columns.str.replace('\r\n', '').str.strip()
